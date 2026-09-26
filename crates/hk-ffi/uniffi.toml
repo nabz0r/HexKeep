@@ -1,0 +1,5 @@
+[bindings.kotlin]
+package_name = "game.hexkeep.core"
+cdylib_name = "hk_ffi"
+android = true
+android_cleaner = false

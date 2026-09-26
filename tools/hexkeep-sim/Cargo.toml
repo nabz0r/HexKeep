@@ -1,0 +1,12 @@
+[package]
+name = "hexkeep-sim"
+version.workspace = true
+edition.workspace = true
+[dependencies]
+hk-core = {path = "../../crates/hk-core"}
+hk-proto = {path = "../../crates/hk-proto"}
+hk-sim = {path = "../../crates/hk-sim"}
+hk-net = {path = "../../crates/hk-net"}
+hk-crypto = {path = "../../crates/hk-crypto"}
+serde_json.workspace = true
+hk-world = {path = "../../crates/hk-world"}

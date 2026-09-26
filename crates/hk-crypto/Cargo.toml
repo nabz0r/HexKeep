@@ -1,0 +1,11 @@
+[package]
+name = "hk-crypto"
+version.workspace = true
+edition.workspace = true
+[dependencies]
+hk-proto = { path = "../hk-proto" }
+ed25519-dalek.workspace = true
+rand.workspace = true
+blake3.workspace = true
+bip39 = { version = "2", features = ["rand"] }
+sharks = "0.5"

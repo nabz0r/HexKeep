@@ -1,0 +1,15 @@
+[package]
+name = "hk-net"
+version.workspace = true
+edition.workspace = true
+[dependencies]
+hk-proto = {path = "../hk-proto"}
+hk-crypto = {path = "../hk-crypto"}
+hk-sim = {path = "../hk-sim"}
+hk-ledger = {path = "../hk-ledger"}
+borsh.workspace = true
+serde.workspace = true
+blake3.workspace = true
+libp2p = {version = "0.56", features = ["tokio", "tcp", "noise", "yamux", "mdns", "gossipsub", "identify", "ping", "macros"]}
+tokio = {version = "1", features = ["rt", "sync", "time", "macros", "net"]}
+futures = "0.3"

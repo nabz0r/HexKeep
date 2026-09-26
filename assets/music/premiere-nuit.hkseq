@@ -1,0 +1,12 @@
+# HEXKEEP original score — La Première Nuit
+# 22050 Hz, step 6615 samples. Two pulse voices, triangle bass, LFSR noise.
+PULSE1 duty=25 gain=800
+440 - 523 587 659 587 523 - 392 - 440 523 587 523 440 -
+349 - 440 523 587 659 784 659 523 587 440 - 392 349 330 -
+PULSE2 duty=50 gain=800
+Every fourth step: PULSE1 / 2; otherwise silent.
+TRIANGLE gain=9
+Eight steps per note: 110 98 87 98
+NOISE
+LFSR 15-bit, taps 0 and 1; accent every fourth step, first 500 samples.
+# The executable sequencer is crates/hk-apu/src/lib.rs.

@@ -1,0 +1,10 @@
+[package]
+name = "hk-world"
+version.workspace = true
+edition.workspace = true
+[dependencies]
+hk-proto = { path = "../hk-proto" }
+serde.workspace = true
+borsh.workspace = true
+blake3.workspace = true
+h3o = "0.8"

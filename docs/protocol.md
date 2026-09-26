@@ -1,0 +1,11 @@
+# Protocole dev v1
+
+Les formats exacts exécutables se trouvent dans `hk-proto`, `hk-ledger` et `hk-net`, structs dérivées Borsh. Les entiers sont ceux de Borsh (little-endian), les vecteurs et chaînes portent leurs longueurs. Les empreintes sont BLAKE3, les signatures Ed25519. Préfixe de signature : `HEXKEEP/v1/<network>/<kind>\0`, suivi du contenu canonique. Domaine `event` pour le registre, `net` pour les paquets LAN.
+
+Événement : `Body { version:u8, network:String, cell:u64, parents:Vec<[u8;32]>, seal:[u8;32], lamport:u64, kind:Kind, realm:Realm, value:u32, time:u64, author:[u8;32] }`, puis `signature:Vec<u8>`. Identifiant : hash de l’événement complet. Parents triés, uniques, au plus huit. Le fold trie `(lamport, hash)`, refuse signatures invalides, bannis fournis à la fonction, parents absents, intercellulaires ou de Lamport non inférieur. Les pièces invalides restent stockées. La première fondation valide dans cet ordre gagne dans le fold dev. Les règles de preuve de fondation prod ne sont pas encore implémentées.
+
+Paquet LAN : `author:[u8;32], sequence:u64, message:Message, signature:Vec<u8>`. Le contenu signé est le tuple `(author, sequence, message)`. Transport chiffré Noise sur TCP. Topic `hk/dev/marche/<h3>/lan`. Présence : identité publique, nom borné, royaume, rôle et cellule H3 rés. 9, seulement à bannière levée. Jamais latitude/longitude. Les événements historiques ne sont transmis qu’après 900 secondes ; les données hors Marche sont écartées.
+
+Combat : Start contient cellule, participants et nonce. La graine dérive du hash Borsh de ce tuple ; c’est une variante dev, sans référence de Sceau. Les entrées sont signées individuellement, retard de deux ticks, prédiction bornée et rollback jusqu’à huit ticks. Les états confirmés sont échangés tous les trente ticks. Chaque résultat cosigné est revérifiable par `hexkeep-sim replay`. En cas de désaccord ou d’absence, aucune capture ni PR n’est validé. Une preuve interrompue reste explicitement incomplète.
+
+Écarts au protocole cible : clés du Nom directes en dev, pas de certificats de session/appareil, pas de chaîne de hash par joueur, pas de Sceaux, pas de preuve Merkle, pas de négociation Codex, pas de réconciliation Negentropy, de QUIC, DHT ou relais. Ces limites interdisent l’ouverture de prod.

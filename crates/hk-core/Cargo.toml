@@ -1,0 +1,17 @@
+[package]
+name = "hk-core"
+version.workspace = true
+edition.workspace = true
+[dependencies]
+hk-proto = { path = "../hk-proto" }
+hk-ppu = { path = "../hk-ppu" }
+hk-apu = { path = "../hk-apu" }
+hk-sim = { path = "../hk-sim" }
+hk-world = { path = "../hk-world" }
+hk-crypto = { path = "../hk-crypto" }
+hk-ledger = { path = "../hk-ledger" }
+serde.workspace = true
+serde_json.workspace = true
+rand.workspace = true
+blake3.workspace = true
+hk-net = {path = "../hk-net"}

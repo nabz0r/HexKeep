@@ -1,0 +1,10 @@
+[package]
+name = "hk-ledger"
+version.workspace = true
+edition.workspace = true
+[dependencies]
+hk-proto = { path = "../hk-proto" }
+hk-crypto = { path = "../hk-crypto" }
+serde.workspace = true
+borsh.workspace = true
+blake3.workspace = true

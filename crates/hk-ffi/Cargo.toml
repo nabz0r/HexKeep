@@ -1,0 +1,13 @@
+[package]
+name = "hk-ffi"
+version.workspace = true
+edition.workspace = true
+[lib]
+crate-type = ["cdylib", "rlib"]
+[dependencies]
+hk-core = { path = "../hk-core" }
+uniffi.workspace = true
+hk-apu = {path = "../hk-apu"}
+hk-sim = {path = "../hk-sim"}
+hk-proto = {path = "../hk-proto"}
+serde_json.workspace = true

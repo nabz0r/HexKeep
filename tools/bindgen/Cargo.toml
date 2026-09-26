@@ -1,0 +1,6 @@
+[package]
+name = "hk-bindgen"
+version.workspace = true
+edition.workspace = true
+[dependencies]
+uniffi = {workspace = true, features = ["cli"]}

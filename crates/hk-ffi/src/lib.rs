@@ -1,0 +1,140 @@
+use std::sync::{Arc, Mutex};
+uniffi::setup_scaffolding!();
+#[derive(uniffi::Object)]
+pub struct Engine {
+    game: Mutex<hk_core::Game>,
+    audio: Mutex<hk_apu::Apu>,
+}
+#[uniffi::export]
+impl Engine {
+    #[uniffi::constructor]
+    pub fn new(snapshot: String, dev: bool) -> Arc<Self> {
+        Arc::new(Self {
+            game: Mutex::new(hk_core::Game::new(&snapshot, dev)),
+            audio: Mutex::new(hk_apu::Apu::default()),
+        })
+    }
+    pub fn frame(&self, width: i32) -> Vec<u8> {
+        self.game.lock().unwrap().frame(width)
+    }
+    pub fn tick(&self, time: u64) {
+        self.game.lock().unwrap().tick(time);
+    }
+    pub fn touch(&self, id: i32, phase: u8, x: i32, y: i32) {
+        self.game.lock().unwrap().touch(id, phase, x, y);
+    }
+    pub fn snapshot(&self) -> String {
+        self.game.lock().unwrap().snapshot()
+    }
+    pub fn dirty(&self) -> bool {
+        let mut g = self.game.lock().unwrap();
+        let d = g.dirty;
+        g.dirty = false;
+        d && !g.storage_error
+    }
+    pub fn action(&self) -> u8 {
+        let mut g = self.game.lock().unwrap();
+        let a = g.native_action;
+        g.native_action = 0;
+        a
+    }
+    pub fn sensitive(&self) -> bool {
+        self.game.lock().unwrap().sensitive()
+    }
+    pub fn haptic(&self) -> u8 {
+        let mut g = self.game.lock().unwrap();
+        let h = g.haptic;
+        g.haptic = 0;
+        h
+    }
+    pub fn location(&self, lat: i32, lng: i32, mock: bool) {
+        self.game.lock().unwrap().gps(lat, lng, mock);
+    }
+    pub fn notice(&self, message: String) {
+        self.game.lock().unwrap().toast(&message);
+    }
+    pub fn audio(&self, count: u32) -> Vec<u8> {
+        let (enabled, effect) = {
+            let mut g = self.game.lock().unwrap();
+            let pair = (g.save.settings.music, g.sound);
+            g.sound = 0;
+            pair
+        };
+        let mut a = self.audio.lock().unwrap();
+        a.enabled = enabled;
+        if effect > 0 {
+            a.trigger(effect);
+        }
+        a.samples(count.min(4096) as usize)
+            .into_iter()
+            .flat_map(|s| s.to_le_bytes())
+            .collect()
+    }
+    pub fn set_storage_error(&self) {
+        self.game.lock().unwrap().storage_error = true;
+    }
+    pub fn back(&self) {
+        let mut g = self.game.lock().unwrap();
+        if g.screen == 6 {
+            g.screen = 14;
+            g.touches.clear();
+        } else if g.save.created {
+            g.screen = 7;
+        } else {
+            g.screen = 0;
+        }
+    }
+    pub fn debug_status(&self) -> String {
+        let g = self.game.lock().unwrap();
+        format!(
+            "screen={} ticks={} cell={:x} events={} error={}",
+            g.screen,
+            g.ticks,
+            g.save.world.current,
+            g.save.ledger.events.len(),
+            g.storage_error
+        )
+    }
+    pub fn connect(&self, address: String) {
+        self.game.lock().unwrap().connect(address);
+    }
+    pub fn network_addresses(&self) -> Vec<String> {
+        self.game.lock().unwrap().addresses.clone()
+    }
+    pub fn network_peers(&self) -> u32 {
+        self.game.lock().unwrap().peers.len() as u32
+    }
+    pub fn proof(&self) -> String {
+        self.game.lock().unwrap().last_proof.clone()
+    }
+    pub fn determinism_check(&self) -> String {
+        hk_proto::hex(&hk_sim::determinism_suite())
+    }
+    pub fn pause_network(&self) {
+        let mut g = self.game.lock().unwrap();
+        if g.online.is_some() {
+            g.finish_online();
+            g.screen = 17;
+        }
+        g.node = None;
+        g.peers.clear();
+        g.peer_count = 0;
+        g.addresses.clear();
+    }
+    pub fn network_report(&self) -> String {
+        let g = self.game.lock().unwrap();
+        if let Some(o) = &g.online {
+            let tick = o.rollback.confirmed() / 30 * 30;
+            let hash = o
+                .rollback
+                .states
+                .get(&tick)
+                .map(|s| hk_proto::hex(&s.hash()))
+                .unwrap_or_default();
+            serde_json::json!({"tick":tick,"hash":hash,"participants":o.rollback.players.len(),"error":o.rollback.error}).to_string()
+        } else {
+            serde_json::json!({"tick":0,"hash":"","participants":g.peers.len()+1,"error":null})
+                .to_string()
+        }
+    }
+}

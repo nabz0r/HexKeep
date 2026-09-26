@@ -1,0 +1,13 @@
+/target/
+/.tools/
+/android/.gradle/
+/android/local.properties
+/android/**/build/
+/android/app/src/main/jniLibs/
+/artifacts/*.apk
+/artifacts/*.zip
+*.keystore
+*.jks
+/secrets/
+
+/artifacts/
