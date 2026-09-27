@@ -1,4 +1,5 @@
 mod adventure;
+mod discoveries;
 mod expansion;
 mod network;
 mod presentation;
@@ -88,12 +89,22 @@ pub struct Expedition {
     pub dust: u32,
     pub flasks: u8,
     pub explored: Vec<bool>,
+    pub secured: [bool; 3],
+    pub tier: u8,
+    pub sites: Vec<discoveries::Site>,
+    pub enemies: Vec<discoveries::Enemy>,
+    pub hazards: Vec<discoveries::Hazard>,
+    pub challenge_target: u16,
+    pub loot_count: u32,
+    pub summoned: bool,
+    pub boss_since: u32,
 }
 pub struct Game {
     pub save: Save,
     pub expansion: expansion::Expansion,
     pub session: hk_crypto::identity::Session,
     pub screen: u8,
+    pub inventory_return: u8,
     pub ticks: u64,
     pub now: u64,
     pub width: i32,
@@ -135,7 +146,8 @@ impl Game {
             serde_json::from_str::<Save>(snapshot)
         };
         let error = parsed.is_err();
-        let save = parsed.unwrap_or_default();
+        let mut save = parsed.unwrap_or_default();
+        save.journey.migrate();
         let mut tampered = save.version != 1 || save.ledger.events.iter().any(|e| !e.valid("dev"));
         let mut authority = expansion::fixture().authority;
         if authority
@@ -160,6 +172,7 @@ impl Game {
                 ..Default::default()
             },
             screen: 0,
+            inventory_return: 7,
             ticks: 0,
             now: 0,
             width: 520,
@@ -223,6 +236,8 @@ impl Game {
         self.dirty = true;
     }
     pub fn start_battle(&mut self, mode: u8) {
+        self.key_input = Input::default();
+        self.inventory_return = 7;
         self.expansion.court = None;
         self.online = None;
         self.battle_mode = mode;
@@ -239,6 +254,15 @@ impl Game {
                 dust: 0,
                 flasks: 2,
                 explored: vec![false; 480],
+                secured: [false; 3],
+                tier: self.save.journey.difficulty,
+                sites: vec![],
+                enemies: vec![],
+                hazards: vec![],
+                challenge_target: 0,
+                loot_count: 0,
+                summoned: false,
+                boss_since: 0,
             })
         } else {
             None
@@ -254,7 +278,9 @@ impl Game {
             self.save.role,
             if mode == 3 || mode == 5 || mode == 7 {
                 9
-            } else if mode == 2 || mode == 8 {
+            } else if mode == 8 {
+                6
+            } else if mode == 2 {
                 3
             } else {
                 1
@@ -262,6 +288,7 @@ impl Game {
             mode == 4,
         );
         if mode == 8 {
+            self.save.journey.recent.clear();
             b.fighters[0].pos = Vec2::new(4 * UNIT, 8 * UNIT);
         }
         if self.tutorial {
@@ -287,6 +314,11 @@ impl Game {
                 f.power = 55;
                 f.armor = 20;
             }
+            discoveries::prepare(
+                &mut b,
+                self.expedition.as_mut().unwrap(),
+                self.save.journey.difficulty,
+            );
         }
         if mode == 5 {
             b.begin_siege(self.save.realm, self.walls());
@@ -387,7 +419,7 @@ impl Game {
         }
         if self.screen != 6 {
             // Opening an in-match menu cannot pause the other participants.
-            if self.screen == 14 && self.online.is_some() {
+            if matches!(self.screen, 14 | 40 | 42) && self.online.is_some() {
                 self.step_online(Input::default());
             }
             return;
@@ -447,7 +479,11 @@ impl Game {
             b.step(&[(0, input), (1, Input::default())]);
             b.fighters[0].hp = self.save.realm.hp();
         } else {
-            b.step(&[(0, input)]);
+            if let Some(run) = &self.expedition {
+                b.step(&discoveries::inputs(b, run, input));
+            } else {
+                b.step(&[(0, input)]);
+            }
         }
         if b.fighters[0].hp < old_hp && self.save.settings.haptics {
             self.haptic = 1;
@@ -516,7 +552,11 @@ impl Game {
             for (i, pos) in points.iter().enumerate() {
                 let d = Vec2::new(b.fighters[0].pos.x - pos.x, b.fighters[0].pos.y - pos.y);
                 if run.charges[i] < 90
-                    && (if run.kind == 1 {
+                    && (if run.kind == 3 {
+                        b.tick >= (i as u32 + 1) * 900
+                    } else if run.kind == 4 {
+                        run.sites.iter().filter(|s| s.opened).count() >= i * 2 + 1
+                    } else if run.kind == 1 {
                         b.fighters[0].kills as usize >= (i + 1) * 2
                     } else {
                         d.x * d.x + d.y * d.y < (UNIT * 3 / 2).pow(2)
@@ -524,7 +564,7 @@ impl Game {
                     && b.fighters[0].hp > 0
                 {
                     run.charges[i] = (run.charges[i]
-                        + if run.kind == 1 {
+                        + if matches!(run.kind, 1 | 3 | 4) {
                             90
                         } else if run.kind == 2 {
                             6
@@ -552,17 +592,27 @@ impl Game {
                                     },
                                     (5 + j as i32 * 6) * UNIT,
                                 );
-                                enemy.hp = 65;
-                                enemy.max_hp = 65;
-                                enemy.power = 55;
-                                enemy.armor = 10;
-                                enemy.invulnerable = 20;
+                                run.enemies.push(discoveries::configure(
+                                    &mut enemy,
+                                    ((i * 2 + j + 2) % 5) as u8,
+                                    run.tier,
+                                    false,
+                                ));
+                                enemy.pos =
+                                    hk_sim::navigation::safe_position(enemy.pos, &b.obstacles);
                                 b.fighters.push(enemy);
                             }
                         }
                         b.fighters[0].hp = (b.fighters[0].hp + 35).min(b.fighters[0].max_hp);
                     }
                 }
+            }
+            if let Some(message) = discoveries::tick(b, run, &mut self.save.journey) {
+                self.message = message;
+                self.message_until = self.ticks + 150;
+                self.sound = 4;
+                self.haptic = 2;
+                self.dirty = true;
             }
             if run.charges.iter().all(|c| *c == 90) && run.wave == 0 {
                 run.wave = 1;
@@ -573,11 +623,13 @@ impl Game {
                     true,
                 );
                 boss.pos = Vec2::new(25 * UNIT, 8 * UNIT);
-                boss.hp = 360;
-                boss.max_hp = 360;
-                boss.power = 70;
-                boss.armor = 60;
+                run.enemies.clear();
+                run.enemies
+                    .push(discoveries::configure(&mut boss, 6, run.tier, false));
+                run.boss_since = b.tick;
+                run.hazards.clear();
                 boss.genome = [160; 16];
+                boss.pos = hk_sim::navigation::safe_position(boss.pos, &b.obstacles);
                 b.fighters.truncate(1);
                 b.fighters.push(boss);
                 self.sound = 5;

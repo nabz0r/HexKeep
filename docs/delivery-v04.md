@@ -32,7 +32,7 @@ Empreinte commune du déterminisme :
 f43191762e1faeabc961d020ba34150d1372dbeb1ae5447e1c0def3ebf00780c
 ```
 
-La preuve publique [cosigned-duel.json](../examples/cosigned-duel.json) se rejoue avec le moteur 0.4. Empreinte du résultat : `9f81eaa66291aa39f0389cc193af914fd92591a1784c71da02ba4e0025a6c352`.
+La preuve publique [cosigned-duel.json](../examples/archive/v04-cosigned-duel.json) se rejoue avec le moteur 0.4. Empreinte du résultat : `9f81eaa66291aa39f0389cc193af914fd92591a1784c71da02ba4e0025a6c352`.
 
 Les mesures de rendu varient avec la charge du GPU logiciel SwiftShader : les parcours tactiles réalisés pendant les essais ont donné environ 25–47 images/s sur le format téléphone et 35–60 sur le format 4:3. Le dernier parcours complet, après suppression du fond redondant, mesure 47,15 images/s pendant 20,21 secondes. Les relevés bruts accompagnent la livraison locale. Il ne s’agit pas de performances de téléphones physiques, ni d’une promesse universelle de 60 images/s. Le banc mixte à dix reste en dessous des 30 ticks/s visés lorsqu’il ralentit, malgré la concordance des états.
 

@@ -1,4 +1,4 @@
-# Protocole v0.4 DEV
+# Protocole v0.5 DEV
 
 `hk-proto`, `hk-net`, `hk-crypto/identity`, `hk-ledger`, `hk-crown` et `hk-season` définissent les formats exacts. La sérialisation signée est Borsh, avec entiers little endian. JSON sert à l'export et à la sauvegarde, pas à construire arbitrairement les octets signés.
 
@@ -10,7 +10,7 @@ Nom Ed25519 → liaison de clé P-256 signée par le Nom → certificat de sessi
 
 `Packet { author: Nom, sequence, message, signature, certificate?, issued }`. Les paquets actuels doivent avoir un certificat valide et une date à ±120 s de la réception. Le Nom public reste l'identifiant ; les signatures haute fréquence utilisent la session. Les certificats répétés sont factorisés dans les exports de preuves, puis restaurés avant la vérification des octets signés.
 
-TCP/Noise/Yamux, QUIC, mDNS, gossipsub, Identify, Ping, AutoNAT, DCUtR, Kademlia et client Relay v2. Gossip par Marche `hk/dev/marche/<H3>/v04`, et canal de Mémoires consenti `hk/dev/v04/memories`. Limite de paquet 256 KiB, déduplication et tailles de listes contrôlées. Le relais a des limites de réservations, de durée et d'octets ; il ne lit pas les charges Noise entre les clients.
+TCP/Noise/Yamux, QUIC, mDNS, gossipsub, Identify, Ping, AutoNAT, DCUtR, Kademlia et client Relay v2. Gossip par Marche `hk/dev/marche/<H3>/v05`, et canal de Mémoires consenti `hk/dev/v05/memories`. Limite de paquet 256 KiB, déduplication et tailles de listes contrôlées. Le relais a des limites de réservations, de durée et d'octets ; il ne lit pas les charges Noise entre les clients.
 
 ## Combat et preuve
 
@@ -36,4 +36,4 @@ La validation des chaînes de session est mise en cache par empreinte complète,
 
 ## Compatibilité de simulation
 
-La 0.4 modifie le déplacement, les collisions, l’IA, la cadence et l’état des combattants. Identify utilise `/hexkeep/dev/4` et les topics géographiques sont suffixés `v04`. Tous les participants doivent employer la même version. Une preuve d’une version antérieure demande son ancien moteur ; la preuve `examples/cosigned-duel.json` livrée sur `main` est une preuve 0.4. Les sauvegardes de profil migrent par ajout de champs, sans changer le Nom ni le registre.
+La 0.5 corrige la sortie des angles de mur dans la navigation. Cette modification change les trajectoires calculées et impose une version commune du moteur. Identify utilise `/hexkeep/dev/5` et les topics géographiques sont suffixés `v05`. Tous les participants doivent employer la même version. Une preuve d’une version antérieure demande son ancien moteur ; la preuve `examples/cosigned-duel.json` livrée sur `main` est une preuve 0.5. Les sauvegardes de profil migrent par ajout de champs, sans changer le Nom ni le registre.

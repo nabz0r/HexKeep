@@ -85,3 +85,12 @@ Cette trame exige le futur registre scellé. La chronique affichée dans l’APK
 Dans **les Jardins de cendre**, les premiers feux repoussent la brume et rendent les sentiers visibles. Dans **le Val des cloches**, les ombres se rassemblent autour d’un chef : leur chasse ouvre une route entre les ruines. Sur **les Hauts de verre**, les mémoires rappellent que les trois royaumes ont autrefois prêté un même serment.
 
 Le sac raconte ces sorties à petite échelle : une lame de guetteur, un manteau de veille, un sceau d’aube. La forge transforme ce que l’on abandonne en une chance de repartir. Ces fragments sont le cadre narratif des trois contrats de la 0.4 ; les rencontres dialoguées avec Éline et une campagne scénarisée longue ne sont pas présentées comme déjà jouables.
+
+
+## L’Éveil des Veilleurs — neuf mémoires
+
+La 0.5 transforme les curiosités en souvenirs que le joueur peut conserver et relire. Dans chaque région, une cloche parle d’Éline et des routes ; un autel rappelle un acte de veille ; Minuit laisse une histoire plus légère. Le carnet donne des indices tant que ces textes ne sont pas découverts.
+
+Les neuf fragments vont du nom sous la cendre à la clé sans serrure : une carte volontairement laissée vide, un voisin raccompagné, une tasse de thé partagée, la quatrième note d’un carillon, une couronne abandonnée pour ouvrir un refuge, un chat qui préfère les détours, un ciel de lanternes reflété dans le verre et une clé forgée par trois mains. Leur conclusion ouvre un prochain chapitre sans présenter une longue campagne cinématique comme déjà livrée.
+
+Minuit et les noms d’objets — Clochette de Minuit, Cape des neuf vies, Dé du vagabond, Clé sans serrure — sont les clins d’œil internes d’HEXKEEP. Aucun personnage ni objet d’une licence tierce n’est repris.

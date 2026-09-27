@@ -112,7 +112,9 @@ impl Engine {
     }
     pub fn back(&self) {
         let mut g = self.game.lock().unwrap();
-        if g.screen == 6 {
+        if matches!(g.screen, 40 | 42) {
+            g.ui_action("inventory_back");
+        } else if g.screen == 6 {
             g.screen = 14;
             g.touches.clear();
         } else if g.save.created {

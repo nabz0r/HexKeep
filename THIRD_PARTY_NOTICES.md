@@ -16,7 +16,7 @@ Les composants externes conservent leurs licences respectives, indépendamment d
 
 ## Création artistique
 
-Les illustrations du refuge, des personnages, des ruines et du terrain ont été générées pour HEXKEEP avec ImageGen, puis intégrées au moteur. Les prompts, dimensions et fichiers sources sont documentés dans `docs/art/v03-direction.md`. Les icônes d’objets, interfaces, masques de brume, mini-carte et effets sont dessinés par le code Android. La musique et les sons proviennent du synthétiseur original `hk-apu`.
+Les illustrations du refuge, des personnages, des ruines et du terrain ont été générées pour HEXKEEP avec ImageGen, puis intégrées au moteur. Sept atlas d’animation et un atlas de curiosités ont été générés pour la 0.5. Les briefs, dimensions et fichiers sources sont documentés dans `docs/art/v03-direction.md` et `docs/art/v05-atlases.md`. Les icônes d’objets, interfaces, masques de brume, mini-carte et effets sont dessinés par le code Android. La musique et les sons proviennent du synthétiseur original `hk-apu`.
 
 Les fontes utilisées par l’interface sont celles de la plateforme Android ; aucune fonte commerciale n’est redistribuée.
 

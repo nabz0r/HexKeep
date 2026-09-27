@@ -1,39 +1,53 @@
-# Les premiers chemins
+# L’Éveil des Veilleurs — guide 0.5
 
-Tu es un veilleur. Éline garde le refuge ; tu portes sa dernière carte. Les royaumes ne te demandent pas de conquérir tout de suite : commence par rapporter une lumière, une mémoire, puis de quoi équiper ton prochain départ.
+Tu es un veilleur. Éline garde le refuge ; tu portes sa dernière carte. Rapporte une lumière, une mémoire, puis de quoi équiper ton prochain départ. L’écran annonce toujours ton prochain objectif.
 
-## Commandes
+## Les gestes
 
-Pose le pouce où tu veux dans la partie gauche du terrain. Glisse un peu pour marcher, davantage pour courir. Le cercle suit les grands mouvements du pouce ; relâcher freine immédiatement. Le bouton **Esquive** traverse rapidement une zone libre, mais ne traverse plus les murs. Un mouvement en diagonale contre un mur glisse le long de celui-ci.
+Pose le pouce dans la partie gauche du terrain et glisse pour te déplacer. Le cercle suit les grands mouvements ; relâcher freine immédiatement. Le veilleur change de direction et de pose avec ses pas. Un mouvement diagonal contre un mur glisse le long de celui-ci.
 
-Maintiens **ATTAQUE** pour viser et tirer sur un ennemi visible à portée. Glisser depuis ce bouton ou dans la partie droite prend la visée manuelle. L’attaque automatique peut être activée dans les réglages pour jouer avec un seul pouce. Les projectiles sont arrêtés par les obstacles. Observe le cône rouge du Rempart et le signal d’attaque des ombres : l’esquive donne une courte invulnérabilité. Le **Pouvoir** dépend du rôle et du royaume. **Soin** restaure la moitié de ta vie maximale ; tu disposes de deux fioles par expédition.
+Maintiens **ATTAQUE** pour viser un ennemi visible ; glisse depuis ce bouton ou dans la partie droite pour viser toi-même. La visée automatique se règle aussi dans les préférences. Les obstacles arrêtent les projectiles. **Esquive** donne un déplacement rapide et une courte invulnérabilité, sans traverser les murs. **Surcharge**, **Protection** ou **Entrave** rappelle l’effet du pouvoir de ton rôle. Le chiffre sur chaque bouton est le temps restant avant de pouvoir le réutiliser.
 
-## Une sortie
+Les ombres préparent leurs frappes : observe les signaux rouges. L’oracle et le gardien marquent le sol ; quitte leurs cercles avant qu’ils se ferment. Le gardien accélère ses secousses sous la moitié de sa vie. Le bestiaire explique les sept familles d’ennemis.
 
-Au refuge, **Choisir une aventure** ouvre le carnet. Les feux se rallument en restant près d’eux pendant 1,5 seconde. La chasse demande six ombres ; les mémoires se récupèrent en traversant leurs cercles. Chaque contrat se termine avec un gardien.
+## Choisir une aventure
 
-La carte se révèle autour du veilleur. Trois caches contiennent des objets ; les braises des ennemis se ramassent à proximité. La mini-carte garde les points d’objectif visibles pour retrouver le chemin. Les trois vies permettent de revenir après une chute. Le menu pause arrête une sortie solo ; en ligne, les autres joueurs continuent.
+Au refuge, **Choisir une aventure** ouvre cinq contrats sur deux pages :
 
-Le bilan annonce le butin. **Retrouver le refuge** attribue une seule fois les récompenses et les sauvegarde. Une sortie interrompue par fermeture forcée n’est pas reprise ; le matériel déjà conservé au refuge reste enregistré. Une sortie abandonnée par le menu rapporte les caches et les braises déjà récupérées.
+| Contrat | Objectif avant le gardien |
+|---|---|
+| Les trois feux | Rester dans chacun des trois cercles bleus pour rallumer les feux |
+| La chasse aux ombres | Dissiper six ombres |
+| Les mémoires perdues | Retrouver les trois pierres bleues |
+| La longue veillée | Tenir 90 secondes face aux renforts |
+| La piste du passeur | Approcher et utiliser cinq curiosités |
 
-## Le sac
+La boussole indique la direction et la distance du prochain repère. La carte se dévoile en marchant. Les trois anciennes caches se ramassent en passant dessus ; les deux nouveaux coffres, la source, la cloche, l’autel et Minuit affichent un bouton **Interagir** à proximité. La mini-carte mémorise les curiosités découvertes.
 
-Trois emplacements : arme, manteau, relique. Sélectionne un objet pour voir l’écart de vie et de puissance avec l’objet porté, puis équipe-le. La couleur indique la rareté : commun, inhabituel, rare, épique. L’équipement modifie vie maximale, puissance, armure et cadence pendant les expéditions. Une cadence de 1 réduit le délai entre tirs d’un tick, soit 1/30 seconde.
+La source rend un tiers de la vie maximale et une fiole, jusqu’à deux fioles. Le bouton **Soin** consomme une fiole pour restaurer la moitié de la vie maximale. L’autel est facultatif : il appelle deux élites et promet un épique après deux ombres supplémentaires dissipées. Le pilleur tente de fuir avec son butin. Les trois vies permettent de revenir après une chute.
 
-Recycler un objet non équipé rend 4, 8, 12 ou 16 poussières selon sa rareté. La forge façonne un objet rare pour 30 poussières. Le sac contient 60 objets ; le surplus de récompenses devient de la poussière. La première victoire d’un contrat donne un objet rare et 60 éclats supplémentaires ; chaque cinquième sortie achevée par une première victoire de contrat peut donner un épique. Rejouer un contrat déjà accompli donne un objet inhabituel.
+## Le sac, même en pleine aventure
 
-Le niveau affiché augmente tous les 250 éclats. C’est un repère de progression ; il ne donne pas de bonus caché. Les statistiques sont affichées dans le sac. En PvP, seul le Codex commun détermine les valeurs de départ.
+Touche **Sac · stats** ou la barre de vie. La sortie solo est suspendue pendant la consultation. Le sac montre la vie actuelle et maximale, l’armure, la puissance et la cadence. Choisis un objet, compare ses quatre caractéristiques avec l’objet porté puis équipe-le. Reprends ensuite l’aventure à son état exact. Changer d’équipement ne soigne pas. En combat réseau, la partie continue et le matériel PvE ne modifie pas le Codex commun.
 
-## Le territoire
+Le butin des caches et des rencontres est ajouté immédiatement. Il est conservé en cas de retour au refuge. Le gardien ajoute la récompense de fin lorsque tu quittes le bilan. Les sauvegardes automatiques se font régulièrement et à la fermeture normale ; une fermeture forcée peut perdre les dernières secondes. Une expédition interrompue par fermeture de l’application ne se recharge pas en cours de combat.
 
-La carte représente des cellules H3 autour de ta position. **Utiliser ma position GPS** demande l’autorisation Android. La carte suit ensuite ta marche, les secteurs visités restent marqués et le carnet change de région. Le GPS est facultatif. **Voyager ici · simulation** permet de découvrir un secteur voisin en DEV ; ce choix coupe le suivi GPS jusqu’à sa réactivation.
+Trois emplacements : arme, manteau, relique. Quatre raretés : commun, inhabituel, rare, épique. **36 modèles** peuvent rejoindre la collection. Deux pièces du même serment — Aube, Givre, Sève ou Étoile — donnent **+12 vie maximale et +8 puissance**. Les écarts affichés comparent les caractéristiques des pièces ; le total du personnage inclut le bonus de serment. Une unité de cadence réduit le délai entre tirs d’un tick, soit 1/30 seconde, dans la limite prévue par le rôle.
 
-Les Jardins de cendre, le Val des cloches et les Hauts de verre donnent un nom et une couleur aux marches. Les contrats se renouvellent par lieu et par période de trente minutes. Leur durée restante ne t’empêche pas de terminer une sortie déjà commencée.
+Au refuge, recycler un objet non équipé rend 4, 8, 12 ou 16 braises selon sa rareté. La forge façonne un objet rare pour 30 braises. Le sac contient 60 objets ; les récompenses excédentaires deviennent des braises, avec un message explicite.
 
-Fonder un bastion demande une cellule éclairée et un site libre. La veille entretient les lieux ; une expédition victorieuse éclaire sa cellule de départ. Les fonctions de royaume se trouvent dans **Forteresse & chroniques**.
+## Une raison de repartir
 
-## Les autres veilleurs
+Le carnet conserve les ennemis dissipés, les modèles trouvés et **neuf mémoires**. Chaque région cache une cloche, un défi d’autel et un récit de Minuit. Les mémoires manquantes donnent un indice ; celles retrouvées peuvent être relues. Cherche notamment la tasse de thé, la quatrième note et la clé sans serrure.
 
-Dans **Jouer avec des veilleurs**, lance la recherche sur chaque appareil. La découverte locale demande la même version, la même marche et le même Wi-Fi. La connexion directe et le relais sont disponibles pour les bancs réseau. Le champ accepte jusqu’à dix participants. Les contrats PvE de cette version sont locaux ; l’écran distingue les joueurs réellement découverts.
+Trois victoires débloquent **Périlleux** ; neuf débloquent **Éclipse**. Choisis la difficulté dans le journal avant de partir. Les ennemis deviennent plus résistants et dangereux. Périlleux garantit au moins un rare sur le gardien ; Éclipse garantit un épique. En Découverte, une première victoire de contrat donne un rare et 60 éclats, avec un épique possible tous les cinq départs achevés par une première victoire ; une répétition donne un inhabituel.
 
-Pour Maisons, saison, sièges, Phare, Trône et règles, lire le [manuel M0–M7](gm-manual.md).
+Le niveau augmente tous les 250 éclats. Il sert de repère et ne donne pas de bonus caché. La ligne dorée du refuge et du carnet indique la prochaine étape de progression.
+
+## Le territoire et les autres veilleurs
+
+**Explorer la marche** affiche des cellules H3 autour de ta position. **Utiliser ma position GPS** demande l’autorisation Android. Les secteurs visités restent marqués ; le journal change de région. Le GPS est facultatif : **Voyager ici · simulation** permet d’explorer un voisin en DEV et coupe le suivi GPS jusqu’à sa réactivation.
+
+Les Jardins de cendre, le Val des cloches et les Hauts de verre donnent un nom et une couleur aux marches. Les contrats renouvellent leur première récompense par lieu et période de trente minutes. Une sortie commencée peut être terminée après ce renouvellement. Une victoire éclaire sa cellule de départ. Les bastions et chroniques restent dans **Forteresse & chroniques**.
+
+**Jouer avec des veilleurs** ouvre la recherche sur le même Wi-Fi et dans la même marche. La connexion directe et le relais servent aux essais réseau. Jusqu’à dix participants sont pris en charge en DEV. Les cinq contrats sont des aventures PvE locales ; il n’existe pas encore de serveur MMO public permanent. Pour Maisons, saison, sièges, Phare, Trône et règles, lire le [manuel M0–M7](gm-manual.md).

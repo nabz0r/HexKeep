@@ -75,7 +75,23 @@ pub fn safe_position(p: Vec2, obs: &[Obstacle]) -> Vec2 {
         .unwrap_or(Vec2::new(UNIT, UNIT))
 }
 pub fn direction(from: Vec2, to: Vec2, obs: &[Obstacle]) -> Vec2 {
-    if clear_line(from, to, obs, RADIUS + 8) {
+    // A swept circle can legally stop inside the corners of an expanded AABB.
+    // The conservative ray must not trap that actor by rejecting every exit.
+    let walk_line = |a: Vec2, b: Vec2, padding: i32| {
+        if clear_line(a, a, obs, padding) && clear_line(b, b, obs, padding) {
+            clear_line(a, b, obs, padding)
+        } else {
+            let steps = ((b.x - a.x).abs().max((b.y - a.y).abs()) / 16 + 1).max(1);
+            (0..=steps).all(|i| {
+                !blocked(
+                    Vec2::new(a.x + (b.x - a.x) * i / steps, a.y + (b.y - a.y) * i / steps),
+                    obs,
+                    false,
+                )
+            })
+        }
+    };
+    if walk_line(from, to, RADIUS + 8) {
         return Vec2::new(to.x - from.x, to.y - from.y).scaled(1024);
     }
     let cell = |v: Vec2| ((v.y / UNIT).clamp(0, 15) * 30 + (v.x / UNIT).clamp(0, 29)) as usize;
@@ -106,10 +122,9 @@ pub fn direction(from: Vec2, to: Vec2, obs: &[Obstacle]) -> Vec2 {
             if prev[next] != usize::MAX || blocked(center(next), obs, false) {
                 continue;
             }
-            if !clear_line(
+            if !walk_line(
                 if at == start { from } else { center(at) },
                 center(next),
-                obs,
                 RADIUS + 2,
             ) {
                 continue;
@@ -129,7 +144,7 @@ pub fn direction(from: Vec2, to: Vec2, obs: &[Obstacle]) -> Vec2 {
     }
     let dest = path
         .into_iter()
-        .find(|i| clear_line(from, center(*i), obs, RADIUS + 8))
+        .find(|i| walk_line(from, center(*i), RADIUS + 8))
         .map(center)
         .unwrap_or(to);
     Vec2::new(dest.x - from.x, dest.y - from.y).scaled(1024)
@@ -137,6 +152,32 @@ pub fn direction(from: Vec2, to: Vec2, obs: &[Obstacle]) -> Vec2 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn actor_can_leave_a_wall_margin_and_rounded_corner() {
+        let obs = vec![Obstacle {
+            x: 9 * UNIT,
+            y: 12 * UNIT,
+            w: 2 * UNIT,
+            h: UNIT,
+            kind: 0,
+            life: 0,
+        }];
+        for start in [
+            Vec2::new(9 * UNIT - 64, 12 * UNIT + 100),
+            Vec2::new(9 * UNIT - 47, 12 * UNIT - 47),
+        ] {
+            assert!(!blocked(start, &obs, false));
+            let mut p = start;
+            let goal = Vec2::new(14 * UNIT, 14 * UNIT);
+            for _ in 0..200 {
+                p = slide(p, direction(p, goal, &obs).scaled(43), &obs);
+                if p.dist2(goal) < 10000 {
+                    break;
+                }
+            }
+            assert!(p.dist2(goal) < 10000, "Actor remained trapped at {p:?}");
+        }
+    }
     #[test]
     fn swept_dash_cannot_tunnel() {
         let o = vec![Obstacle {

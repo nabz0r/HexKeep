@@ -34,7 +34,7 @@ class NetworkHarness {
                 if(tick>last){output.appendText(state.put("elapsed_ms",SystemClock.elapsedRealtime()).toString()+"\n");last=tick}
                 SystemClock.sleep(100)
             }
-            instrumentation.runOnMainSync{File(activity.getExternalFilesDir(null),"v04-network-render.json").writeText(activity.renderMetrics());activity.finish()}
+            instrumentation.runOnMainSync{File(activity.getExternalFilesDir(null),"v05-network-render.json").writeText(activity.renderMetrics());activity.finish()}
             assertEquals(10,participants)
             assertTrue("Too few ticks: $last",last>=1200)
         }

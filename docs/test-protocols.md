@@ -1,4 +1,6 @@
-# Validation de la v0.2
+# Protocoles de validation — historique et version courante
+
+**Version courante : [rapport 0.5](delivery-v05.md).** Les premières sections ci-dessous conservent les résultats historiques de la 0.2 et ne constituent pas les mesures de la 0.5.
 
 Exécution locale du 27 septembre 2026. Deux AVD Pixel 5 ARM64 sous Android 15 / API 35, macOS ARM64, exécution x86_64 par Rosetta. Aucun téléphone physique, modem 4G ou lecteur biométrique matériel n'a été testé. Les valeurs ci-dessous ne qualifient pas un déploiement de production.
 
@@ -103,3 +105,17 @@ cargo test -p hk-sim --release --target x86_64-apple-darwin ten_thousand_replays
 Pour le 4:3, configurer l’émulateur de test avec `adb shell wm size 1080x1440`, exécuter le parcours, puis `adb shell wm size reset`. Les coordonnées sont converties par le même facteur d’échelle et le même décalage vertical que la vue Android.
 
 Après les essais de Trône et de GPS, le banc à dix doit employer des profils d’émulateurs dédiés remis au Codex initial et à la même cellule. Archiver les captures avant de réinitialiser ces seuls profils de test. Ne jamais effacer les données d’un téléphone utilisateur pour ce banc.
+
+
+## Reprise v0.5
+
+Le [rapport 0.5](delivery-v05.md) donne les résultats du paquet livré. `adventure --all-tiers` joue 135 combinaisons royaume × rôle × contrat × difficulté. Le pilote utilise déplacement, visée, esquive, pouvoir, fioles, interaction, équipement réellement récupéré et sortie des cercles de danger. Il n’injecte ni dégâts, ni téléportation, ni statistiques de combat. Les victoires préalables nécessaires au choix des difficultés sont préparées dans le profil du banc.
+
+```sh
+cargo run --release -p hk-core --example adventure -- --all-tiers
+adb shell am instrument -w -e class game.hexkeep.EveilTest,game.hexkeep.AdventureTest game.hexkeep.dev.test/androidx.test.runner.AndroidJUnitRunner
+```
+
+`EveilTest` change de direction par gestes, observe les poses du joueur et des ennemis, ouvre le sac depuis le HUD, vérifie pause et santé, consulte le carnet, reprend la même graine et marche vers trois curiosités pour les ouvrir avec leur bouton. Les captures et compteurs sont exportés. Les parcours tactiles du banc utilisent la géométrie circulaire réelle : un rectangle de marge trop conservateur dans le pilote peut sinon le maintenir contre un angle légal.
+
+Pour la migration, installer d’abord la nouvelle instrumentation sur l’ancien paquet signé et exécuter `IdentityMigrationTest#captureBefore`. Installer ensuite la 0.5 sans effacer les données puis exécuter `IdentityMigrationTest#verifyAfter` avant tout parcours qui gagne de nouveaux objets. Le contrôle compare identité publique, Nom, XP, identifiants, valeurs des pièces, équipement et braises. Il n’exporte pas la clé privée.

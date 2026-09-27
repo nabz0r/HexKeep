@@ -322,7 +322,7 @@ async fn run(
                 }
                 .into(),
                 identify: identify::Behaviour::new(identify::Config::new(
-                    "/hexkeep/dev/4".into(),
+                    "/hexkeep/dev/5".into(),
                     key.public(),
                 )),
                 ping: ping::Behaviour::new(
@@ -345,7 +345,7 @@ async fn run(
     swarm
         .listen_on("/ip4/0.0.0.0/udp/0/quic-v1".parse().unwrap())
         .map_err(|e| e.to_string())?;
-    let memory_topic = gossipsub::IdentTopic::new("hk/dev/v04/memories");
+    let memory_topic = gossipsub::IdentTopic::new("hk/dev/v05/memories");
     swarm
         .behaviour_mut()
         .gossip

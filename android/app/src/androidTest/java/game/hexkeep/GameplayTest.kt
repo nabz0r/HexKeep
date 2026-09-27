@@ -24,7 +24,7 @@ class GameplayTest {
     private lateinit var activity:MainActivity
     private fun onActivity(block:(MainActivity)->Unit){instrumentation.runOnMainSync{block(activity)}}
     private fun tap(x:Float,y:Float){val t=SystemClock.uptimeMillis();instrumentation.uiAutomation.injectInputEvent(MotionEvent.obtain(t,t,MotionEvent.ACTION_DOWN,x*scale,y*scale+top,0),false);SystemClock.sleep(60);instrumentation.uiAutomation.injectInputEvent(MotionEvent.obtain(t,SystemClock.uptimeMillis(),MotionEvent.ACTION_UP,x*scale,y*scale+top,0),false);SystemClock.sleep(200)}
-    private fun capture(name:String){SystemClock.sleep(350);val image=instrumentation.uiAutomation.takeScreenshot();val f=File(instrumentation.targetContext.getExternalFilesDir(null),"v04-$name.png");f.outputStream().use{image.compress(Bitmap.CompressFormat.PNG,100,it)}}
+    private fun capture(name:String){SystemClock.sleep(350);val image=instrumentation.uiAutomation.takeScreenshot();val f=File(instrumentation.targetContext.getExternalFilesDir(null),"v05-$name.png");f.outputStream().use{image.compress(Bitmap.CompressFormat.PNG,100,it)}}
     private fun point(down:Long,action:Int,points:List<Triple<Int,Float,Float>>){val props=points.map{MotionEvent.PointerProperties().apply{id=it.first;toolType=MotionEvent.TOOL_TYPE_FINGER}}.toTypedArray();val coords=points.map{MotionEvent.PointerCoords().apply{x=it.second*scale;y=it.third*scale+top;pressure=1f;size=1f}}.toTypedArray();instrumentation.uiAutomation.injectInputEvent(MotionEvent.obtain(down,SystemClock.uptimeMillis(),action,points.size,props,coords,0,0,1f,1f,0,0,android.view.InputDevice.SOURCE_TOUCHSCREEN,0),false);SystemClock.sleep(60)}
     @Test fun soloOfflineLifecycle(){
         var identity="";var storedXp=0
@@ -66,10 +66,10 @@ class GameplayTest {
             onActivity{assertEquals(6,JSONObject(it.engine.presentation(584)).getInt("screen"));it.engine.uiAction("home")}
             SystemClock.sleep(250)
             onActivity{
-                val snapshot=it.engine.snapshot();val obj=JSONObject(snapshot);assertTrue(obj.getBoolean("created"));assertTrue(obj.getBoolean("introduction_seen"));assertEquals(identity,obj.getJSONArray("secret").toString());storedXp=obj.getJSONObject("expansion").getJSONObject("campaign").getInt("xp");it.persist();assertEquals(snapshot,Vault(it).read());assertNotEquals(snapshot,File(it.filesDir,"state.hk").readText());File(it.getExternalFilesDir(null),"v04-render.json").writeText(it.renderMetrics())
+                val snapshot=it.engine.snapshot();val obj=JSONObject(snapshot);assertTrue(obj.getBoolean("created"));assertTrue(obj.getBoolean("introduction_seen"));assertEquals(identity,obj.getJSONArray("secret").toString());storedXp=obj.getJSONObject("expansion").getJSONObject("campaign").getInt("xp");it.persist();assertEquals(snapshot,Vault(it).read());assertNotEquals(snapshot,File(it.filesDir,"state.hk").readText());File(it.getExternalFilesDir(null),"v05-render.json").writeText(it.renderMetrics())
             }
         }
         ActivityScenario.launch<MainActivity>(Intent(instrumentation.targetContext,MainActivity::class.java)).use{scenario->SystemClock.sleep(1100);scenario.onActivity{activity=it};onActivity{val saved=JSONObject(it.engine.snapshot());assertEquals(identity,saved.getJSONArray("secret").toString());assertTrue("Saved XP must survive; passive watch can add an éclat during relaunch",saved.getJSONObject("expansion").getJSONObject("campaign").getInt("xp")>=storedXp);assertTrue(saved.getBoolean("introduction_seen"))};tap(180f,410f);capture("restored")}
     }
-    @Test fun nativeDeterminism(){val e=game.hexkeep.core.Engine("",true);val digest=e.determinismCheck();assertEquals("f43191762e1faeabc961d020ba34150d1372dbeb1ae5447e1c0def3ebf00780c",digest);File(instrumentation.targetContext.getExternalFilesDir(null),"determinism-android.txt").writeText(digest)}
+    @Test fun nativeDeterminism(){val e=game.hexkeep.core.Engine("",true);val digest=e.determinismCheck();assertEquals("015c7661915282832b72f2943daa4b53888f18f01fc1b0034a2a7a79ac0ef997",digest);File(instrumentation.targetContext.getExternalFilesDir(null),"determinism-android.txt").writeText(digest)}
 }

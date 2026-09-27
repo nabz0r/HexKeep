@@ -31,7 +31,7 @@ La musique est une synthèse originale à 44,1 kHz : nappes à quatre voix, moti
 
 ## Fichiers enregistrés dans cet espace de travail
 
-- [keep.png](/Users/n/.codex/.chatgpt-projects/g-p-6ab83bd4da808191b19fbaa70f9dda7e/hexkeep/android/app/src/main/assets/art/keep.png)
-- [characters.png](/Users/n/.codex/.chatgpt-projects/g-p-6ab83bd4da808191b19fbaa70f9dda7e/hexkeep/android/app/src/main/assets/art/characters.png)
-- [courtyard.png](/Users/n/.codex/.chatgpt-projects/g-p-6ab83bd4da808191b19fbaa70f9dda7e/hexkeep/android/app/src/main/assets/art/courtyard.png)
-- [ruins.png](/Users/n/.codex/.chatgpt-projects/g-p-6ab83bd4da808191b19fbaa70f9dda7e/hexkeep/android/app/src/main/assets/art/ruins.png)
+- [keep.png](../../android/app/src/main/assets/art/keep.png)
+- [characters.png](../../android/app/src/main/assets/art/characters.png)
+- [courtyard.png](../../android/app/src/main/assets/art/courtyard.png)
+- [ruins.png](../../android/app/src/main/assets/art/ruins.png)

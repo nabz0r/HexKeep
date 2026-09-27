@@ -14,6 +14,8 @@ impl Game {
             "accessible":self.save.settings.accessible,"effects":self.save.sound_effects,"haptics":self.save.settings.haptics,
             "journey":self.journey_view(),"xp":self.save.expansion.campaign.xp,"kills":self.save.kills,"equipped":self.save.expansion.campaign.equipped,
             "battle":self.battle,"battle_mode":self.battle_mode,"expedition":self.expedition,
+            "guidance":self.battle.as_ref().zip(self.expedition.as_ref()).map(|(b,run)|discoveries::view(b,run)),
+            "bestiary":(0..7).map(|i|serde_json::json!({"kind":i,"name":discoveries::NAMES[i],"tactic":discoveries::TACTICS[i],"defeated":self.save.journey.bestiary.get(&(i as u8)).copied().unwrap_or(0)})).collect::<Vec<_>>(),
             "local":self.online.as_ref().map(|o|o.rollback.local).unwrap_or(0),"online":self.online.is_some(),
             "banner":self.save.world.banner,"selected_current":self.selected==self.save.world.current,"gps":self.save.world.gps,
             "peers":self.peer_count,"latency":self.latency,"cells":cells,"emblem":self.save.expansion.campaign.draft,
@@ -70,7 +72,7 @@ impl Game {
                     self.expedition = None;
                     self.expansion.court = None;
                     self.screen = 7;
-                } else if self.screen == 6 || self.screen == 14 || self.screen == 12 {
+                } else if self.battle.is_some() && matches!(self.screen, 6 | 14 | 12 | 40 | 42) {
                     self.end_battle();
                 } else {
                     self.screen = 7;
@@ -298,7 +300,7 @@ mod tests {
             assert_eq!(g.expedition.as_ref().unwrap().wave, 1);
             let b = g.battle.as_mut().unwrap();
             assert_ne!(b.fighters[0].realm, b.fighters[1].realm);
-            assert_eq!(b.fighters[1].hp, 360);
+            assert_eq!(b.fighters[1].hp, 420);
             b.fighters[1].hp = 0;
             b.fighters[1].respawn = 120;
             g.tick(101);
