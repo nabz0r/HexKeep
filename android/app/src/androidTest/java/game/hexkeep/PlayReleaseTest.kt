@@ -32,7 +32,7 @@ class PlayReleaseTest {
         val py = viewport.getDouble("top").toFloat() + y * viewport.getDouble("scale").toFloat()
         val now = SystemClock.uptimeMillis()
         for (action in listOf(MotionEvent.ACTION_DOWN, MotionEvent.ACTION_UP)) {
-            val event = MotionEvent.obtain(now, SystemClock.uptimeMillis(), action, px, py, 0)
+            val event = MotionEvent.obtain(now, SystemClock.uptimeMillis(), action, px, py, 0).apply { source=android.view.InputDevice.SOURCE_TOUCHSCREEN }
             assertTrue(test.uiAutomation.injectInputEvent(event, true)); event.recycle()
             SystemClock.sleep(60)
         }

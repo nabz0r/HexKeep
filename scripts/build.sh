@@ -3,13 +3,13 @@ set -eu
 . "$(dirname "$0")/env.sh"
 cd "$HK_ROOT"
 cargo test --workspace --locked --release
-cargo build -p hk-ffi
+cargo build -p hk-ffi --release
 case "$(uname -s)" in
-  Darwin) HK_LIBRARY=target/debug/libhk_ffi.dylib ;;
-  Linux) HK_LIBRARY=target/debug/libhk_ffi.so ;;
+  Darwin) HK_LIBRARY=target/release/libhk_ffi.dylib ;;
+  Linux) HK_LIBRARY=target/release/libhk_ffi.so ;;
   *) echo "Use macOS or Linux to build this Android package." >&2; exit 1 ;;
 esac
-cargo run -p hk-bindgen -- generate --library "$HK_LIBRARY" --language kotlin --out-dir android/app/src/main/java --config crates/hk-ffi/uniffi.toml
+cargo run -p hk-bindgen --release -- generate --library "$HK_LIBRARY" --language kotlin --out-dir android/app/src/main/java --config crates/hk-ffi/uniffi.toml
 mkdir -p artifacts
 HK_JNI_STAGE=$(mktemp -d "$HK_ROOT/artifacts/jni-XXXXXX")
 cargo ndk -t arm64-v8a -t armeabi-v7a -t x86_64 --platform 26 -o "$HK_JNI_STAGE" build -p hk-ffi --release

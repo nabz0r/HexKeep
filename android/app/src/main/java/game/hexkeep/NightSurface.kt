@@ -125,7 +125,11 @@ class NightSurface(
     fun close(){destroyed.set(true);active=false;worker.shutdownNow();clearInput()}
     fun back(){clearInput();when{helpOpen->{helpOpen=false};snapshot.optInt("screen")==10->{command(settingsReturn)};snapshot.optInt("screen") in listOf(40,42)->command("inventory_back");snapshot.optInt("screen")==41->command("home");intro>=0->{intro=-1;heroChoice=false};heroChoice->{heroChoice=false;if(firstChoice)intro=2 else engine.uiAction("home")};worldMap->{worldMap=false};snapshot.optInt("screen")==6->engine.uiAction("pause");snapshot.optInt("screen")==14->engine.uiAction("resume");snapshot.optInt("screen")==12->engine.uiAction("finish");snapshot.optInt("screen") in listOf(0,7)->activity.finish();else->engine.back()}}
 
-    fun metrics():String=JSONObject().put("frames",frames).put("seconds",if(metricStart==0L)0.0 else (System.nanoTime()-metricStart)/1e9).put("over_33ms",slowFrames).put("renderer","Android hardware Canvas").put("animation",actorAnimator.metrics()).put("viewport",JSONObject().put("left",viewportLeft).put("top",viewportTop).put("scale",viewportScale).put("width",vw)).toString()
+    fun metrics():String{
+        // Input injection uses screen coordinates; older Android versions offset the content view.
+        val origin=IntArray(2);getLocationOnScreen(origin)
+        return JSONObject().put("frames",frames).put("seconds",if(metricStart==0L)0.0 else (System.nanoTime()-metricStart)/1e9).put("over_33ms",slowFrames).put("renderer","Android hardware Canvas").put("animation",actorAnimator.metrics()).put("viewport",JSONObject().put("left",viewportLeft+origin[0]).put("top",viewportTop+origin[1]).put("scale",viewportScale).put("width",vw)).toString()
+    }
     private fun clearInput(){input=StickInput();movePointer=-1;aimPointer=-1;attackPointer=-1;attackHeld=false;attackRequest.set(false);dashRequest.set(false);skillRequest.set(false);focused=null;engine.controls(0,0,0,0,false,false,false);engine.touch(0,3u,0,0)}
     private fun command(name:String){
         clearInput()

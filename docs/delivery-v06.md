@@ -17,10 +17,11 @@ Nouveau refuge peint, couverture de boutique, icônes adaptative/monochrome, aid
 | Moteur Rust | **75 tests réussis**, dont le verrou de production, la variante solo, la reprise, l’absence de double récompense, les anciennes sauvegardes et 10 000 relectures déterministes |
 | Aventures DEV | **135/135 victoires** : trois royaumes × trois rôles × cinq contrats × trois difficultés |
 | Aventures Play | **135/135 victoires** avec le constructeur hors ligne ; caches et inventaire conservés au rechargement |
+| Android 8 / API 26, AAB installé en APK fractionnés | **Six tests réussis ensemble** en 116,34 s ; démarrage, JNI, coffre chiffré, gestes, aventure et cycle de vie |
 | Android 15, téléphone 2340×1080 | Trois tests de publication et deux parcours tactiles réussis : aventure complète, butin, équipement, animation, curiosités, sauvegarde et reprise |
 | Android 15, format 1280×960 | Trois tests de publication réussis ; aide et réglages inspectés visuellement |
 | Android 16, AAB installé en APK fractionnés | **Six tests réussis ensemble** en 125,65 s : sauvegarde, permissions, aventure, animations, curiosités, prologue et mise en arrière-plan |
-| Android 16, pages mémoire 16 Ko | **Six tests réussis** en 123,11 s sur un émulateur dédié ; `getconf PAGE_SIZE` retourne **16384** ; APK fractionnés issus de l’AAB |
+| Android 16, pages mémoire 16 Ko | **Six tests réussis** en 118,22 s sur un émulateur dédié ; `getconf PAGE_SIZE` retourne **16384** ; APK fractionnés issus de l’AAB |
 | Migration DEV 0.5 → 0.6 | Installation par-dessus réussie ; identité publique, nom, XP, identifiants et statistiques d’objets, équipement et poussières conservés |
 | Android Lint | Aucune erreur bloquante sur Play release ; avertissements restants sur les API historiques de rendu et les mises à jour de dépendances |
 | Paquet | API cible 36, versionCode 6, trois architectures ; signature de l’APK et alignement ZIP vérifiés, neuf bibliothèques natives inspectées, segments ELF 64 bits ≥ 16 Ko |
@@ -34,7 +35,8 @@ Les rapports reproductibles sont dans [validation/v06](validation/v06/). Le prot
 
 - La protection des écrans sensibles provoquait des mises à jour de fenêtre à chaque instant de simulation. Elle n’est désormais modifiée que si la sensibilité change ; la pause se redessine moins fréquemment.
 - L’assemblage pouvait conserver d’anciennes bibliothèques dans le répertoire de sortie. La construction utilise maintenant un répertoire neuf avant remplacement ; le vérificateur refuse un moteur ne contenant pas les nouvelles fonctions.
-- Le banc tactile ne comptait pas les encoches. Il utilise maintenant les coordonnées réelles de la zone de jeu. Android 16 rejetait aussi une seconde libération d’un geste déjà terminé : le pilote de test suit explicitement ce geste.
+- Le banc tactile utilise une source explicitement déclarée tactile, attend le retour du focus après Accueil Android et prépare l’état initial avant le prologue. Ces points ont été vérifiés sur Android 8 et corrigent les gestes ignorés par les images Android standard de la CI.
+- Le banc tactile ne comptait pas les encoches. Il utilise maintenant les coordonnées réelles de la zone de jeu, y compris la position de la vue dans la fenêtre. Android 16 rejetait aussi une seconde libération d’un geste déjà terminé : le pilote de test suit explicitement ce geste.
 - Le test de cycle de vie attendait que le rendu soit inactif, laissant parfois un combat se terminer avant sa mise en arrière-plan. Il utilise désormais le bouton Accueil Android puis le retour à la tâche existante, et vérifie que les ticks restent figés.
 - L’écran Android d’explication du mode immersif recouvrait les essais sur un émulateur neuf. L’environnement de test acquitte cette indication système ; les boutons du jeu restent testés par des événements tactiles réels.
 - Les bindings Android utilisent le nettoyeur Android à partir de l’API 34 et le repli JNA avant, avec les annotations adéquates. Les services DEV ne sont plus compilés dans Play.

@@ -4,6 +4,9 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   rust:
     strategy:
@@ -73,9 +76,12 @@ jobs:
             adb install artifacts/artifacts/HEXKEEP-v0.6-PLAY-preview.apk
             adb install artifacts/artifacts/app-play-debug-androidTest.apk
             adb shell am instrument -w -e class game.hexkeep.PlayReleaseTest,game.hexkeep.AdventureTest,game.hexkeep.EveilTest,game.hexkeep.GameplayTest#soloOfflineLifecycle game.hexkeep.test/androidx.test.runner.AndroidJUnitRunner | tee artifacts/play-device.txt
+            adb pull /sdcard/Android/data/game.hexkeep/files artifacts/device-files
             grep -q 'OK (6 tests)' artifacts/play-device.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: play-device-report
-          path: artifacts/play-device.txt
+          path: |
+            artifacts/play-device.txt
+            artifacts/device-files/

@@ -22,7 +22,7 @@ class GameplayTest {
     private lateinit var engine:game.hexkeep.core.Engine
     private lateinit var activity:MainActivity
     private fun onActivity(block:(MainActivity)->Unit){instrumentation.runOnMainSync{block(activity)}}
-    private fun tap(x:Float,y:Float){val t=SystemClock.uptimeMillis();instrumentation.uiAutomation.injectInputEvent(MotionEvent.obtain(t,t,MotionEvent.ACTION_DOWN,left+x*scale,y*scale+top,0),false);SystemClock.sleep(60);instrumentation.uiAutomation.injectInputEvent(MotionEvent.obtain(t,SystemClock.uptimeMillis(),MotionEvent.ACTION_UP,left+x*scale,y*scale+top,0),false);SystemClock.sleep(200)}
+    private fun tap(x:Float,y:Float){val t=SystemClock.uptimeMillis();instrumentation.uiAutomation.injectInputEvent(MotionEvent.obtain(t,t,MotionEvent.ACTION_DOWN,left+x*scale,y*scale+top,0).apply{source=android.view.InputDevice.SOURCE_TOUCHSCREEN},false);SystemClock.sleep(60);instrumentation.uiAutomation.injectInputEvent(MotionEvent.obtain(t,SystemClock.uptimeMillis(),MotionEvent.ACTION_UP,left+x*scale,y*scale+top,0).apply{source=android.view.InputDevice.SOURCE_TOUCHSCREEN},false);SystemClock.sleep(200)}
     private fun capture(name:String){SystemClock.sleep(350);val image=instrumentation.uiAutomation.takeScreenshot();val f=File(instrumentation.targetContext.getExternalFilesDir(null),"v05-$name.png");f.outputStream().use{image.compress(Bitmap.CompressFormat.PNG,100,it)}}
     private fun point(down:Long,action:Int,points:List<Triple<Int,Float,Float>>){val props=points.map{MotionEvent.PointerProperties().apply{id=it.first;toolType=MotionEvent.TOOL_TYPE_FINGER}}.toTypedArray();val coords=points.map{MotionEvent.PointerCoords().apply{x=left+it.second*scale;y=it.third*scale+top;pressure=1f;size=1f}}.toTypedArray();instrumentation.uiAutomation.injectInputEvent(MotionEvent.obtain(down,SystemClock.uptimeMillis(),action,points.size,props,coords,0,0,1f,1f,0,0,android.view.InputDevice.SOURCE_TOUCHSCREEN,0),false);SystemClock.sleep(60)}
     @Test fun soloOfflineLifecycle(){
@@ -32,7 +32,7 @@ class GameplayTest {
             scenario.onActivity{activity=it;engine=it.engine;val viewport=JSONObject(it.renderMetrics()).getJSONObject("viewport");scale=viewport.getDouble("scale").toFloat();left=viewport.getDouble("left").toFloat();top=viewport.getDouble("top").toFloat();vw=viewport.getDouble("width").toFloat();identity=JSONObject(it.engine.snapshot()).getJSONArray("secret").toString()}
             capture("title")
             // Replaying the introduction also exercises upgrades from a v0.2 identity.
-            onActivity{it.engine.uiAction("settings")};SystemClock.sleep(200);capture("settings");tap(150f,384f);tap(vw-180,496f);SystemClock.sleep(1200);capture("intro-1")
+            onActivity{it.engine.uiAction("continue");it.engine.uiAction("home");it.engine.uiAction("settings")};SystemClock.sleep(200);capture("settings");tap(150f,384f);tap(vw-180,496f);SystemClock.sleep(1200);capture("intro-1")
             tap(vw-190,440f);SystemClock.sleep(700);capture("intro-2");tap(vw-190,440f);SystemClock.sleep(700);capture("intro-3");tap(vw-190,440f);capture("heroes")
             tap(vw/2,265f);tap(vw-200,447f)
             capture("first-combat-frame")
@@ -65,7 +65,15 @@ class GameplayTest {
             SystemClock.sleep(600)
             onActivity{assertEquals(pausedTick,JSONObject(it.engine.presentation(584)).getJSONObject("battle").getInt("tick"))}
             instrumentation.targetContext.startActivity(Intent(instrumentation.targetContext,MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT))
-            SystemClock.sleep(700);tap(vw/2,224f);SystemClock.sleep(200)
+            // Android 8 defers app switches briefly after Home. Wait for the real window,
+            // rather than sending a touch while the launcher still owns input focus.
+            val focusDeadline=SystemClock.uptimeMillis()+10000
+            var focused=false
+            while(!focused&&SystemClock.uptimeMillis()<focusDeadline){onActivity{focused=it.hasWindowFocus()};if(!focused)SystemClock.sleep(50)}
+            assertTrue("Game did not regain input focus",focused)
+            SystemClock.sleep(200)
+            onActivity{val viewport=JSONObject(it.renderMetrics()).getJSONObject("viewport");scale=viewport.getDouble("scale").toFloat();left=viewport.getDouble("left").toFloat();top=viewport.getDouble("top").toFloat();vw=viewport.getDouble("width").toFloat()}
+            tap(vw/2,224f);SystemClock.sleep(200)
             onActivity{assertEquals(6,JSONObject(it.engine.presentation(584)).getInt("screen"));it.engine.uiAction("home")}
             SystemClock.sleep(250)
             onActivity{
