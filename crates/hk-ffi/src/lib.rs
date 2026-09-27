@@ -116,7 +116,7 @@ impl Engine {
             g.screen = 14;
             g.touches.clear();
         } else if g.save.created {
-            g.screen = 7;
+            g.ui_action("home");
         } else {
             g.screen = 0;
         }

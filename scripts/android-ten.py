@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import pathlib,subprocess,time,os,re,json,shutil
-root=pathlib.Path(__file__).resolve().parents[1];out=root/'artifacts'/'v03-android-ten';out.mkdir(exist_ok=True)
+root=pathlib.Path(__file__).resolve().parents[1];out=root/'artifacts'/'v04-android-ten';out.mkdir(exist_ok=True)
 for old in out.iterdir():
  if old.is_file():old.unlink()
 adb=os.environ.get('ADB') or shutil.which('adb') or str(pathlib.Path(os.environ.get('ANDROID_HOME',str(pathlib.Path.home()/'Library/Android/sdk')))/'platform-tools/adb');env=dict(os.environ,HK_TEST_DISABLE_MDNS='1');processes=[];files=[]

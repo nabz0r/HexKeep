@@ -121,7 +121,7 @@ class MainActivity : Activity(), LocationListener {
         if(failed)engine.setStorageError()
         surface=NightSurface(this,engine,::persist,::action,::feedback,::protect)
         setContentView(surface);ready=true
-        if(resumed)startAudio()
+        if(resumed){startAudio();resumeGps()}
     }
     fun persist() {
         if(!ready)return
@@ -140,6 +140,7 @@ class MainActivity : Activity(), LocationListener {
         11->requestBle()
         12->{shop?.close();shop=PlayShop(this,engine).also{it.inspect(engine.nativeText())}}
         13->{if(engine.phare()){if(checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED){engine.stopPhare("Active le GPS avant de lancer le Phare.");requestGps()}else{try{startForegroundService(Intent(this,PhareService::class.java))}catch(_:Exception){engine.stopPhare("Le système refuse la veille en arrière-plan.")}}}else stopService(Intent(this,PhareService::class.java))}
+        15->{getPreferences(0).edit().putBoolean("gps-enabled",false).apply();locationManager.removeUpdates(this);lastLocation=null}
         14->{val input=android.widget.EditText(this);input.hint="/ip4/.../tcp/.../p2p/...";android.app.AlertDialog.Builder(this).setTitle("Pair ou relais").setView(input).setPositiveButton("Connecter"){_,_->connectAddress(input.text.toString(),false)}.setNeutralButton("Réserver un relais"){_,_->connectAddress(input.text.toString(),true)}.setNegativeButton("Retour",null).show()}
     }}}
     private fun connectAddress(value:String,relay:Boolean){Thread({try{var address=value.trim();val parts=address.split("/");if(parts.size>3&&parts[1]in listOf("dns","dns4","dns6")){val resolved=java.net.InetAddress.getAllByName(parts[2]).firstOrNull{parts[1]=="dns"||(parts[1]=="dns4"&&it is java.net.Inet4Address)||(parts[1]=="dns6"&&it is java.net.Inet6Address)}?:throw IllegalArgumentException("DNS");address="/${if(resolved is java.net.Inet4Address)"ip4"else"ip6"}/${resolved.hostAddress}/"+parts.drop(3).joinToString("/")};if(relay)engine.reserveRelay(address)else engine.connect(address)}catch(_:Exception){engine.notice("Adresse indisponible. Vérifie le pair ou le relais.")}},"HEXKEEP system DNS").start()}
@@ -147,9 +148,10 @@ class MainActivity : Activity(), LocationListener {
     private fun feedback(){runOnUiThread{getSystemService(Vibrator::class.java)?.vibrate(VibrationEffect.createOneShot(18,80))}}
     private fun requestGps(){
         if(checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED){requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION),31);return}
-        try{locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,3000,4f,this);engine.notice("Recherche GPS. La partie continue hors ligne.")}
+        try{locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,3000,4f,this);getPreferences(0).edit().putBoolean("gps-enabled",true).apply();engine.notice("Recherche GPS. La partie continue hors ligne.")}
         catch(e:Exception){engine.notice("GPS indisponible. La carte DEV reste jouable.")}
     }
+    private fun resumeGps(){if(getPreferences(0).getBoolean("gps-enabled",false)&&checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED){lastLocation=null;requestGps()}}
     override fun onRequestPermissionsResult(requestCode:Int,permissions:Array<out String>,results:IntArray){super.onRequestPermissionsResult(requestCode,permissions,results);if(requestCode==32){if(results.all{it==PackageManager.PERMISSION_GRANTED})requestBle()else engine.bleStatus("Co-présence BLE non autorisée.")};if(requestCode==31){if(results.isNotEmpty()&&results[0]==PackageManager.PERMISSION_GRANTED)requestGps()else engine.notice("GPS refusé : utilise la carte de développement.")}}
     override fun onLocationChanged(location:Location){
         if(!ready||!resumed||location.accuracy>100f)return
@@ -175,7 +177,7 @@ class MainActivity : Activity(), LocationListener {
         },"HEXKEEP audio").start()
     }
     override fun onPause(){resumed=false;GameRuntime.foreground=false;audioRunning.set(false);if(ready){engine.touch(0,3u,0,0);if(!engine.phare()){engine.pauseNetwork();ble?.stop()};multicast?.let{if(it.isHeld)it.release()};multicast=null;surface.onPause();if(engine.dirty())persist()};locationManager.removeUpdates(this);super.onPause()}
-    override fun onResume(){super.onResume();resumed=true;GameRuntime.foreground=true;window.decorView.systemUiVisibility=5894;if(ready){surface.onResume();startAudio()}}
+    override fun onResume(){super.onResume();resumed=true;GameRuntime.foreground=true;window.decorView.systemUiVisibility=5894;if(ready){surface.onResume();startAudio();resumeGps()}}
     override fun onDestroy(){if(ready)surface.close();shop?.close();ble?.stop();audioRunning.set(false);authSignal?.cancel();super.onDestroy()}
     @Deprecated("Back compatibility") override fun onBackPressed(){if(ready){surface.back()}else super.onBackPressed()}
 }

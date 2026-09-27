@@ -6,14 +6,14 @@ android {
         applicationId = "game.hexkeep"
         minSdk = 26
         targetSdk = 36
-        versionCode = 3
-        versionName = "0.3.0-les-braises"
+        versionCode = 4
+        versionName = "0.4.0-les-chemins"
         ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64") }
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     flavorDimensions += "network"
     productFlavors {
-        create("dev") { signingConfig = signingConfigs.getByName("debug"); dimension = "network"; applicationIdSuffix = ".dev"; buildConfigField("boolean", "DEV_NETWORK", "true"); resValue("string", "app_name", "HEXKEEP · Braises") }
+        create("dev") { signingConfig = signingConfigs.getByName("debug"); dimension = "network"; applicationIdSuffix = ".dev"; buildConfigField("boolean", "DEV_NETWORK", "true"); resValue("string", "app_name", "HEXKEEP · Chemins") }
         create("prod") { dimension = "network"; buildConfigField("boolean", "DEV_NETWORK", "false"); resValue("string", "app_name", "HEXKEEP") }
     }
     buildTypes { getByName("release") { isMinifyEnabled = false } }

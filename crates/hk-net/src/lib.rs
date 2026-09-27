@@ -322,7 +322,7 @@ async fn run(
                 }
                 .into(),
                 identify: identify::Behaviour::new(identify::Config::new(
-                    "/hexkeep/dev/3".into(),
+                    "/hexkeep/dev/4".into(),
                     key.public(),
                 )),
                 ping: ping::Behaviour::new(
@@ -345,7 +345,7 @@ async fn run(
     swarm
         .listen_on("/ip4/0.0.0.0/udp/0/quic-v1".parse().unwrap())
         .map_err(|e| e.to_string())?;
-    let memory_topic = gossipsub::IdentTopic::new("hk/dev/v03/memories");
+    let memory_topic = gossipsub::IdentTopic::new("hk/dev/v04/memories");
     swarm
         .behaviour_mut()
         .gossip
@@ -423,6 +423,9 @@ impl Rollback {
             .enumerate()
             .map(|(i, p)| Fighter::new(i as u8, p.realm, p.role, false))
             .collect();
+        for f in &mut battle.fighters {
+            f.pos = hk_sim::navigation::safe_position(f.pos, &battle.obstacles);
+        }
         let states = BTreeMap::from([(0, battle.clone())]);
         let count = players.len();
         Ok(Self {

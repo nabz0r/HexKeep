@@ -77,3 +77,11 @@ Victoire : « À l’aube, personne ne sut quelle lanterne avait été la derni�
 « Lors de la [saison], [royaume] tint [nombre] lieux sous [nombre] lanternes. Au [lieu], [noms] relevèrent la première pierre. La Mémoire de [royaume] traversa [marches] entre les mains de [porteur], puis [résultat]. Lorsque vint la Nuit Longue, [actions vérifiées]. Sous le Sceau [empreinte], la Couronne inscrit ces actes et les témoins qui les rendent vrais. »
 
 Cette trame exige le futur registre scellé. La chronique affichée dans l’APK actuel est explicitement locale et provisoire.
+
+## Les Chemins de Braise — le carnet d’Éline
+
+Éline gardait les archives d’une forteresse dont personne ne prononce plus le nom. Elle a sauvé un livre de routes, mais chaque page s’efface lorsque son dernier témoin s’endort. Au refuge, elle confie cette carte aux veilleurs. Elle ne leur promet pas de vaincre le Noir ; elle leur demande de laisser un chemin à celui qui viendra après eux.
+
+Dans **les Jardins de cendre**, les premiers feux repoussent la brume et rendent les sentiers visibles. Dans **le Val des cloches**, les ombres se rassemblent autour d’un chef : leur chasse ouvre une route entre les ruines. Sur **les Hauts de verre**, les mémoires rappellent que les trois royaumes ont autrefois prêté un même serment.
+
+Le sac raconte ces sorties à petite échelle : une lame de guetteur, un manteau de veille, un sceau d’aube. La forge transforme ce que l’on abandonne en une chance de repartir. Ces fragments sont le cadre narratif des trois contrats de la 0.4 ; les rencontres dialoguées avec Éline et une campagne scénarisée longue ne sont pas présentées comme déjà jouables.

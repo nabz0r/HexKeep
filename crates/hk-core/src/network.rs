@@ -31,7 +31,7 @@ impl Game {
         let region = marche(self.save.world.current).unwrap_or(0);
         self.node = Some(Node::with_session(
             self.session.clone(),
-            format!("hk/dev/marche/{region:x}/v03"),
+            format!("hk/dev/marche/{region:x}/v04"),
         ));
         self.save.world.banner = true;
         self.native_action = 3;
@@ -485,6 +485,7 @@ impl Game {
             finish_sent: false,
         });
         self.tutorial = false;
+        self.expedition = None;
         self.screen = 6;
         self.touches.clear();
         self.toast("Le Champ s'ouvre. Combat provisoire, sans PR.");

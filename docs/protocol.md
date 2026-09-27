@@ -1,4 +1,4 @@
-# Protocole v0.2 DEV
+# Protocole v0.4 DEV
 
 `hk-proto`, `hk-net`, `hk-crypto/identity`, `hk-ledger`, `hk-crown` et `hk-season` définissent les formats exacts. La sérialisation signée est Borsh, avec entiers little endian. JSON sert à l'export et à la sauvegarde, pas à construire arbitrairement les octets signés.
 
@@ -8,9 +8,9 @@ Chaque signature est préfixée par `HEXKEEP/v1/<network>/<type>\0`. Types : eve
 
 Nom Ed25519 → liaison de clé P-256 signée par le Nom → certificat de session Ed25519 signé P-256, durée maximale 86 400 s. Android crée la P-256 dans son Keystore avec défi d'attestation BLAKE3(Nom public), StrongBox si disponible, repli DEV sur Keystore sans attestation quand l'émulateur ne le permet pas. La chaîne de certificats est jointe. Le transport vérifie les signatures et les bornes de session ; la qualification Google de production n'est pas activée.
 
-`Packet { author: Nom, sequence, message, signature, certificate?, issued }`. Les paquets de la v0.2 doivent avoir un certificat valide et une date à ±120 s de la réception. Le Nom public reste l'identifiant ; les signatures haute fréquence utilisent la session. Les certificats répétés sont factorisés dans les exports de preuves, puis restaurés avant la vérification des octets signés.
+`Packet { author: Nom, sequence, message, signature, certificate?, issued }`. Les paquets actuels doivent avoir un certificat valide et une date à ±120 s de la réception. Le Nom public reste l'identifiant ; les signatures haute fréquence utilisent la session. Les certificats répétés sont factorisés dans les exports de preuves, puis restaurés avant la vérification des octets signés.
 
-TCP/Noise/Yamux, QUIC, mDNS, gossipsub, Identify, Ping, AutoNAT, DCUtR, Kademlia et client Relay v2. Gossip par Marche `hk/dev/marche/<H3>/v02`, et canal de Mémoires consenti `hk/dev/v02/memories`. Limite de paquet 256 KiB, déduplication et tailles de listes contrôlées. Le relais a des limites de réservations, de durée et d'octets ; il ne lit pas les charges Noise entre les clients.
+TCP/Noise/Yamux, QUIC, mDNS, gossipsub, Identify, Ping, AutoNAT, DCUtR, Kademlia et client Relay v2. Gossip par Marche `hk/dev/marche/<H3>/v04`, et canal de Mémoires consenti `hk/dev/v04/memories`. Limite de paquet 256 KiB, déduplication et tailles de listes contrôlées. Le relais a des limites de réservations, de durée et d'octets ; il ne lit pas les charges Noise entre les clients.
 
 ## Combat et preuve
 
@@ -30,6 +30,10 @@ Un Sceau signe époque, prédécesseur, heure, racine de Merkle des cellules, t�
 
 Balise = 16 premiers octets de BLAKE3(session publique || époque de dix minutes), plus royaume. Un témoignage signé lie observateur, sujet, jeton observé, heure et cellule. Une co-présence requiert deux témoignages réciproques récents. Les parts Shamir 3-sur-5 sont chiffrées X25519 / ChaCha20-Poly1305 pour chaque dépositaire et l'enveloppe est signée par le Nom propriétaire.
 
-Les Maisons ont une héraldique 16×16 et des serments Ed25519 distincts. La fondation DEV avec personnages de test est marquée explicitement. Les reçus de boutique DEV sont signés dans un domaine distinct des vrais reçus Play et ne représentent aucun paiement. Les structures de campagne / cosmétique ne sont pas consultées pour calculer les dégâts, PV ou déplacements du combat.
+Les Maisons ont une héraldique 16×16 et des serments Ed25519 distincts. La fondation DEV avec personnages de test est marquée explicitement. Les reçus de boutique DEV sont signés dans un domaine distinct des vrais reçus Play et ne représentent aucun paiement. Les structures de campagne / cosmétique ne sont pas consultées pour calculer les dégâts, PV ou déplacements du combat réseau. Les bonus locaux du sac sont appliqués uniquement par le lancement d’expédition PvE.
 
 La validation des chaînes de session est mise en cache par empreinte complète, dans une table bornée à 256 entrées. Une modification du certificat impose une nouvelle vérification. La signature de chaque paquet et ses bornes temporelles sont toujours vérifiées ; le moteur ne revalide pas une seconde fois un paquet déjà authentifié par le transport. Les essais incluent les signatures modifiées et certificats expirés après amorçage du cache.
+
+## Compatibilité de simulation
+
+La 0.4 modifie le déplacement, les collisions, l’IA, la cadence et l’état des combattants. Identify utilise `/hexkeep/dev/4` et les topics géographiques sont suffixés `v04`. Tous les participants doivent employer la même version. Une preuve d’une version antérieure demande son ancien moteur ; la preuve `examples/cosigned-duel.json` livrée sur `main` est une preuve 0.4. Les sauvegardes de profil migrent par ajout de champs, sans changer le Nom ni le registre.

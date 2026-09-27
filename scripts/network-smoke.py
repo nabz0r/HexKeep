@@ -5,7 +5,7 @@ root=pathlib.Path(__file__).resolve().parents[1]
 mode=sys.argv[1] if len(sys.argv)>1 else 'direct'
 count=int(sys.argv[2]) if len(sys.argv)>2 else 2
 seconds=int(sys.argv[3]) if len(sys.argv)>3 else 50
-out=root/'artifacts'/('v03-network-'+mode+str(count));out.mkdir(exist_ok=True)
+out=root/'artifacts'/('v04-network-'+mode+str(count));out.mkdir(exist_ok=True)
 for old in out.iterdir():
  if old.is_file():old.unlink()
 processes=[];streams=[]

@@ -18,7 +18,7 @@ class PresentationPerformanceTest {
    i.runOnMainSync{after=JSONObject(activity.renderMetrics())}
    val seconds=after.getDouble("seconds")-before.getDouble("seconds");val frames=after.getLong("frames")-before.getLong("frames");val fps=frames/seconds
    val report=JSONObject().put("seconds",seconds).put("frames",frames).put("fps",fps).put("over_33ms",after.getLong("over_33ms")-before.getLong("over_33ms")).put("screen_width",activity.window.decorView.width).put("screen_height",activity.window.decorView.height)
-   File(i.targetContext.getExternalFilesDir(null),"v03-performance.json").writeText(report.toString())
+   File(i.targetContext.getExternalFilesDir(null),"v04-performance.json").writeText(report.toString())
    assertTrue("Renderer did not progress: $report",fps>=20)
    i.runOnMainSync{activity.engine.uiAction("home");activity.finish()}
   }

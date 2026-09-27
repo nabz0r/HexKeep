@@ -1,6 +1,8 @@
 //! Combat uses signed integer subtiles (1/256 tile), with no float operations.
+pub mod navigation;
 use borsh::{BorshDeserialize, BorshSerialize};
 use hk_proto::*;
+use navigation::{blocked, safe_position, slide};
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha8Rng;
 use serde::{Deserialize, Serialize};
@@ -29,6 +31,10 @@ pub struct Fighter {
     pub bot: bool,
     pub genome: [u8; 16],
     pub velocity: Vec2,
+    pub stride: Vec2,
+    pub max_hp: i32,
+    pub power: i32,
+    pub haste: u16,
 }
 impl Fighter {
     pub fn new(id: u8, realm: Realm, role: Role, bot: bool) -> Self {
@@ -54,6 +60,10 @@ impl Fighter {
             bot,
             genome: [128; 16],
             velocity: Vec2::default(),
+            stride: Vec2::default(),
+            max_hp: realm.hp(),
+            power: 100,
+            haste: 0,
         }
     }
 }
@@ -129,15 +139,6 @@ pub struct Battle {
 }
 fn touches(p: Vec2, o: &Obstacle, r: i32) -> bool {
     p.x + r > o.x && p.x - r < o.x + o.w && p.y + r > o.y && p.y - r < o.y + o.h
-}
-fn blocked(p: Vec2, obs: &[Obstacle], air: bool) -> bool {
-    p.x < UNIT / 2
-        || p.y < UNIT / 2
-        || p.x > WIDTH - UNIT / 2
-        || p.y > HEIGHT - UNIT / 2
-        || obs
-            .iter()
-            .any(|o| !(air && o.kind != 0) && touches(p, o, 70))
 }
 impl Battle {
     pub fn new(seed: u64, realm: Realm, role: Role, bots: u8, duel: bool) -> Self {
@@ -217,6 +218,9 @@ impl Battle {
                 },
             ]
         };
+        for f in &mut fighters {
+            f.pos = safe_position(f.pos, &obstacles);
+        }
         Self {
             codex: Default::default(),
             siege: None,
@@ -236,6 +240,7 @@ impl Battle {
     pub fn apply_codex(&mut self, codex: hk_crown::Codex) {
         for f in &mut self.fighters {
             f.hp = codex.hp[f.realm.index()];
+            f.max_hp = f.hp;
         }
         self.codex = codex;
     }
@@ -293,31 +298,21 @@ impl Battle {
             mx = dx;
             my = dy;
         }
-        let probe = Vec2::new(mx, my).scaled(100);
-        if blocked(
-            Vec2::new(f.pos.x + probe.x, f.pos.y + probe.y),
-            &self.obstacles,
-            false,
-        ) {
-            let sign = if (self.tick / 90 + f.id as u32) % 2 == 0 {
-                1
-            } else {
-                -1
-            };
-            let options = [
-                Vec2::new(-probe.y * sign, probe.x * sign),
-                Vec2::new(probe.y * sign, -probe.x * sign),
-                Vec2::new(-probe.x, -probe.y),
-            ];
-            if let Some(v) = options.iter().find(|v| {
-                !blocked(
-                    Vec2::new(f.pos.x + v.x, f.pos.y + v.y),
-                    &self.obstacles,
-                    false,
-                )
-            }) {
-                mx = v.x;
-                my = v.y;
+        let visible = navigation::clear_line(f.pos, t.pos, &self.obstacles, 24);
+        if !navigation::clear_line(f.pos, t.pos, &self.obstacles, 72) {
+            let route = navigation::direction(f.pos, t.pos, &self.obstacles);
+            mx = route.x;
+            my = route.y;
+        } else {
+            let probe = Vec2::new(mx, my).scaled(160);
+            if blocked(
+                Vec2::new(f.pos.x + probe.x, f.pos.y + probe.y),
+                &self.obstacles,
+                false,
+            ) {
+                let route = navigation::direction(f.pos, t.pos, &self.obstacles);
+                mx = route.x;
+                my = route.y;
             }
         }
         let mv = Vec2::new(mx, my).scaled(1024);
@@ -327,11 +322,12 @@ impl Battle {
             move_y: mv.y as i16,
             aim_x: aim.x as i16,
             aim_y: aim.y as i16,
-            shoot: match f.role {
-                Role::Foudre => dist < 850 && phase >= 90,
-                Role::Rempart => phase >= 100,
-                Role::Lien => phase >= 75 && phase < 100,
-            },
+            shoot: visible
+                && match f.role {
+                    Role::Foudre => dist < 850 && phase >= 90,
+                    Role::Rempart => phase >= 100,
+                    Role::Lien => phase >= 75 && phase < 100,
+                },
             dash: f.role == Role::Foudre && dist < 1400 && phase == 90,
             skill: f.role != Role::Foudre && phase == 100 && self.tick % 360 < 120,
         }
@@ -399,8 +395,10 @@ impl Battle {
                 if !self.duel {
                     f.respawn = f.respawn.saturating_sub(1);
                     if f.respawn == 0 {
-                        f.pos = spawn(f.id);
-                        f.hp = self.codex.hp[f.realm.index()];
+                        f.pos = safe_position(spawn(f.id), &self.obstacles);
+                        f.hp = f.max_hp;
+                        f.stride = Vec2::default();
+                        f.velocity = Vec2::default();
                         f.armor = 50;
                         f.invulnerable = 30;
                     }
@@ -418,18 +416,38 @@ impl Battle {
             ] {
                 *timer = timer.saturating_sub(1);
             }
-            if f.hp > self.codex.hp[f.realm.index()] && self.tick % 30 == 0 {
+            if f.hp > f.max_hp && self.tick % 30 == 0 {
                 f.hp -= 1;
             }
             let aim = input.aim();
             if aim.x != 0 || aim.y != 0 {
                 f.aim = aim.scaled(UNIT);
             }
-            let mut velocity = input.movement().scaled(34);
-            if self.effects.iter().any(|e| {
+            // Preserve stick magnitude; a short acceleration ramp removes the digital snap.
+            let stick = input.movement();
+            let length = isqrt(stick.dist2(Vec2::default()) as u64) as i32;
+            let stick = if length > 1024 {
+                stick.scaled(1024)
+            } else {
+                stick
+            };
+            let slow = self.effects.iter().any(|e| {
                 e.kind == 3 && e.realm != f.realm && e.pos.dist2(f.pos) < (2 * UNIT).pow(2) as i64
-            }) {
-                velocity = velocity.scaled(20);
+            });
+            let speed = if slow {
+                26
+            } else if f.bot {
+                34
+            } else {
+                48
+            };
+            let desired = Vec2::new(stick.x * speed / 1024, stick.y * speed / 1024);
+            let accel = if stick == Vec2::default() { 24 } else { 16 };
+            f.stride.x += (desired.x - f.stride.x).clamp(-accel, accel);
+            f.stride.y += (desired.y - f.stride.y).clamp(-accel, accel);
+            let mut velocity = f.stride;
+            if blocked(f.pos, &self.obstacles, false) {
+                f.pos = safe_position(f.pos, &self.obstacles);
             }
             if input.dash && f.dash_cd == 0 {
                 let direction = if velocity.x != 0 || velocity.y != 0 {
@@ -453,14 +471,7 @@ impl Battle {
             velocity.y += f.velocity.y;
             f.velocity.x = f.velocity.x * 3 / 4;
             f.velocity.y = f.velocity.y * 3 / 4;
-            let next = Vec2::new(f.pos.x + velocity.x, f.pos.y);
-            if !blocked(next, &self.obstacles, f.airborne > 0) {
-                f.pos = next;
-            }
-            let next = Vec2::new(f.pos.x, f.pos.y + velocity.y);
-            if !blocked(next, &self.obstacles, f.airborne > 0) {
-                f.pos = next;
-            }
+            f.pos = slide(f.pos, velocity, &self.obstacles);
             if input.skill && f.skill_cd == 0 {
                 f.skill_cd = 180;
                 match f.role {
@@ -498,7 +509,7 @@ impl Battle {
             }
             if (input.shoot || heavy) && f.cooldown == 0 && f.charge == 0 {
                 let base_speed = self.codex.projectile[f.realm.index()];
-                f.cooldown = [24, 30, 36][f.role.index()];
+                f.cooldown = [18u16, 22, 25][f.role.index()].saturating_sub(f.haste.min(8));
                 let dmg = if f.rage > 0 { 3 } else { 1 };
                 let aim = if f.aim == Vec2::default() {
                     Vec2::new(UNIT, 0)
@@ -517,7 +528,11 @@ impl Battle {
                         owner: f.id,
                         realm: f.realm,
                         kind: 0,
-                        damage: if heavy { 150 * dmg } else { 100 * dmg },
+                        damage: if heavy {
+                            150 * dmg * f.power / 100
+                        } else {
+                            75 * dmg * f.power / 100
+                        },
                         life: 100,
                         heavy,
                     }),
@@ -530,7 +545,7 @@ impl Battle {
                                 owner: f.id,
                                 realm: f.realm,
                                 kind: 1,
-                                damage: 12 * dmg,
+                                damage: 15 * dmg * f.power / 100,
                                 life: 6,
                                 heavy: false,
                             });
@@ -542,7 +557,7 @@ impl Battle {
                         owner: f.id,
                         realm: f.realm,
                         kind: 2,
-                        damage: 60 * dmg,
+                        damage: 55 * dmg * f.power / 100,
                         life: 35,
                         heavy: false,
                     }),
@@ -595,10 +610,7 @@ impl Battle {
                 || p.pos.x > WIDTH
                 || p.pos.y < 0
                 || p.pos.y > HEIGHT
-                || self
-                    .obstacles
-                    .iter()
-                    .any(|o| o.kind == 0 && touches(p.pos, o, 20));
+                || self.obstacles.iter().any(|o| touches(p.pos, o, 20));
             let gate_hit = self.siege.as_ref().is_some_and(|s| {
                 s.gate_hp > 0
                     && p.realm == s.attacker

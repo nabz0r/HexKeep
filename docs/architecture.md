@@ -1,4 +1,4 @@
-# Architecture v0.2
+# Architecture v0.4
 
 Le cœur de combat est Rust : calcul entier Q24.8, horloge logique 30 Hz, RNG ChaCha8 déterministe. Android fournit une présentation Canvas accélérée, AudioTrack 44,1 kHz, les entrées tactiles, GPS, Bluetooth, Keystore, biométrie, fichiers et service de veille. La simulation possède sa boucle à 30 Hz ; le rendu suit les images Android avec interpolation. Les textes et illustrations sont dessinés à la résolution de l’écran, sur un repère adaptatif de 540 unités de haut. Les commandes sémantiques du cœur permettent de conserver les écrans avancés sans rasterisation rétro.
 
@@ -33,8 +33,16 @@ Sans Phare, mise en pause = arrêt audio/GPS/réseau, sauvegarde et interruption
 
 ## Séparation du combat et de la progression
 
-Le Codex scellé détermine les paramètres de combat communs. Les achats, rangs, maisons et XP ne modifient pas la simulation. Les Mémoires affectent uniquement la garde collective ; les Murs dimensionnent la Porte. Les replays sont rejoués avant d'être admis en Haute Cour.
+Le Codex scellé détermine les paramètres de combat communs. Les achats cosmétiques, rangs, maisons et XP ne modifient pas les combats entre joueurs. Le module `hk-core/adventure.rs` applique les bonus du sac uniquement au lancement d’une expédition locale ; le lancement réseau reconstruit les combattants à partir du Codex commun. Les Mémoires affectent uniquement la garde collective ; les Murs dimensionnent la Porte. Les replays sont rejoués avant d'être admis en Haute Cour.
 
 ## Frontières de livraison
 
 Cette version couvre un parcours DEV des fonctions M0 à M7. Les essais de laboratoire ne certifient pas un déploiement commercial : attestation Google complète, signature officielle, paiements / remboursements réels, qualification radio sur deux opérateurs et consommation sur téléphone doivent encore être traités avant production. Les limites détaillées et les preuves de test figurent dans le rapport.
+
+## Déplacements et aventures en 0.4
+
+`hk-sim/navigation.rs` gère rayon du personnage, déplacements balayés, glissement, correction des positions de départ, visibilité entière et recherche de chemins. L’accélération analogique est séparée de l’impulsion d’esquive. La présentation Android n’applique pas de déplacement autoritaire ; elle interpole les états à 30 Hz. Le joystick a des identifiants de pointeurs indépendants pour déplacement, attaque et visée. Les pressions d’esquive, de pouvoir et d’attaque courte sont mémorisées jusqu’au prochain tick.
+
+`Save.journey` est ajouté avec une valeur par défaut compatible avec les sauvegardes antérieures. Il contient les objets, les trois identifiants équipés, la poussière, les lieux découverts, les contrats déjà récompensés et les dernières trouvailles. L’inventaire est limité à 60 objets ; la liste de contrats récompensés conserve 128 entrées. Les récompenses d’une sortie sont consommées lorsque l’expédition est retirée de l’état actif. La cellule d’origine est conservée pendant le combat, même si le GPS change.
+
+Le brouillard est un masque Canvas adouci, recalculé seulement quand la découverte change. La mini-carte expose les objectifs ; le rendu et le masque suivent la caméra sans modifier les coordonnées de simulation. Les attaques ennemies sont annoncées selon les mêmes phases que leur IA.

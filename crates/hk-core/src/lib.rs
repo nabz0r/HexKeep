@@ -1,3 +1,4 @@
+mod adventure;
 mod expansion;
 mod network;
 mod presentation;
@@ -8,7 +9,6 @@ use hk_sim::*;
 use hk_world::*;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
-#[cfg(test)]
 use std::collections::BTreeSet;
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Settings {
@@ -46,6 +46,8 @@ pub struct Save {
     pub introduction_seen: bool,
     #[serde(default = "default_sound")]
     pub sound_effects: bool,
+    #[serde(default)]
+    pub journey: adventure::Journey,
 }
 fn default_sound() -> bool {
     true
@@ -69,6 +71,7 @@ impl Default for Save {
             expansion: Default::default(),
             introduction_seen: false,
             sound_effects: true,
+            journey: Default::default(),
         }
     }
 }
@@ -77,6 +80,14 @@ pub struct Expedition {
     pub charges: [u16; 3],
     pub wave: u8,
     pub victory: bool,
+    pub kind: u8,
+    pub event_id: String,
+    pub cell: u64,
+    pub caches: [bool; 3],
+    pub drops: Vec<adventure::Drop>,
+    pub dust: u32,
+    pub flasks: u8,
+    pub explored: Vec<bool>,
 }
 pub struct Game {
     pub save: Save,
@@ -212,6 +223,7 @@ impl Game {
         self.dirty = true;
     }
     pub fn start_battle(&mut self, mode: u8) {
+        self.expansion.court = None;
         self.online = None;
         self.battle_mode = mode;
         self.expedition = if mode == 8 {
@@ -219,13 +231,23 @@ impl Game {
                 charges: [0; 3],
                 wave: 0,
                 victory: false,
+                kind: 0,
+                cell: self.save.world.current,
+                event_id: format!("{}:{}:0", self.save.world.current, self.now / 1800),
+                caches: [false; 3],
+                drops: vec![],
+                dust: 0,
+                flasks: 2,
+                explored: vec![false; 480],
             })
         } else {
             None
         };
         self.tutorial = mode == 0;
         self.lesson = 0;
-        let seed = self.save.world.current ^ (self.save.kills as u64 * 997);
+        let seed = self.save.world.current
+            ^ (self.save.kills as u64 * 997)
+            ^ (self.save.journey.outings as u64 * 7919);
         let mut b = Battle::new(
             seed,
             self.save.realm,
@@ -252,10 +274,17 @@ impl Game {
             b.apply_codex(state.codex);
         }
         if mode == 8 {
-            b.fighters[0].hp += 60;
+            let (health, power, armor, haste) = self.save.journey.stats();
+            b.fighters[0].hp += 60 + health;
+            b.fighters[0].max_hp = b.fighters[0].hp;
+            b.fighters[0].power += power;
+            b.fighters[0].armor += armor;
+            b.fighters[0].haste = haste;
             for f in b.fighters.iter_mut().skip(1) {
                 f.realm = Realm::from_index((self.save.realm.index() + 1) % 3);
                 f.hp = 75;
+                f.max_hp = 75;
+                f.power = 55;
                 f.armor = 20;
             }
         }
@@ -302,10 +331,11 @@ impl Game {
         if let Some(b) = self.battle.take() {
             self.expansion_battle_end(&b);
             if let Some(run) = self.expedition.take() {
+                self.journey_reward(&b, &run);
                 let lit = run.charges.iter().filter(|v| **v == 90).count() as u32;
                 self.save.expansion.campaign.xp += lit * 20 + if run.victory { 80 } else { 0 };
                 if run.victory {
-                    if let Some(c) = self.save.world.cells.get_mut(&self.save.world.current) {
+                    if let Some(c) = self.save.world.cells.get_mut(&run.cell) {
                         c.clear = true;
                     }
                     self.event(Kind::Lantern, lit);
@@ -337,6 +367,9 @@ impl Game {
             return;
         }
         if self.save.created && self.ticks % 30 == 0 {
+            if self.save.journey.discovered.insert(self.save.world.current) {
+                self.dirty = true;
+            }
             if self.save.world.seconds == 0 {
                 for c in self.save.world.cells.values_mut() {
                     c.last_watch = now;
@@ -426,6 +459,50 @@ impl Game {
             self.sound = 3;
         }
         if let Some(run) = &mut self.expedition {
+            let player_pos = b.fighters[0].pos;
+            for i in 0..480 {
+                let p = Vec2::new(
+                    (i % 30) as i32 * UNIT + UNIT / 2,
+                    (i / 30) as i32 * UNIT + UNIT / 2,
+                );
+                if p.dist2(player_pos) < (5 * UNIT).pow(2) as i64 {
+                    run.explored[i] = true;
+                }
+            }
+            if b.fighters[0].kills > old_kills {
+                for f in b
+                    .fighters
+                    .iter()
+                    .skip(1)
+                    .filter(|f| f.hp <= 0 && f.respawn == 120)
+                {
+                    run.drops.push(adventure::Drop {
+                        pos: f.pos,
+                        collected: false,
+                        value: 3,
+                    });
+                }
+            }
+            for drop in &mut run.drops {
+                if !drop.collected && drop.pos.dist2(player_pos) < (2 * UNIT).pow(2) as i64 {
+                    drop.collected = true;
+                    run.dust += drop.value;
+                    self.sound = 4;
+                }
+            }
+            for (i, (x, y)) in [(3, 13), (16, 2), (27, 12)].iter().enumerate() {
+                if !run.caches[i]
+                    && player_pos.dist2(Vec2::new(x * UNIT, y * UNIT))
+                        < (UNIT * 3 / 2).pow(2) as i64
+                    && b.fighters[0].hp > 0
+                {
+                    run.caches[i] = true;
+                    run.dust += 2;
+                    self.sound = 4;
+                    self.haptic = 2;
+                }
+            }
+
             for f in b.fighters.iter_mut().skip(1) {
                 if f.hp <= 0 {
                     f.respawn = u16::MAX;
@@ -439,10 +516,22 @@ impl Game {
             for (i, pos) in points.iter().enumerate() {
                 let d = Vec2::new(b.fighters[0].pos.x - pos.x, b.fighters[0].pos.y - pos.y);
                 if run.charges[i] < 90
-                    && d.x * d.x + d.y * d.y < (UNIT * 3 / 2).pow(2)
+                    && (if run.kind == 1 {
+                        b.fighters[0].kills as usize >= (i + 1) * 2
+                    } else {
+                        d.x * d.x + d.y * d.y < (UNIT * 3 / 2).pow(2)
+                    })
                     && b.fighters[0].hp > 0
                 {
-                    run.charges[i] += 1;
+                    run.charges[i] = (run.charges[i]
+                        + if run.kind == 1 {
+                            90
+                        } else if run.kind == 2 {
+                            6
+                        } else {
+                            2
+                        })
+                    .min(90);
                     if run.charges[i] == 90 {
                         self.sound = 4;
                         self.haptic = 2;
@@ -464,13 +553,14 @@ impl Game {
                                     (5 + j as i32 * 6) * UNIT,
                                 );
                                 enemy.hp = 65;
+                                enemy.max_hp = 65;
+                                enemy.power = 55;
                                 enemy.armor = 10;
                                 enemy.invulnerable = 20;
                                 b.fighters.push(enemy);
                             }
                         }
-                        b.fighters[0].hp =
-                            (b.fighters[0].hp + 35).min(b.codex.hp[self.save.realm.index()] + 60);
+                        b.fighters[0].hp = (b.fighters[0].hp + 35).min(b.fighters[0].max_hp);
                     }
                 }
             }
@@ -484,6 +574,8 @@ impl Game {
                 );
                 boss.pos = Vec2::new(25 * UNIT, 8 * UNIT);
                 boss.hp = 360;
+                boss.max_hp = 360;
+                boss.power = 70;
                 boss.armor = 60;
                 boss.genome = [160; 16];
                 b.fighters.truncate(1);

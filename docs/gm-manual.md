@@ -1,8 +1,8 @@
-# Manuel du Trône — v0.2 DEV
+# Manuel des jalons et du Trône — v0.4 DEV
 
 ## Dans l'application
 
-Depuis la Carte, toucher **VEILLE >**, puis **TRÔNE DEV**. Android demande la biométrie ou le code si l'appareil en possède un. La DEV utilise un certificat de Trône de test inclus dans sa Genèse. Un geste de sept pressions dans le haut du titre ouvre aussi cet accès.
+Depuis le refuge, ouvrir **Forteresse & chroniques**, puis **Le Trône · DEV**. Android demande la biométrie ou le code si l'appareil en possède un. La DEV utilise un certificat de Trône de test inclus dans sa Genèse. Un geste de sept pressions dans le haut du titre ouvre aussi cet accès.
 
 - **Sceller maintenant** : signe un Sceau et recalcule la racine de Merkle. Le Trône actif scelle aussi toutes les quinze minutes.
 - **Édits** : choisir bannissement PvP 24 h / grâce, attribution du bastion, retour de la cellule au premier Sceau, octroi / retrait d'apparence, Proclamation. La cible DEV affichée est le premier pair connu ; sans pair, le Nom local. L'Édit reste en attente jusqu'au Sceau.
@@ -44,3 +44,18 @@ Pour les joueurs, le menu Identité permet de revoir les mots, certifier l'appar
 ## Limites d'exploitation
 
 La production reste verrouillée : il manque la Genèse officielle, la signature de publication et la qualification de l'attestation des appareils. La Haute Cour valide la cohérence du rejeu ; elle ne prouve pas l'absence d'assistance humaine au tir. Les paiements et remboursements réels exigent la configuration Google Play de l'éditeur.
+
+## Périmètre des jalons dans la 0.4
+
+| Jalon | Accès ou composant livré | Qualification restante |
+|---|---|---|
+| M0 Squelette | Workspace, CI, APK, UniFFI, titre et musique | Builds publics CI à distinguer du certificat APK distribué |
+| M1 Combat | Neuf combinaisons, pickups, tutoriel, déplacement analogique, esquive, IA et déterminisme | Équilibrage avec des joueurs humains |
+| M2 Monde solo | H3, GPS facultatif, veille, Noir, bastions, registre ; aventures, découverte et inventaire 0.4 | Campagne sur terrain réel |
+| M3 Identité | Nom, 24 mots, Keystore, certificats appareil/session, récupération DEV | Attestation et fournisseurs SSO de production |
+| M4 Réseau local | Découverte, duel, entrées signées et preuve rejouable | Diversité de routeurs et téléphones |
+| M5 Dix joueurs et Internet | Champ à dix, sièges, Courses, BLE, relais, simulateur | Deux opérateurs mobiles, rencontres BLE et partitions réelles |
+| M6 Couronne | Cérémonie, Trône, Édits, Sceaux, Merkle et Haute Cour | Genèse officielle, attestation anti-Parjure et procédures humaines |
+| M7 Saison et boutique | Codex, 40 paliers, Nuit Longue, Chronique, Billing, cosmétiques, Maisons et héraldique | Paiements/remboursements Play réels et autonomie physique du Phare |
+
+« Présent en DEV » ne signifie pas « homologué en production ». Le [rapport 0.4](delivery-v04.md) distingue les essais effectivement exécutés des fonctions héritées et des limites restantes.

@@ -85,3 +85,21 @@ Avant `PhareTest`, connecter le Wi-Fi de l’émulateur et conserver l’aliment
 Pour le test à dix, utiliser des profils DEV de test sur la même marche, avec le Codex initial. `NetworkHarness` interroge directement le moteur synchronisé depuis le fil de test ; attendre que la boucle de dessin devienne inactive fausse un échantillonnage temps réel. Le script exige au moins 40 points de contrôle communs et aucune divergence.
 
 `cargo run --release -p hk-core --example expedition` joue neuf expéditions par déplacement réel et visée assistée, sans téléporter le joueur ni forcer les dégâts. `cargo run --release -p hk-apu --example score -- extrait.wav` reproduit l’extrait sonore livré.
+
+## Reprise v0.4
+
+Le [rapport courant](delivery-v04.md) remplace les résultats historiques ci-dessus pour la version 0.4. Le protocole de simulation a changé ; les empreintes et preuves antérieures ne sont pas comparables avec celles de la 0.4.
+
+```sh
+cargo test --workspace --locked --release
+cargo run --release -p hk-core --example adventure
+cargo test -p hk-sim --release --target x86_64-apple-darwin ten_thousand_replays -- --nocapture
+```
+
+`AdventureTest` réalise une sortie complète par événements tactiles : deux doigts maintiennent déplacement et attaque ; le test parcourt trois caches, les objectifs et le gardien, puis équipe le meilleur butin via les boutons et vérifie la réouverture. Aucun adversaire n’est supprimé artificiellement. La mesure de rendu couvre ce déplacement effectif, avec un seuil de régression de 20 images/s sur le GPU logiciel du banc.
+
+`GeolocationTest` injecte des callbacks de position Android pour vérifier l’acceptation d’une marche, le rejet d’une mesure imprécise et d’un saut trop rapide, la découverte H3 et l’arrêt du GPS en voyage simulé. Il ne remplace pas une promenade physique. `IdentityMigrationTest` compare la clé publique et les progrès avant et après installation de l’APK signée. Les tests ignorent les gains passifs légitimes d’XP lors d’une relance.
+
+Pour le 4:3, configurer l’émulateur de test avec `adb shell wm size 1080x1440`, exécuter le parcours, puis `adb shell wm size reset`. Les coordonnées sont converties par le même facteur d’échelle et le même décalage vertical que la vue Android.
+
+Après les essais de Trône et de GPS, le banc à dix doit employer des profils d’émulateurs dédiés remis au Codex initial et à la même cellule. Archiver les captures avant de réinitialiser ces seuls profils de test. Ne jamais effacer les données d’un téléphone utilisateur pour ce banc.
