@@ -14,6 +14,30 @@ impl Engine {
             audio: Mutex::new(hk_apu::Apu::default()),
         })
     }
+    pub fn presentation(&self, width: i32) -> String {
+        self.game.lock().unwrap().presentation(width)
+    }
+    pub fn ui_action(&self, action: String) {
+        self.game.lock().unwrap().ui_action(&action);
+    }
+    pub fn hero(&self, realm: u8, role: u8) {
+        self.game.lock().unwrap().hero(realm, role);
+    }
+    pub fn controls(
+        &self,
+        mx: i16,
+        my: i16,
+        ax: i16,
+        ay: i16,
+        auto: bool,
+        dash: bool,
+        skill: bool,
+    ) {
+        self.game
+            .lock()
+            .unwrap()
+            .controls(mx, my, ax, ay, auto, dash, skill);
+    }
     pub fn frame(&self, width: i32) -> Vec<u8> {
         self.game.lock().unwrap().frame(width)
     }
@@ -54,7 +78,7 @@ impl Engine {
         self.game.lock().unwrap().toast(&message);
     }
     pub fn audio(&self, count: u32) -> Vec<u8> {
-        let (enabled, effect, theme) = {
+        let (enabled, effects, effect, theme) = {
             let mut g = self.game.lock().unwrap();
             let theme = if g.screen == 0 {
                 0
@@ -67,12 +91,13 @@ impl Engine {
             } else {
                 g.save.realm.index() as u8 + 1
             };
-            let pair = (g.save.settings.music, g.sound, theme);
+            let pair = (g.save.settings.music, g.save.sound_effects, g.sound, theme);
             g.sound = 0;
             pair
         };
         let mut a = self.audio.lock().unwrap();
         a.enabled = enabled;
+        a.effects_enabled = effects;
         a.theme = theme;
         if effect > 0 {
             a.trigger(effect);

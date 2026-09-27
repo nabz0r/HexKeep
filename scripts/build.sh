@@ -17,4 +17,4 @@ mkdir -p ../artifacts
 cp app/build/outputs/apk/dev/debug/app-dev-debug.apk ../artifacts/
 cp app/build/outputs/apk/prod/release/app-prod-release-unsigned.apk ../artifacts/
 
-cp app/build/outputs/apk/dev/release/app-dev-release.apk ../artifacts/HEXKEEP-v0.2.apk
+cp app/build/outputs/apk/dev/release/app-dev-release.apk ../artifacts/HEXKEEP-v0.3.apk

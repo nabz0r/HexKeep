@@ -156,15 +156,37 @@ impl Battle {
             fighters.push(f);
         }
         let mut obstacles = Vec::new();
-        for (x, y, w, h, kind) in [
-            (9, 3, 2, 3, 0),
-            (19, 10, 2, 3, 0),
-            (14, 6, 2, 4, 1),
-            (5, 8, 3, 1, 1),
-            (22, 5, 3, 1, 1),
-            (10, 12, 4, 1, 2),
-            (17, 2, 3, 1, 2),
-        ] {
+        // Open lanes, readable cover and unblocked lantern destinations on every map.
+        let layout = match seed % 3 {
+            0 => [
+                (10, 3, 2, 3, 0),
+                (19, 10, 2, 3, 0),
+                (14, 7, 2, 2, 1),
+                (7, 10, 2, 1, 1),
+                (22, 7, 3, 1, 1),
+                (10, 13, 3, 1, 2),
+                (18, 2, 3, 1, 2),
+            ],
+            1 => [
+                (11, 3, 1, 4, 0),
+                (19, 9, 1, 4, 0),
+                (14, 7, 3, 1, 1),
+                (7, 10, 2, 1, 1),
+                (22, 10, 2, 1, 1),
+                (14, 3, 3, 1, 2),
+                (9, 13, 3, 1, 2),
+            ],
+            _ => [
+                (9, 7, 2, 2, 0),
+                (21, 7, 2, 2, 0),
+                (14, 3, 3, 2, 1),
+                (7, 12, 3, 1, 1),
+                (21, 12, 3, 1, 1),
+                (13, 9, 2, 1, 2),
+                (18, 10, 2, 1, 2),
+            ],
+        };
+        for (x, y, w, h, kind) in layout {
             obstacles.push(Obstacle {
                 x: x * UNIT,
                 y: y * UNIT,
@@ -173,11 +195,6 @@ impl Battle {
                 kind,
                 life: 0,
             });
-        }
-        if seed % 2 == 1 {
-            for o in &mut obstacles {
-                o.x = WIDTH - o.x - o.w;
-            }
         }
         let pickups = if duel {
             vec![]
@@ -250,10 +267,11 @@ impl Battle {
         let dx = t.pos.x - f.pos.x;
         let dy = t.pos.y - f.pos.y;
         let dist = isqrt(f.pos.dist2(t.pos) as u64) as i32;
-        let preferred = if f.role == Role::Rempart {
-            650
-        } else {
-            1000 + f.genome[1] as i32 * 3
+        let phase = (self.tick + f.id as u32 * 17) % 120;
+        let preferred = match f.role {
+            Role::Foudre => 380,
+            Role::Rempart => 800,
+            Role::Lien => 1600,
         };
         let (mut mx, mut my) = if dist > preferred {
             (dx, dy)
@@ -265,6 +283,15 @@ impl Battle {
         if (self.tick / 90 + f.id as u32) % 2 == 0 {
             mx += dy / 2;
             my -= dx / 2;
+        }
+        // A sentinel plants its feet before a burst; a wolf commits to a close lunge.
+        if f.role == Role::Rempart && (60..100).contains(&phase) {
+            mx = 0;
+            my = 0;
+        }
+        if f.role == Role::Foudre && phase >= 90 {
+            mx = dx;
+            my = dy;
         }
         let probe = Vec2::new(mx, my).scaled(100);
         if blocked(
@@ -300,9 +327,13 @@ impl Battle {
             move_y: mv.y as i16,
             aim_x: aim.x as i16,
             aim_y: aim.y as i16,
-            shoot: self.tick % 90 > (15 + (255 - f.genome[3] as u32) / 8),
-            dash: dist < 500 && self.tick % 120 == f.id as u32,
-            skill: self.tick % 180 == f.id as u32,
+            shoot: match f.role {
+                Role::Foudre => dist < 850 && phase >= 90,
+                Role::Rempart => phase >= 100,
+                Role::Lien => phase >= 75 && phase < 100,
+            },
+            dash: f.role == Role::Foudre && dist < 1400 && phase == 90,
+            skill: f.role != Role::Foudre && phase == 100 && self.tick % 360 < 120,
         }
     }
     pub fn step(&mut self, inputs: &[(u8, Input)]) {

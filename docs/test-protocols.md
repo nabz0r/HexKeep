@@ -75,3 +75,13 @@ Le banc à dix enregistre l'heure monotone de chaque checkpoint et le nombre de 
 - 720p, 5556: 54.59 images/s ; 26.73 ticks/s mesurés ; 97 trames >33ms ; 65.87 secondes.
 
 La fréquence logique cible reste 30 Hz ; la progression réellement observée ci-dessus est inférieure quand le banc ralentit. Le critère complet de fluidité A3/A10 sur téléphones reste donc à qualifier, même si les états réseau sont cohérents.
+
+## Reprise v0.3
+
+`GameplayTest` utilise les coordonnées de la présentation native et vérifie les gestes à deux doigts, la pause, le retour depuis le bilan, le changement de format, le stockage et la relance. `IdentityMigrationTest` enregistre uniquement l’identité publique avant remplacement de l’APK et la compare ensuite. Les commandes du profil de test sont indépendantes de l’identité réelle d’un joueur.
+
+Avant `PhareTest`, connecter le Wi-Fi de l’émulateur et conserver l’alimentation. Le test accorde les permissions de localisation et de notification à son seul paquet de test. Le service doit rester actif pendant la mise en arrière-plan et s’arrêter sur demande.
+
+Pour le test à dix, utiliser des profils DEV de test sur la même marche, avec le Codex initial. `NetworkHarness` interroge directement le moteur synchronisé depuis le fil de test ; attendre que la boucle de dessin devienne inactive fausse un échantillonnage temps réel. Le script exige au moins 40 points de contrôle communs et aucune divergence.
+
+`cargo run --release -p hk-core --example expedition` joue neuf expéditions par déplacement réel et visée assistée, sans téléporter le joueur ni forcer les dégâts. `cargo run --release -p hk-apu --example score -- extrait.wav` reproduit l’extrait sonore livré.

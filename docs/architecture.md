@@ -1,6 +1,6 @@
 # Architecture v0.2
 
-Le cœur de combat est Rust : calcul entier Q24.8, horloge logique 30 Hz, RNG ChaCha8 déterministe. Android fournit l'écran OpenGL ES 2, AudioTrack, les entrées tactiles, GPS, Bluetooth, Keystore, biométrie, fichiers et service de veille. Le rendu conserve une hauteur de 240 pixels et une mise à l'échelle entière avec filtrage nearest.
+Le cœur de combat est Rust : calcul entier Q24.8, horloge logique 30 Hz, RNG ChaCha8 déterministe. Android fournit une présentation Canvas accélérée, AudioTrack 44,1 kHz, les entrées tactiles, GPS, Bluetooth, Keystore, biométrie, fichiers et service de veille. La simulation possède sa boucle à 30 Hz ; le rendu suit les images Android avec interpolation. Les textes et illustrations sont dessinés à la résolution de l’écran, sur un repère adaptatif de 540 unités de haut. Les commandes sémantiques du cœur permettent de conserver les écrans avancés sans rasterisation rétro.
 
 ## Modules
 
@@ -15,7 +15,7 @@ Le cœur de combat est Rust : calcul entier Q24.8, horloge logique 30 Hz, RNG Ch
 | hk-crown | Genèse, certificats, Édits, Sceaux, Merkle, réconciliation |
 | hk-season | Mémoires, garde collective, saison, cosmétiques et Maisons |
 | hk-core | Parcours du jeu, écrans, état persistant et raccordement |
-| hk-ppu / hk-apu | Pixel art et synthèse originale à quatre canaux |
+| hk-ppu / hk-apu | Commandes de présentation, diagnostic raster et musique ambiante originale |
 | hk-ffi | Frontière UniFFI, accès synchronisés au cœur |
 | crown | Cérémonie entièrement hors ligne |
 | hexkeep-relay | Circuits réseau aveugles et temporaires |

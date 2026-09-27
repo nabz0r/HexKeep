@@ -1,5 +1,6 @@
 mod expansion;
 mod network;
+mod presentation;
 use hk_ledger::{Kind, Ledger};
 use hk_ppu::*;
 use hk_proto::*;
@@ -41,6 +42,13 @@ pub struct Save {
     pub settings: Settings,
     #[serde(default)]
     pub expansion: expansion::ExpansionSave,
+    #[serde(default)]
+    pub introduction_seen: bool,
+    #[serde(default = "default_sound")]
+    pub sound_effects: bool,
+}
+fn default_sound() -> bool {
+    true
 }
 impl Default for Save {
     fn default() -> Self {
@@ -59,8 +67,16 @@ impl Default for Save {
             tutorial_done: false,
             settings: Settings::default(),
             expansion: Default::default(),
+            introduction_seen: false,
+            sound_effects: true,
         }
     }
+}
+#[derive(Clone, serde::Serialize)]
+pub struct Expedition {
+    pub charges: [u16; 3],
+    pub wave: u8,
+    pub victory: bool,
 }
 pub struct Game {
     pub save: Save,
@@ -89,6 +105,7 @@ pub struct Game {
     keyboard_return: u8,
     pub key_input: Input,
     pub battle_mode: u8,
+    pub expedition: Option<Expedition>,
     battle_start_kills: u16,
     pub last_hash: String,
     pub node: Option<hk_net::Node>,
@@ -154,6 +171,7 @@ impl Game {
             keyboard_return: 0,
             key_input: Input::default(),
             battle_mode: 0,
+            expedition: None,
             battle_start_kills: 0,
             last_hash: String::new(),
             node: None,
@@ -196,6 +214,15 @@ impl Game {
     pub fn start_battle(&mut self, mode: u8) {
         self.online = None;
         self.battle_mode = mode;
+        self.expedition = if mode == 8 {
+            Some(Expedition {
+                charges: [0; 3],
+                wave: 0,
+                victory: false,
+            })
+        } else {
+            None
+        };
         self.tutorial = mode == 0;
         self.lesson = 0;
         let seed = self.save.world.current ^ (self.save.kills as u64 * 997);
@@ -205,13 +232,16 @@ impl Game {
             self.save.role,
             if mode == 3 || mode == 5 || mode == 7 {
                 9
-            } else if mode == 2 {
+            } else if mode == 2 || mode == 8 {
                 3
             } else {
                 1
             },
             mode == 4,
         );
+        if mode == 8 {
+            b.fighters[0].pos = Vec2::new(4 * UNIT, 8 * UNIT);
+        }
         if self.tutorial {
             b.fighters[0].pos = Vec2::new(7 * UNIT, 8 * UNIT);
             b.fighters[1].pos = Vec2::new(21 * UNIT, 8 * UNIT);
@@ -220,6 +250,14 @@ impl Game {
         }
         if let Ok(state) = self.save.expansion.authority.state(&self.save.ledger) {
             b.apply_codex(state.codex);
+        }
+        if mode == 8 {
+            b.fighters[0].hp += 60;
+            for f in b.fighters.iter_mut().skip(1) {
+                f.realm = Realm::from_index((self.save.realm.index() + 1) % 3);
+                f.hp = 75;
+                f.armor = 20;
+            }
         }
         if mode == 5 {
             b.begin_siege(self.save.realm, self.walls());
@@ -263,6 +301,16 @@ impl Game {
         }
         if let Some(b) = self.battle.take() {
             self.expansion_battle_end(&b);
+            if let Some(run) = self.expedition.take() {
+                let lit = run.charges.iter().filter(|v| **v == 90).count() as u32;
+                self.save.expansion.campaign.xp += lit * 20 + if run.victory { 80 } else { 0 };
+                if run.victory {
+                    if let Some(c) = self.save.world.cells.get_mut(&self.save.world.current) {
+                        c.clear = true;
+                    }
+                    self.event(Kind::Lantern, lit);
+                }
+            }
             self.last_hash = hex(&b.hash());
             let kills = b.fighters[0].kills as u32;
             self.save.kills += kills;
@@ -273,7 +321,7 @@ impl Game {
                 }
             }
         }
-        if self.tutorial {
+        if self.tutorial && self.lesson >= 4 {
             self.save.tutorial_done = true;
         }
         self.screen = 7;
@@ -305,6 +353,10 @@ impl Game {
             }
         }
         if self.screen != 6 {
+            // Opening an in-match menu cannot pause the other participants.
+            if self.screen == 14 && self.online.is_some() {
+                self.step_online(Input::default());
+            }
             return;
         }
         let mut input = self.key_input;
@@ -358,6 +410,7 @@ impl Game {
             }
         }
         if self.tutorial && self.lesson < 4 {
+            b.fighters[1].invulnerable = 2;
             b.step(&[(0, input), (1, Input::default())]);
             b.fighters[0].hp = self.save.realm.hp();
         } else {
@@ -371,6 +424,78 @@ impl Game {
         }
         if b.fighters[0].kills > old_kills {
             self.sound = 3;
+        }
+        if let Some(run) = &mut self.expedition {
+            for f in b.fighters.iter_mut().skip(1) {
+                if f.hp <= 0 {
+                    f.respawn = u16::MAX;
+                }
+            }
+            let points = [
+                Vec2::new(6 * UNIT, 4 * UNIT),
+                Vec2::new(15 * UNIT, 12 * UNIT),
+                Vec2::new(25 * UNIT, 5 * UNIT),
+            ];
+            for (i, pos) in points.iter().enumerate() {
+                let d = Vec2::new(b.fighters[0].pos.x - pos.x, b.fighters[0].pos.y - pos.y);
+                if run.charges[i] < 90
+                    && d.x * d.x + d.y * d.y < (UNIT * 3 / 2).pow(2)
+                    && b.fighters[0].hp > 0
+                {
+                    run.charges[i] += 1;
+                    if run.charges[i] == 90 {
+                        self.sound = 4;
+                        self.haptic = 2;
+                        if i < 2 {
+                            for j in 0..2 {
+                                let id = b.fighters.len() as u8;
+                                let mut enemy = Fighter::new(
+                                    id,
+                                    Realm::from_index((self.save.realm.index() + 1) % 3),
+                                    Role::from_index((i + j) % 3),
+                                    true,
+                                );
+                                enemy.pos = Vec2::new(
+                                    if b.fighters[0].pos.x < 15 * UNIT {
+                                        26 * UNIT
+                                    } else {
+                                        3 * UNIT
+                                    },
+                                    (5 + j as i32 * 6) * UNIT,
+                                );
+                                enemy.hp = 65;
+                                enemy.armor = 10;
+                                enemy.invulnerable = 20;
+                                b.fighters.push(enemy);
+                            }
+                        }
+                        b.fighters[0].hp =
+                            (b.fighters[0].hp + 35).min(b.codex.hp[self.save.realm.index()] + 60);
+                    }
+                }
+            }
+            if run.charges.iter().all(|c| *c == 90) && run.wave == 0 {
+                run.wave = 1;
+                let mut boss = Fighter::new(
+                    1,
+                    Realm::from_index((self.save.realm.index() + 1) % 3),
+                    Role::Rempart,
+                    true,
+                );
+                boss.pos = Vec2::new(25 * UNIT, 8 * UNIT);
+                boss.hp = 360;
+                boss.armor = 60;
+                boss.genome = [160; 16];
+                b.fighters.truncate(1);
+                b.fighters.push(boss);
+                self.sound = 5;
+            } else if run.wave == 1 && b.fighters[1].hp <= 0 {
+                run.victory = true;
+                b.finished = true;
+            }
+            if b.fighters[0].deaths >= 3 {
+                b.finished = true;
+            }
         }
         if (self.tutorial && b.fighters[0].kills > 0)
             || (self.battle_mode == 6 && b.fighters[0].kills > 0)
@@ -704,16 +829,23 @@ impl Game {
         }
     }
     pub fn frame(&mut self, w: i32) -> Vec<u8> {
+        self.canvas(w, false).px
+    }
+    pub fn canvas(&mut self, w: i32, recording: bool) -> Canvas {
         self.width = w.clamp(400, 640) / 8 * 8;
         let w = self.width;
-        let mut c = Canvas::new(w, 240);
+        let mut c = if recording {
+            Canvas::recording(w, 240)
+        } else {
+            Canvas::new(w, 240)
+        };
         c.clear(INK);
         if !self.is_dev {
             c.center(44, "HEXKEEP", GOLD, 4);
             c.center(111, "PRODUCTION VERROUILLÉE", WHITE, 1);
             c.center(136, "Genèse et attestation officielles requises.", MUTED, 1);
             c.center(170, "Utilise l'APK DEV pour jouer.", GOLD, 1);
-            return c.px;
+            return c;
         }
         if self.storage_error {
             c.center(80, "SAUVEGARDE INDISPONIBLE", RED, 2);
@@ -724,7 +856,7 @@ impl Game {
                 MUTED,
                 1,
             );
-            return c.px;
+            return c;
         }
         match self.screen {
             0 => {
@@ -943,7 +1075,11 @@ impl Game {
                 }
                 c.button(w / 2 - 90, 209, 180, "REVOIR MES MOTS", false);
             }
-            6 => self.draw_battle(&mut c),
+            6 => {
+                if !recording {
+                    self.draw_battle(&mut c)
+                }
+            }
             7 => self.draw_map(&mut c),
             8 => {
                 c.center(16, "LA CHRONIQUE", GOLD, 2);
@@ -1196,7 +1332,7 @@ impl Game {
                 }
             }
         }
-        c.px
+        c
     }
     fn draw_map(&self, c: &mut Canvas) {
         let w = c.w;

@@ -9,10 +9,43 @@ pub const BLUE: u32 = 0x73bddd;
 pub const RED: u32 = 0xe47d72;
 pub const GREEN: u32 = 0x9ac8a2;
 pub const REALMS: [u32; 3] = [GOLD, BLUE, GREEN];
+#[derive(serde::Serialize)]
+#[serde(tag = "kind")]
+pub enum UiCommand {
+    Text {
+        x: i32,
+        y: i32,
+        text: String,
+        color: u32,
+        scale: i32,
+    },
+    Button {
+        x: i32,
+        y: i32,
+        w: i32,
+        text: String,
+        active: bool,
+    },
+    Panel {
+        x: i32,
+        y: i32,
+        w: i32,
+        h: i32,
+    },
+    Sprite {
+        x: i32,
+        y: i32,
+        sprite: u8,
+        realm: usize,
+        scale: i32,
+    },
+}
 pub struct Canvas {
     pub w: i32,
     pub h: i32,
     pub px: Vec<u8>,
+    pub ui: Vec<UiCommand>,
+    pub recording: bool,
 }
 impl Canvas {
     pub fn new(w: i32, h: i32) -> Self {
@@ -20,6 +53,17 @@ impl Canvas {
             w,
             h,
             px: vec![0; (w * h * 4) as usize],
+            ui: vec![],
+            recording: false,
+        }
+    }
+    pub fn recording(w: i32, h: i32) -> Self {
+        Self {
+            w,
+            h,
+            px: vec![],
+            ui: vec![],
+            recording: true,
         }
     }
     pub fn clear(&mut self, c: u32) {
@@ -28,12 +72,15 @@ impl Canvas {
         }
     }
     pub fn pixel(&mut self, x: i32, y: i32, c: u32) {
-        if x >= 0 && y >= 0 && x < self.w && y < self.h {
+        if !self.px.is_empty() && x >= 0 && y >= 0 && x < self.w && y < self.h {
             let i = ((y * self.w + x) * 4) as usize;
             self.px[i..i + 4].copy_from_slice(&[(c >> 16) as u8, (c >> 8) as u8, c as u8, 255]);
         }
     }
     pub fn rect(&mut self, x: i32, y: i32, w: i32, h: i32, c: u32) {
+        if self.px.is_empty() {
+            return;
+        }
         for yy in y.max(0)..(y + h).min(self.h) {
             for xx in x.max(0)..(x + w).min(self.w) {
                 self.pixel(xx, yy, c);
@@ -69,10 +116,25 @@ impl Canvas {
         self.rect(x + w - 1, y, 1, h, c);
     }
     pub fn panel(&mut self, x: i32, y: i32, w: i32, h: i32) {
+        if self.recording {
+            self.ui.push(UiCommand::Panel { x, y, w, h });
+        }
         self.rect(x, y, w, h, PANEL);
         self.frame(x, y, w, h, EDGE);
     }
     pub fn text(&mut self, x: i32, y: i32, s: &str, c: u32, scale: i32) {
+        if self.recording {
+            self.ui.push(UiCommand::Text {
+                x,
+                y,
+                text: s.into(),
+                color: c,
+                scale,
+            });
+        }
+        if self.px.is_empty() {
+            return;
+        }
         let mut xx = x;
         for ch in s.chars() {
             let g = glyph(ch);
@@ -96,6 +158,16 @@ impl Canvas {
         );
     }
     pub fn button(&mut self, x: i32, y: i32, w: i32, s: &str, active: bool) {
+        if self.recording {
+            self.ui.push(UiCommand::Button {
+                x,
+                y,
+                w,
+                text: s.into(),
+                active,
+            });
+            return;
+        }
         let col = if active { GOLD } else { EDGE };
         self.rect(x, y, w, 23, if active { 0x352e27 } else { PANEL });
         self.frame(x, y, w, 23, col);
@@ -149,6 +221,16 @@ impl Canvas {
         }
     }
     pub fn sprite(&mut self, x: i32, y: i32, kind: u8, realm: usize, scale: i32, anim: u32) {
+        if self.recording {
+            self.ui.push(UiCommand::Sprite {
+                x,
+                y,
+                sprite: kind,
+                realm,
+                scale,
+            });
+            return;
+        }
         let color = REALMS[realm % 3];
         let rows: &[&str] = match kind {
             0 => &[

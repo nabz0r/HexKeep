@@ -31,7 +31,7 @@ impl Game {
         let region = marche(self.save.world.current).unwrap_or(0);
         self.node = Some(Node::with_session(
             self.session.clone(),
-            format!("hk/dev/marche/{region:x}/v02"),
+            format!("hk/dev/marche/{region:x}/v03"),
         ));
         self.save.world.banner = true;
         self.native_action = 3;

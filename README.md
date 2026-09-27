@@ -1,21 +1,22 @@
-# HEXKEEP v0.2 — La Première Nuit
+# HEXKEEP v0.3 — Les Braises
 
-Un monde que les joueurs tiennent allumé. Jeu Android natif, simulation Rust entière à 30 Hz, rendu pixel à 60 Hz, trois royaumes et trois rôles.
+Un monde que les joueurs tiennent allumé. Jeu Android natif, simulation Rust entière à 30 Hz, présentation Android native avec illustrations peintes, trois royaumes et trois rôles.
 
 ## Installer
 
-Le fichier principal est **`artifacts/HEXKEEP-v0.2.apk`** : DEV release signée, Android 8 ou ultérieur, ARM64 / ARMv7 / x86_64. Ouvrir le fichier sur le téléphone, autoriser ponctuellement l'installation depuis l'application qui l'ouvre, puis installer. La mise à jour de la DEV v0.1 conserve le Nom et le monde. Garder ses 24 mots avant toute désinstallation.
+Le fichier principal est **`artifacts/HEXKEEP-v0.3.apk`** : DEV release signée, Android 8 ou ultérieur, ARM64 / ARMv7 / x86_64. Ouvrir le fichier sur le téléphone, autoriser ponctuellement l'installation depuis l'application qui l'ouvre, puis installer. La mise à jour de la DEV v0.1/v0.2 conserve le Nom et le monde. Garder ses 24 mots avant toute désinstallation.
 
 Ne pas utiliser `app-prod-release-unsigned.apk` pour installer directement : c'est un artefact destiné à la signature de publication. La variante production reste verrouillée tant que sa chaîne d'attestation et sa Genèse officielles ne sont pas configurées.
 
 ## Jouer
 
-1. Créer son Nom et vérifier trois des 24 mots ; déplacer, viser, esquiver, utiliser sa compétence dans le tutoriel.
-2. Depuis la Carte, chasser, veiller et fonder un bastion. Le GPS est facultatif dans la DEV ; sélectionner une cellule puis **Marcher (DEV)** permet les essais.
-3. Toucher **VEILLE >** pour accéder aux sièges, Courses de Mémoire, saison, boutique, Maisons, Phare et Trône.
-4. Siège : détruire la Porte puis tenir la Cour pendant 60 secondes sans ennemi. Mémoire : choisir un sanctuaire, vaincre ses gardiens, consentir à la publication de la cellule, puis livrer à son bastion. Le bouton de chute reproduit une vitesse excessive en DEV.
-5. La boutique est gratuite en DEV, sans débit. Les cosmétiques se collectionnent et s'équipent ; ils ne changent aucune statistique de combat. La piste de saison comporte 40 paliers.
-6. **Trône DEV** ouvre les Édits, les Sceaux, le Codex, la Haute Cour et la Chronique. Voir [le manuel](docs/gm-manual.md).
+1. Entrer dans la nuit : trois scènes de prologue, choix du veilleur et apprentissage jouable. Le Nom est créé et sauvegardé automatiquement ; retrouver ses 24 mots dans **Réglages → Mon Nom & sauvegarde**.
+2. Le pouce gauche déplace le veilleur. L’assistance vise et attaque les ombres proches ; glisser à droite reprend la visée manuelle. Les deux boutons déclenchent l’esquive et le pouvoir. Musique, sons, vibrations et assistance se règlent séparément.
+3. **Partir en expédition** : rester trois secondes près de chaque balise, repousser les renforts puis dissiper le gardien. Trois lumières permettent de revenir après une chute. Le bilan rejoint la progression du refuge.
+4. **Explorer la marche** conserve la sélection de cellules, le GPS facultatif, le déplacement DEV, les bastions et la bannière. **Forteresse & chroniques** ouvre sièges, Courses de Mémoire, saison, boutique, Maisons, Phare et Trône.
+5. La boutique est gratuite en DEV, sans débit ; les cosmétiques ne changent pas les statistiques de combat. La piste de saison comporte 40 paliers. Voir [le manuel](docs/gm-manual.md) pour les fonctions M0–M7.
+
+Les personnages, le sol et les décors sont de nouvelles illustrations ; le jeu conserve une vue en deux dimensions. [Direction artistique, fichiers et prompts](docs/art/v03-direction.md).
 
 ## Construire
 
@@ -30,7 +31,7 @@ scripts/build.sh
 Le script teste le workspace, régénère UniFFI, compile les trois architectures et construit la DEV debug, la DEV release signée et la production unsigned. `JAVA_HOME`, `ANDROID_HOME` et `ANDROID_NDK_HOME` peuvent désigner les installations locales. Le JDK local `.tools/` n'est pas livré dans l'archive.
 
 ```sh
-adb install -r artifacts/HEXKEEP-v0.2.apk
+adb install -r artifacts/HEXKEEP-v0.3.apk
 ```
 
 Une signature de publication distincte se configure dans Gradle ou avec `apksigner`. La clé debug de développement ne doit jamais servir à publier la production.
@@ -69,7 +70,7 @@ Ouvrir le port TCP/UDP choisi. Le relais affiche sa multiadresse publique avec s
 
 La cérémonie DEV et les commandes hors ligne sont décrites dans [le manuel GM](docs/gm-manual.md). La racine privée reste hors dépôt et hors APK. La DEV contient une délégation administrative partagée pour les tests, valable trente jours ; elle est volontairement impropre à une production ouverte.
 
-- [Rapport de validation](docs/delivery.md)
+- [Rapport v0.3](docs/delivery-v03.md) · [Archive v0.2](docs/delivery.md)
 - [Protocoles de test](docs/test-protocols.md)
 - [Architecture](docs/architecture.md) et [protocole](docs/protocol.md)
 - [Économie](docs/economy.md), [vie privée](docs/privacy.md), [menaces](docs/threat-model.md)

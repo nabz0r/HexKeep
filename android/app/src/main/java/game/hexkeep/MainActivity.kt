@@ -17,27 +17,19 @@ import android.media.AudioTrack
 import android.media.AudioManager
 import android.net.wifi.WifiManager
 import android.os.*
-import android.opengl.GLSurfaceView
-import android.opengl.GLES20.*
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.AtomicFile
 import android.util.Log
-import android.view.KeyEvent
-import android.view.MotionEvent
 import android.view.WindowManager
 import game.hexkeep.core.Engine
 import java.io.File
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
 import java.security.KeyStore
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
-import javax.microedition.khronos.egl.EGLConfig
-import javax.microedition.khronos.opengles.GL10
 
 class Vault(private val activity: Context) {
     companion object { private val diskLock = Any() }
@@ -73,7 +65,7 @@ class Vault(private val activity: Context) {
 
 class MainActivity : Activity(), LocationListener {
     lateinit var engine: Engine
-    private lateinit var surface: GameSurface
+    private lateinit var surface: NightSurface
     private lateinit var vault: Vault
     private var authContinuation:(()->Unit)?=null
     private var ble:BleLantern?=null
@@ -127,7 +119,7 @@ class MainActivity : Activity(), LocationListener {
         GameRuntime.engine=engine
         try{DeviceIdentity.certify(this,engine)}catch(e:Exception){engine.notice("Keystore indisponible : identité DEV active.")}
         if(failed)engine.setStorageError()
-        surface=GameSurface(this,engine,::persist,::action,::feedback,::protect)
+        surface=NightSurface(this,engine,::persist,::action,::feedback,::protect)
         setContentView(surface);ready=true
         if(resumed)startAudio()
     }
@@ -135,7 +127,7 @@ class MainActivity : Activity(), LocationListener {
         if(!ready)return
         try{vault.write(engine.snapshot())}catch(e:Exception){Log.e("HEXKEEP","Save failed",e);engine.notice("Sauvegarde impossible : déverrouille l'appareil.")}
     }
-    fun renderMetrics():String=surface.pixel.metrics()
+    fun renderMetrics():String=surface.metrics()
     private fun protect(sensitive:Boolean){runOnUiThread{if(sensitive)window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)else window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)}}
     private fun action(id:Int){runOnUiThread{when(id){
         1->requestGps()
@@ -176,66 +168,14 @@ class MainActivity : Activity(), LocationListener {
         Thread({
             android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO)
             val track=AudioTrack.Builder().setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build())
-                .setAudioFormat(AudioFormat.Builder().setSampleRate(22050).setChannelMask(AudioFormat.CHANNEL_OUT_MONO).setEncoding(AudioFormat.ENCODING_PCM_16BIT).build())
-                .setBufferSizeInBytes(maxOf(4410,AudioTrack.getMinBufferSize(22050,AudioFormat.CHANNEL_OUT_MONO,AudioFormat.ENCODING_PCM_16BIT)))
+                .setAudioFormat(AudioFormat.Builder().setSampleRate(44100).setChannelMask(AudioFormat.CHANNEL_OUT_MONO).setEncoding(AudioFormat.ENCODING_PCM_16BIT).build())
+                .setBufferSizeInBytes(maxOf(8820,AudioTrack.getMinBufferSize(44100,AudioFormat.CHANNEL_OUT_MONO,AudioFormat.ENCODING_PCM_16BIT)))
                 .setTransferMode(AudioTrack.MODE_STREAM).build()
-            try{track.play();while(running.get()){val pcm=engine.audio(735u);track.write(pcm,0,pcm.size)}}catch(e:Exception){Log.w("HEXKEEP","Audio interrupted",e)}finally{track.stop();track.release()}
+            try{track.play();while(running.get()){val pcm=engine.audio(1470u);track.write(pcm,0,pcm.size)}}catch(e:Exception){Log.w("HEXKEEP","Audio interrupted",e)}finally{track.stop();track.release()}
         },"HEXKEEP audio").start()
     }
     override fun onPause(){resumed=false;GameRuntime.foreground=false;audioRunning.set(false);if(ready){engine.touch(0,3u,0,0);if(!engine.phare()){engine.pauseNetwork();ble?.stop()};multicast?.let{if(it.isHeld)it.release()};multicast=null;surface.onPause();if(engine.dirty())persist()};locationManager.removeUpdates(this);super.onPause()}
     override fun onResume(){super.onResume();resumed=true;GameRuntime.foreground=true;window.decorView.systemUiVisibility=5894;if(ready){surface.onResume();startAudio()}}
-    override fun onDestroy(){shop?.close();ble?.stop();audioRunning.set(false);authSignal?.cancel();super.onDestroy()}
-    @Deprecated("Back compatibility") override fun onBackPressed(){if(ready){engine.back()}else super.onBackPressed()}
-}
-
-class GameSurface(activity:Activity,private val engine:Engine,save:()->Unit,action:(Int)->Unit,haptic:()->Unit,secure:(Boolean)->Unit):GLSurfaceView(activity){
-    val pixel=PixelRenderer(engine,save,action,haptic,secure)
-    init{setEGLContextClientVersion(2);preserveEGLContextOnPause=true;setRenderer(pixel);isFocusable=true;isFocusableInTouchMode=true}
-    override fun onTouchEvent(event:MotionEvent):Boolean{
-        val action=event.actionMasked
-        if(action==MotionEvent.ACTION_CANCEL){engine.touch(0,3u,0,0);return true}
-        for(i in 0 until event.pointerCount){if(action!=MotionEvent.ACTION_MOVE&&i!=event.actionIndex)continue
-            val phase:UByte=when(action){MotionEvent.ACTION_DOWN,MotionEvent.ACTION_POINTER_DOWN->0u;MotionEvent.ACTION_UP,MotionEvent.ACTION_POINTER_UP->2u;else->1u}
-            val x=((event.getX(i)-pixel.left)/pixel.scale).toInt();val y=((event.getY(i)-pixel.top)/pixel.scale).toInt()
-            engine.touch(event.getPointerId(i),phase,x,y)
-        };return true
-    }
-}
-
-class PixelRenderer(private val engine:Engine,private val save:()->Unit,private val action:(Int)->Unit,private val haptic:()->Unit,private val secure:(Boolean)->Unit):GLSurfaceView.Renderer{
-    @Volatile var logicalWidth=520;private set
-    @Volatile var scale=1;private set
-    @Volatile var left=0;private set
-    @Volatile var top=0;private set
-    private var physicalHeight=0
-    private var program=0;private var texture=0;private var last=0L;private var accumulator=0L;private var frames=0;private var protected=false
-    private var metricStart=0L
-    private var metricElapsed=0L
-    private var metricFrames=0L
-    private var slowFrames=0L
-    @Synchronized fun metrics():String=org.json.JSONObject().put("frames",metricFrames).put("seconds",if(metricStart==0L)0.0 else metricElapsed/1e9).put("over_33ms",slowFrames).toString()
-    private var buffer:ByteBuffer=ByteBuffer.allocateDirect(640*240*4)
-    private val vertices=ByteBuffer.allocateDirect(64).order(ByteOrder.nativeOrder()).asFloatBuffer().apply{put(floatArrayOf(-1f,-1f,0f,1f,1f,-1f,1f,1f,-1f,1f,0f,0f,1f,1f,1f,0f));position(0)}
-    override fun onSurfaceCreated(gl:GL10?,config:EGLConfig?){
-        fun shader(type:Int,src:String):Int{val id=glCreateShader(type);glShaderSource(id,src);glCompileShader(id);val ok=IntArray(1);glGetShaderiv(id,GL_COMPILE_STATUS,ok,0);check(ok[0]!=0){glGetShaderInfoLog(id)};return id}
-        program=glCreateProgram();glAttachShader(program,shader(GL_VERTEX_SHADER,"attribute vec2 p;attribute vec2 t;varying vec2 uv;void main(){gl_Position=vec4(p,0.,1.);uv=t;}"));glAttachShader(program,shader(GL_FRAGMENT_SHADER,"precision mediump float;varying vec2 uv;uniform sampler2D tex;void main(){gl_FragColor=texture2D(tex,uv);}"));glLinkProgram(program)
-        val ids=IntArray(1);glGenTextures(1,ids,0);texture=ids[0];glBindTexture(GL_TEXTURE_2D,texture)
-        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE)
-        glClearColor(0f,0f,0f,1f);last=System.nanoTime()
-    }
-    override fun onSurfaceChanged(gl:GL10?,w:Int,h:Int){scale=minOf(h/240,w/400).coerceAtLeast(1);logicalWidth=(w/scale/8*8).coerceIn(400,640);left=(w-logicalWidth*scale)/2;top=(h-240*scale)/2;physicalHeight=h;last=System.nanoTime();accumulator=0
-        glBindTexture(GL_TEXTURE_2D,texture);glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,logicalWidth,240,0,GL_RGBA,GL_UNSIGNED_BYTE,null)
-    }
-    override fun onDrawFrame(gl:GL10?){
-        val now=System.nanoTime();if(metricStart==0L)metricStart=now;metricFrames++;metricElapsed+=(now-last).coerceIn(0,100_000_000L);if(now-last>33_333_333L)slowFrames++;accumulator+=(now-last).coerceAtMost(166_666_665L);last=now
-        while(accumulator>=33_333_333L){engine.tick((System.currentTimeMillis()/1000).toULong());accumulator-=33_333_333L}
-        val data=engine.frame(logicalWidth);buffer.clear();buffer.put(data);buffer.position(0)
-        glClear(GL_COLOR_BUFFER_BIT);glViewport(left,physicalHeight-top-240*scale,logicalWidth*scale,240*scale)
-        glUseProgram(program);glBindTexture(GL_TEXTURE_2D,texture);glTexSubImage2D(GL_TEXTURE_2D,0,0,0,logicalWidth,240,GL_RGBA,GL_UNSIGNED_BYTE,buffer)
-        val p=glGetAttribLocation(program,"p");val t=glGetAttribLocation(program,"t");vertices.position(0);glEnableVertexAttribArray(p);glVertexAttribPointer(p,2,GL_FLOAT,false,16,vertices);vertices.position(2);glEnableVertexAttribArray(t);glVertexAttribPointer(t,2,GL_FLOAT,false,16,vertices);glDrawArrays(GL_TRIANGLE_STRIP,0,4)
-        val sensitive=engine.sensitive();if(sensitive!=protected){protected=sensitive;secure(sensitive)}
-        val a=engine.action().toInt();if(a!=0)action(a)
-        if(engine.haptic().toInt()!=0)haptic()
-        frames++;if(frames%60==0&&engine.dirty())save()
-    }
+    override fun onDestroy(){if(ready)surface.close();shop?.close();ble?.stop();audioRunning.set(false);authSignal?.cancel();super.onDestroy()}
+    @Deprecated("Back compatibility") override fun onBackPressed(){if(ready){surface.back()}else super.onBackPressed()}
 }

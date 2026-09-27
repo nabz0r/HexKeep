@@ -4,13 +4,13 @@ Données locales : identité Ed25519, nom, préférences, royaume, rôle, cellul
 
 Le GPS est facultatif, demandé uniquement depuis le bouton prévu, et arrêté à la pause. Les coordonnées précises ne sont ni sauvegardées ni transmises ; le cœur ne conserve que H3 rés. 9. Les positions de combat sont des coordonnées de l’arène, sans lien avec une position réelle précise. Aucun accès aux contacts, appareil photo, micro ou stockage global.
 
-Le LAN est désactivé jusqu’à son activation explicite dans PAIRS. Cela lève la bannière et publie une cellule grossière auprès des pairs de la Marche. L’IP est nécessaire au transport et visible des pairs. Les évènements de carte sont retardés de quinze minutes avant diffusion. Aucune Course de Mémoire et donc aucune exception de suivi rés. 10 dans cette version.
+Le LAN est désactivé jusqu’à son activation explicite dans PAIRS. Cela lève la bannière et publie une cellule grossière auprès des pairs de la Marche. L’IP est nécessaire au transport et visible des pairs. Les évènements de carte sont retardés de quinze minutes avant diffusion. La Course de Mémoire demande un consentement distinct avant de publier la cellule de transport.
 
 Risques résiduels : corrélation d’une cellule avec un nom, observation d’IP, modification d’un client dev, extraction sur appareil compromis. Le réseau dev n’offre pas l’anti-Sybil ou l’attestation prod. Le fichier de preuve exporté contient identités publiques, cellule et commandes de combat ; il ne contient ni mots de récupération ni coordonnées GPS exactes. L’utilisateur choisit lui-même la destination dans le sélecteur Android.
 
 L’écran des mots est protégé contre la capture d’écran Android. Les mots sont affichés volontairement à leur propriétaire ; les noter hors ligne. Effacer les données de l’application détruit la copie locale. Désinstaller ne révoque pas les clés dont d’autres pairs possèdent déjà les événements signés.
 
-L’affichage initial explique 16+, l’attention au monde réel, l’interdiction de jouer en conduisant et le respect des propriétés privées. Le placement réel sécurisé selon OpenStreetMap reste à faire. La carte par défaut est explicitement un terrain d’entraînement dev, pas une instruction de déplacement physique.
+La v0.3 commence par un prologue fictif jouable hors ligne. Le GPS est activé seulement depuis la carte, après la permission Android. Le déplacement DEV reste un outil de test. Le placement réel sécurisé selon OpenStreetMap reste à faire ; la carte DEV ne constitue pas une instruction de déplacement physique.
 
 ## Compléments v0.2
 
@@ -19,3 +19,7 @@ Le Bluetooth diffuse un jeton de session tournant et un royaume. La clé de Nom 
 Le Phare utilise une notification persistante et une commande Arrêter ; le service exige secteur et Wi-Fi et conserve une ancre GPS locale. Son démarrage conserve le choix de bannière. Il n'y a pas de permission de localisation permanente. La boutique DEV ne débite aucun paiement et ne recueille pas de coordonnées bancaires ; l'interrogation facultative du catalogue utilise le SDK Google Play Billing.
 
 Les preuves de combat incluent des positions dans l'arène fictive, pas les coordonnées physiques. Les trois preuves complètes les plus récentes sont conservées localement ; l'export de dossier est une action du joueur. Les certificats publics lient les sessions au Nom auprès des pairs de la partie. La DEV ne doit pas être utilisée comme outil de suivi de personnes réelles.
+
+## Présentation v0.3
+
+Le Nom est généré localement à la première entrée dans le prologue. La récupération par 24 mots est accessible dans les réglages ; le jeu rappelle de les noter, sans imposer le questionnaire avant de jouer. Les scènes, sprites et la musique sont intégrés dans l’APK : aucun service de génération n’est contacté par le téléphone. Les préférences d’assistance de visée restent dans le stockage privé de l’application.

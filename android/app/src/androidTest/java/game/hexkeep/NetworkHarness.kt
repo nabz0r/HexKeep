@@ -22,11 +22,11 @@ class NetworkHarness {
         output.writeText("")
         ActivityScenario.launch<MainActivity>(Intent(instrumentation.targetContext,MainActivity::class.java)).use{scenario->
             SystemClock.sleep(800)
-            scenario.onActivity{it.engine.connect(address!!)}
+            lateinit var activity:MainActivity
+            scenario.onActivity{activity=it;if(!JSONObject(it.engine.snapshot()).getBoolean("created")){it.engine.uiAction("prologue");it.engine.uiAction("home")};it.engine.connect(address!!)}
             var last=0;var participants=0;val until=SystemClock.elapsedRealtime()+65000
             while(SystemClock.elapsedRealtime()<until){
-                var json=""
-                scenario.onActivity{json=it.engine.networkReport()}
+                val json=activity.engine.networkReport()
                 val state=JSONObject(json)
                 assertTrue("Network failure: $json",state.isNull("error"))
                 participants=maxOf(participants,state.getInt("participants"))
@@ -34,7 +34,7 @@ class NetworkHarness {
                 if(tick>last){output.appendText(state.put("elapsed_ms",SystemClock.elapsedRealtime()).toString()+"\n");last=tick}
                 SystemClock.sleep(100)
             }
-            scenario.onActivity{File(it.getExternalFilesDir(null),"v02-network-render.json").writeText(it.renderMetrics())}
+            instrumentation.runOnMainSync{File(activity.getExternalFilesDir(null),"v03-network-render.json").writeText(activity.renderMetrics());activity.finish()}
             assertEquals(10,participants)
             assertTrue("Too few ticks: $last",last>=1200)
         }

@@ -17,7 +17,7 @@ class ExpansionTest {
  ActivityScenario.launch<MainActivity>(Intent(instrumentation.targetContext,MainActivity::class.java)).use{scenario->
   SystemClock.sleep(1000)
   fun tap(x:Int,y:Int){scenario.onActivity{it.engine.touch(71,0u,x,y);it.engine.touch(71,2u,x,y)};SystemClock.sleep(100)}
-  fun shot(name:String){SystemClock.sleep(200);val b=instrumentation.uiAutomation.takeScreenshot();File(instrumentation.targetContext.getExternalFilesDir(null),"v02-$name.png").outputStream().use{b.compress(Bitmap.CompressFormat.PNG,100,it)}}
+  fun shot(name:String){SystemClock.sleep(200);val b=instrumentation.uiAutomation.takeScreenshot();File(instrumentation.targetContext.getExternalFilesDir(null),"v03-$name.png").outputStream().use{b.compress(Bitmap.CompressFormat.PNG,100,it)}}
   scenario.onActivity{assertTrue(DeviceIdentity.certify(it,it.engine))}
   var created=false;scenario.onActivity{created=JSONObject(it.engine.snapshot()).getBoolean("created")}
   tap(290,166)
