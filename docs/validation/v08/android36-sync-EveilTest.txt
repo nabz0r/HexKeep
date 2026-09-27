@@ -1,0 +1,8 @@
+
+game.hexkeep.EveilTest:.
+
+Time: 39.298
+
+OK (1 test)
+
+

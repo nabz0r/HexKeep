@@ -29,6 +29,8 @@ Les preuves sont dans [validation/v08](validation/v08/).
 
 La scène tactile de campagne sur l’APK final Android 16 a mesuré **35,1 images/s en moyenne** et environ **127 Mio de tas natif**. Les mesures sont des parcours instrumentés sur émulateur SwiftShader, avec menus et chargements ; elles ne certifient ni un débit constant ni les performances thermiques d’un téléphone. Le cache de 88 Mio borne les images conservées par le renderer, pas la mémoire totale du processus.
 
+Les anciens tests tactiles attendent désormais que le refuge ait effectivement présenté ses contrôles avant de lire les coordonnées et d’envoyer les gestes. Les transitions attendent deux images rendues, et chaque événement injecté doit être accepté. Cette synchronisation corrige les deux démarrages trop précoces détectés sur le runner distant ; les parcours complets de butin et d’exploration ont été rejoués avec succès (`android36-sync-*`).
+
 Les captures `v08-renderer-*` sont des états de test rendus par les classes du jeu. Les captures sans ce préfixe et celles de `store/fr-FR/screenshots/` proviennent de parties et de gestes exécutés sur Android. La présentation des gardiens en fixture ne prétend pas être une victoire jouée.
 
 ## Installer et retrouver les sources

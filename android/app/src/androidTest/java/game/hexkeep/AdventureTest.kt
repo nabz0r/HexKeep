@@ -22,9 +22,10 @@ class AdventureTest {
  private fun event(action:Int,points:List<Pair<Float,Float>>){
   val props=points.indices.map{MotionEvent.PointerProperties().apply{id=it;toolType=MotionEvent.TOOL_TYPE_FINGER}}.toTypedArray()
   val coords=points.map{MotionEvent.PointerCoords().apply{x=left+it.first*scale;y=it.second*scale+top;pressure=1f;size=1f}}.toTypedArray()
-  test.uiAutomation.injectInputEvent(MotionEvent.obtain(down,SystemClock.uptimeMillis(),action,points.size,props,coords,0,0,1f,1f,0,0,android.view.InputDevice.SOURCE_TOUCHSCREEN,0),false)
+  val e=MotionEvent.obtain(down,SystemClock.uptimeMillis(),action,points.size,props,coords,0,0,1f,1f,0,0,android.view.InputDevice.SOURCE_TOUCHSCREEN,0)
+  try{assertTrue("Touch event rejected",test.uiAutomation.injectInputEvent(e,true))}finally{e.recycle()}
  }
- private fun tap(x:Float,y:Float){down=SystemClock.uptimeMillis();event(MotionEvent.ACTION_DOWN,listOf(x to y));SystemClock.sleep(70);event(MotionEvent.ACTION_UP,listOf(x to y));SystemClock.sleep(300)}
+ private fun tap(x:Float,y:Float){down=SystemClock.uptimeMillis();event(MotionEvent.ACTION_DOWN,listOf(x to y));SystemClock.sleep(70);event(MotionEvent.ACTION_UP,listOf(x to y));SystemClock.sleep(300);JourneyUiSync.frames(activity)}
  private fun tapId(id:String){
   repeat(8){
    var metrics=JSONObject();test.runOnMainSync{metrics=JSONObject(activity.renderMetrics())}
@@ -57,8 +58,8 @@ class AdventureTest {
  @Test fun completeLootEquipAndRestore(){
   var identity="";var count=0
   ActivityScenario.launch<MainActivity>(Intent(test.targetContext,MainActivity::class.java)).use{scenario->
-   SystemClock.sleep(1000);scenario.onActivity{activity=it;engine=it.engine;val viewport=JSONObject(it.renderMetrics()).getJSONObject("viewport");scale=viewport.getDouble("scale").toFloat();left=viewport.getDouble("left").toFloat();top=viewport.getDouble("top").toFloat();vw=viewport.getDouble("width").toFloat();it.engine.uiAction("continue");it.engine.uiAction("home");it.engine.hero(0u,0u);identity=it.engine.identityPublic().contentToString()}
-   SystemClock.sleep(250);tap(160f,476f);assertEquals(41,state().getInt("screen"));shot("journal")
+   SystemClock.sleep(1000);scenario.onActivity{activity=it;engine=it.engine;it.engine.uiAction("continue");it.engine.uiAction("home");it.engine.hero(0u,0u);identity=it.engine.identityPublic().contentToString()}
+   val viewport=JourneyUiSync.homeViewport(activity);scale=viewport.getDouble("scale").toFloat();left=viewport.getDouble("left").toFloat();top=viewport.getDouble("top").toFloat();vw=viewport.getDouble("width").toFloat();tap(160f,476f);assertEquals(41,state().getInt("screen"));shot("journal")
    val cw=(vw-128)/3;tap(48+2*(cw+16)+cw/2,407f);SystemClock.sleep(450);assertEquals(6,state().getInt("screen"))
    val metricBefore=JSONObject(activity.renderMetrics());val combatStarted=SystemClock.uptimeMillis()
    down=SystemClock.uptimeMillis();event(MotionEvent.ACTION_DOWN,listOf(100f to 435f));SystemClock.sleep(50);event(MotionEvent.ACTION_POINTER_DOWN or (1 shl 8),listOf(100f to 435f,(vw-91) to 326f))
@@ -76,7 +77,7 @@ class AdventureTest {
    event(MotionEvent.ACTION_CANCEL,listOf(100f to 435f,(vw-91) to 326f))
    assertTrue("Renderer did not advance",fps>0)
    assertTrue("Moving gameplay below $minimumFps FPS: $fps",fps>=minimumFps)
-   event(MotionEvent.ACTION_CANCEL,listOf(100f to 435f,(vw-91) to 326f));assertEquals("Expedition timed out: ${state()}",12,state().getInt("screen"));assertTrue(state().getJSONObject("expedition").getBoolean("victory"));assertTrue((0..2).all{state().getJSONObject("expedition").getJSONArray("caches").getBoolean(it)});shot("loot-result")
+   assertEquals("Expedition timed out: ${state()}",12,state().getInt("screen"));assertTrue(state().getJSONObject("expedition").getBoolean("victory"));assertTrue((0..2).all{state().getJSONObject("expedition").getJSONArray("caches").getBoolean(it)});shot("loot-result")
    tap(vw/2,447f);assertEquals(7,state().getInt("screen"));tap(385f,474f);assertEquals(40,state().getInt("screen"));shot("inventory")
    val j=state().getJSONObject("journey");count=j.getJSONArray("items").length();assertTrue(count>=7)
    // Select a recovered item through its card, then equip it through the actual UI.

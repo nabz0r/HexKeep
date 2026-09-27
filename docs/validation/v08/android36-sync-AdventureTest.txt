@@ -1,0 +1,8 @@
+
+game.hexkeep.AdventureTest:.
+
+Time: 31.866
+
+OK (1 test)
+
+

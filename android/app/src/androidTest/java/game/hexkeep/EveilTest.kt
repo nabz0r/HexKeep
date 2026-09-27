@@ -26,9 +26,10 @@ class EveilTest {
   if(action==MotionEvent.ACTION_UP||action==MotionEvent.ACTION_CANCEL)gestureDown=false
   val props=points.indices.map{MotionEvent.PointerProperties().apply{id=it;toolType=MotionEvent.TOOL_TYPE_FINGER}}.toTypedArray()
   val coords=points.map{MotionEvent.PointerCoords().apply{x=left+it.first*scale;y=it.second*scale+top;pressure=1f;size=1f}}.toTypedArray()
-  assertTrue("Touch event rejected",test.uiAutomation.injectInputEvent(MotionEvent.obtain(down,SystemClock.uptimeMillis(),action,points.size,props,coords,0,0,1f,1f,0,0,android.view.InputDevice.SOURCE_TOUCHSCREEN,0),false));lastPoints=points
+  val e=MotionEvent.obtain(down,SystemClock.uptimeMillis(),action,points.size,props,coords,0,0,1f,1f,0,0,android.view.InputDevice.SOURCE_TOUCHSCREEN,0)
+  try{assertTrue("Touch event rejected",test.uiAutomation.injectInputEvent(e,true))}finally{e.recycle()};lastPoints=points
  }
- private fun tap(x:Float,y:Float,settle:Long=300){down=SystemClock.uptimeMillis();event(MotionEvent.ACTION_DOWN,listOf(x to y));SystemClock.sleep(70);event(MotionEvent.ACTION_UP,listOf(x to y));SystemClock.sleep(settle)}
+ private fun tap(x:Float,y:Float,settle:Long=300){down=SystemClock.uptimeMillis();event(MotionEvent.ACTION_DOWN,listOf(x to y));SystemClock.sleep(70);event(MotionEvent.ACTION_UP,listOf(x to y));SystemClock.sleep(settle);if(settle>0)JourneyUiSync.frames(activity)}
  private fun shot(name:String){SystemClock.sleep(150);val b=test.uiAutomation.takeScreenshot();File(test.targetContext.getExternalFilesDir(null),"v05-$name.png").outputStream().use{b.compress(Bitmap.CompressFormat.PNG,100,it)}}
  private fun state()=JSONObject(engine.presentation(584))
  private fun route(b:JSONObject,goal:Pair<Float,Float>):Pair<Float,Float>{
@@ -56,8 +57,8 @@ class EveilTest {
  private fun metrics()=JSONObject(activity.renderMetrics()).getJSONObject("animation")
  @Test fun animateExploreInspectAndResume(){
   ActivityScenario.launch<MainActivity>(Intent(test.targetContext,MainActivity::class.java)).use{scenario->
-   SystemClock.sleep(1500);scenario.onActivity{activity=it;engine=it.engine;val viewport=JSONObject(it.renderMetrics()).getJSONObject("viewport");scale=viewport.getDouble("scale").toFloat();left=viewport.getDouble("left").toFloat();top=viewport.getDouble("top").toFloat();vw=viewport.getDouble("width").toFloat();engine.uiAction("continue");engine.uiAction("home");engine.hero(0u,0u)}
-   SystemClock.sleep(300);tap(160f,476f);tap(160f,407f);assertEquals(6,state().getInt("screen"))
+   SystemClock.sleep(1500);scenario.onActivity{activity=it;engine=it.engine;engine.uiAction("continue");engine.uiAction("home");engine.hero(0u,0u)}
+   val viewport=JourneyUiSync.homeViewport(activity);scale=viewport.getDouble("scale").toFloat();left=viewport.getDouble("left").toFloat();top=viewport.getDouble("top").toFloat();vw=viewport.getDouble("width").toFloat();tap(160f,476f);tap(160f,407f);assertEquals(6,state().getInt("screen"))
    for((index,direction) in listOf(1f to 0f,0f to -1f,-1f to 0f,0f to 1f).withIndex()){
     beginMove(direction.first,direction.second);SystemClock.sleep(650);shot("walk-$index");stop()
    }
