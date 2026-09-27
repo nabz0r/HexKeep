@@ -1,3 +1,4 @@
+mod expansion;
 mod network;
 use hk_ledger::{Kind, Ledger};
 use hk_ppu::*;
@@ -38,6 +39,8 @@ pub struct Save {
     pub kills: u32,
     pub tutorial_done: bool,
     pub settings: Settings,
+    #[serde(default)]
+    pub expansion: expansion::ExpansionSave,
 }
 impl Default for Save {
     fn default() -> Self {
@@ -55,11 +58,14 @@ impl Default for Save {
             kills: 0,
             tutorial_done: false,
             settings: Settings::default(),
+            expansion: Default::default(),
         }
     }
 }
 pub struct Game {
     pub save: Save,
+    pub expansion: expansion::Expansion,
+    pub session: hk_crypto::identity::Session,
     pub screen: u8,
     pub ticks: u64,
     pub now: u64,
@@ -102,10 +108,29 @@ impl Game {
         };
         let error = parsed.is_err();
         let save = parsed.unwrap_or_default();
-        let tampered = save.version != 1 || save.ledger.events.iter().any(|e| !e.valid("dev"));
+        let mut tampered = save.version != 1 || save.ledger.events.iter().any(|e| !e.valid("dev"));
+        let mut authority = expansion::fixture().authority;
+        if authority
+            .merge(&save.expansion.authority, &save.ledger)
+            .is_err()
+        {
+            tampered = true;
+        }
+        let last_proof = save
+            .expansion
+            .case_files
+            .last()
+            .cloned()
+            .unwrap_or_default();
         let selected = save.world.current;
+        let session = hk_crypto::identity::Session::development(&save.secret, hk_net::unix_time());
         Self {
             save,
+            session,
+            expansion: expansion::Expansion {
+                brush: 1,
+                ..Default::default()
+            },
             screen: 0,
             ticks: 0,
             now: 0,
@@ -137,7 +162,7 @@ impl Game {
             addresses: vec![],
             peer_count: 0,
             latency: 0,
-            last_proof: String::new(),
+            last_proof,
         }
     }
     pub fn snapshot(&self) -> String {
@@ -178,7 +203,7 @@ impl Game {
             seed,
             self.save.realm,
             self.save.role,
-            if mode == 3 {
+            if mode == 3 || mode == 5 || mode == 7 {
                 9
             } else if mode == 2 {
                 3
@@ -192,6 +217,36 @@ impl Game {
             b.fighters[1].pos = Vec2::new(21 * UNIT, 8 * UNIT);
             b.fighters[1].armor = 0;
             b.fighters[1].genome = [32; 16];
+        }
+        if let Ok(state) = self.save.expansion.authority.state(&self.save.ledger) {
+            b.apply_codex(state.codex);
+        }
+        if mode == 5 {
+            b.begin_siege(self.save.realm, self.walls());
+        }
+        if mode >= 5 {
+            for f in &mut b.fighters {
+                if f.id > 0 {
+                    f.genome = self.save.expansion.campaign.genomes
+                        [f.id as usize % self.save.expansion.campaign.genomes.len()];
+                }
+            }
+        }
+        if mode == 7 {
+            let population = self.save.expansion.campaign.genomes.clone();
+            for f in &mut b.fighters {
+                if f.id > 0 {
+                    for j in 0..16 {
+                        f.genome[j] = population
+                            .iter()
+                            .map(|g| g[j] as u32)
+                            .sum::<u32>()
+                            .checked_div(population.len() as u32)
+                            .unwrap_or(128) as u8;
+                    }
+                }
+            }
+            b.fighters[1].hp = 300;
         }
         self.battle_start_kills = 0;
         self.battle = Some(b);
@@ -207,6 +262,7 @@ impl Game {
             return;
         }
         if let Some(b) = self.battle.take() {
+            self.expansion_battle_end(&b);
             self.last_hash = hex(&b.hash());
             let kills = b.fighters[0].kills as u32;
             self.save.kills += kills;
@@ -228,6 +284,7 @@ impl Game {
         self.ticks += 1;
         self.now = now;
         self.poll_network();
+        self.expansion_tick();
         if self.storage_error || !self.is_dev {
             return;
         }
@@ -237,7 +294,9 @@ impl Game {
                     c.last_watch = now;
                 }
             }
-            self.save.world.elapse(now, 1);
+            self.save
+                .world
+                .elapse_radius(now, 1, if self.save.expansion.phare { 5 } else { 2 });
             if self.ticks % 300 == 0 {
                 self.dirty = true;
             }
@@ -313,7 +372,11 @@ impl Game {
         if b.fighters[0].kills > old_kills {
             self.sound = 3;
         }
-        if (self.tutorial && b.fighters[0].kills > 0) || b.finished {
+        if (self.tutorial && b.fighters[0].kills > 0)
+            || (self.battle_mode == 6 && b.fighters[0].kills > 0)
+            || (self.battle_mode == 7 && b.fighters[1].deaths > 0)
+            || b.finished
+        {
             self.screen = 12;
             self.touches.clear();
         }
@@ -362,8 +425,18 @@ impl Game {
             return;
         }
         self.sound = 1;
+        if self.screen >= 20 {
+            self.expansion_tap(x, y);
+            return;
+        }
         match self.screen {
             0 => {
+                if y < 100 {
+                    self.expansion.hidden_taps += 1;
+                    if self.expansion.hidden_taps >= 7 {
+                        self.native_action = 8;
+                    }
+                }
                 if y >= 150 && y <= 184 {
                     if self.save.created {
                         self.screen = 7
@@ -442,7 +515,9 @@ impl Game {
             }
             7 => {
                 if y < 25 {
-                    if x > w - 44 {
+                    if x < 180 {
+                        self.screen = 20;
+                    } else if x > w - 44 {
                         self.screen = 10;
                     } else if x > w - 107 {
                         self.screen = 8;
@@ -545,6 +620,11 @@ impl Game {
                             match hk_crypto::restore(&self.keyboard) {
                                 Ok(secret) => {
                                     self.save.secret = secret;
+                                    self.session = hk_crypto::identity::Session::development(
+                                        &secret,
+                                        hk_net::unix_time(),
+                                    );
+                                    self.native_action = 10;
                                     self.save.created = true;
                                     self.dirty = true;
                                     self.screen = 7;
@@ -683,7 +763,10 @@ impl Game {
                 );
                 c.center(
                     226,
-                    self.tr("DEV · SOLO HORS LIGNE · 0.1", "DEV · OFFLINE SOLO · 0.1"),
+                    self.tr(
+                        "DEV · CAMPAGNE ET COURONNE · 0.2",
+                        "DEV · CAMPAIGN AND CROWN · 0.2",
+                    ),
                     MUTED,
                     1,
                 );
@@ -898,6 +981,9 @@ impl Game {
                         Kind::Victory => "LE NOIR A CÉDÉ DU TERRAIN",
                         Kind::Banner => "UNE BANNIÈRE CHANGE LE VENT",
                         Kind::Generation => "LE NOIR APPREND",
+                        Kind::Capture => "BASTION CAPTURÉ",
+                        Kind::Memory => "MÉMOIRE LIVRÉE",
+                        Kind::Lantern => "LANTERNE DE LA NUIT",
                     };
                     c.text(
                         20,
@@ -1038,13 +1124,31 @@ impl Game {
                     if self.tutorial {
                         "TA LANTERNE EST ALLUMÉE"
                     } else {
-                        "LE DUEL EST TERMINÉ"
+                        if self.battle_mode == 5 {
+                            "LE SIÈGE EST TERMINÉ"
+                        } else if self.battle_mode == 7 {
+                            "UNE FLAMME DANS LA NUIT"
+                        } else {
+                            "LE COMBAT EST TERMINÉ"
+                        }
                     },
                     GOLD,
                     2,
                 );
                 c.center(96, "Le monde tient tant que tu veilles.", WHITE, 1);
-                c.center(119, "Ton prochain pas : fonder un bastion.", MUTED, 1);
+                let stats = self
+                    .battle
+                    .as_ref()
+                    .map(|b| {
+                        format!(
+                            "{} éliminations • {} chutes • {} s",
+                            b.fighters[0].kills,
+                            b.fighters[0].deaths,
+                            b.tick / 30
+                        )
+                    })
+                    .unwrap_or_default();
+                c.center(119, &stats, MUTED, 1);
                 c.button(w / 2 - 125, 159, 250, "RETOURNER À LA CARTE >", true);
             }
             14 => {
@@ -1064,6 +1168,9 @@ impl Game {
                 c.button(w / 2 - 100, 195, 200, "RETOUR À LA CARTE", true);
             }
             _ => {}
+        }
+        if self.screen >= 20 {
+            self.draw_expansion(&mut c);
         }
         if self.message_until > self.ticks && !self.sensitive() {
             let n = self.message.chars().count() as i32 * 6 + 16;
@@ -1095,7 +1202,7 @@ impl Game {
         let w = c.w;
         let world = &self.save.world;
         c.rect(0, 0, w, 26, PANEL);
-        c.text(12, 9, "HEXKEEP", GOLD, 1);
+        c.text(12, 9, "VEILLE >", GOLD, 1);
         c.text(
             68,
             9,
@@ -1162,10 +1269,16 @@ impl Game {
                     self.ticks as u32,
                 );
                 c.rect(x - 2, y + 10, 4, 2, GOLD);
+                if self.save.expansion.campaign.equipped == "lantern_ambre" {
+                    c.ring(x, y, 15, GOLD);
+                }
             }
             if selected {
                 c.text(x - 11, y + 16, "ICI", GOLD, 1);
             }
+        }
+        if self.save.expansion.authority.interregnum(self.now) {
+            c.text(12, 230, "INTERRÈGNE • HISTOIRE PROVISOIRE", GOLD, 1);
         }
         c.rect(w - 163, 27, 163, 213, INK);
         c.button(
@@ -1303,6 +1416,25 @@ impl Game {
                 }
             }
         }
+        if let Some(s) = &b.siege {
+            let (x, y) = point(Vec2::new(20 * UNIT, 8 * UNIT));
+            c.rect(
+                x - 12,
+                y - 18,
+                24,
+                36,
+                if s.gate_hp > 0 { GOLD } else { EDGE },
+            );
+            let (cx, cy) = point(Vec2::new(24 * UNIT, 8 * UNIT));
+            c.ring(cx, cy, 24, GOLD);
+            c.text(
+                ox + 80,
+                oy + 4,
+                &format!("PORTE {}  COUR {}/60", s.gate_hp, s.capture / 30),
+                WHITE,
+                1,
+            );
+        }
         for p in &b.pickups {
             if b.tick >= p.next {
                 let (x, y) = point(p.pos);
@@ -1349,6 +1481,28 @@ impl Game {
                     1,
                     b.tick,
                 );
+            }
+            if f.id == self.online.as_ref().map(|o| o.rollback.local).unwrap_or(0) {
+                let item = &self.save.expansion.campaign.equipped;
+                let index = (blake3::hash(item.as_bytes()).as_bytes()[0] % 4) as usize;
+                let color = [GOLD, BLUE, GREEN, WHITE][index];
+                c.rect(x - 4, y + 2, 8, 6, color);
+                c.rect(x - 1, y + 2, 2, 6, INK);
+                if item.starts_with("skin_") {
+                    c.rect(x - 5, y - 7, 10, 2, color);
+                }
+                if item == "patron_month" {
+                    c.ring(x, y, 12, GOLD);
+                }
+                if let Some(house) = self.save.expansion.campaign.houses.last() {
+                    for yy in 0..4 {
+                        for xx in 0..4 {
+                            if house.emblem[(yy * 4 * 16 + xx * 4) as usize] > 0 {
+                                c.pixel(x - 2 + xx, y + 2 + yy, WHITE);
+                            }
+                        }
+                    }
+                }
             }
             let color = if f.id == self.online.as_ref().map(|o| o.rollback.local).unwrap_or(0) {
                 GOLD

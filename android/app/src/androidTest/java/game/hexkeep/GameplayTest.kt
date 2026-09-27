@@ -73,7 +73,7 @@ class GameplayTest {
     @Test fun nativeDeterminism(){
         val e=game.hexkeep.core.Engine("",true)
         val digest=e.determinismCheck()
-        assertEquals("54f7ff9666521f8b0d41b95742763a1abc94268013332efbe700bfb6289c15cc",digest)
+        assertEquals("dd62be09d7256250da027202439f46ee4080d3a4d0787ffa51c0ab6034f09181",digest)
         File(instrumentation.targetContext.getExternalFilesDir(null),"determinism-android.txt").writeText(digest)
     }
 

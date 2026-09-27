@@ -101,7 +101,20 @@ pub struct Effect {
     pub realm: Realm,
 }
 #[derive(Clone, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
+pub struct Siege {
+    pub gate_hp: i32,
+    pub maximum: i32,
+    pub attacker: Realm,
+    pub capture: u32,
+    pub captured: bool,
+    pub rage_gate: bool,
+}
+#[derive(Clone, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
 pub struct Battle {
+    #[serde(default)]
+    pub codex: hk_crown::Codex,
+    #[serde(default)]
+    pub siege: Option<Siege>,
     pub tick: u32,
     pub seed: u64,
     pub fighters: Vec<Fighter>,
@@ -188,6 +201,8 @@ impl Battle {
             ]
         };
         Self {
+            codex: Default::default(),
+            siege: None,
             tick: 0,
             seed,
             fighters,
@@ -200,6 +215,24 @@ impl Battle {
             round_pause: 0,
             finished: false,
         }
+    }
+    pub fn apply_codex(&mut self, codex: hk_crown::Codex) {
+        for f in &mut self.fighters {
+            f.hp = codex.hp[f.realm.index()];
+        }
+        self.codex = codex;
+    }
+    pub fn begin_siege(&mut self, attacker: Realm, walls: u32) {
+        let hp = 500 + 20 * walls.min(100) as i32;
+        self.siege = Some(Siege {
+            gate_hp: hp,
+            maximum: hp,
+            attacker,
+            capture: 0,
+            captured: false,
+            rage_gate: false,
+        });
+        self.duel = false;
     }
     pub fn hash(&self) -> Hash {
         digest(self)
@@ -233,6 +266,33 @@ impl Battle {
             mx += dy / 2;
             my -= dx / 2;
         }
+        let probe = Vec2::new(mx, my).scaled(100);
+        if blocked(
+            Vec2::new(f.pos.x + probe.x, f.pos.y + probe.y),
+            &self.obstacles,
+            false,
+        ) {
+            let sign = if (self.tick / 90 + f.id as u32) % 2 == 0 {
+                1
+            } else {
+                -1
+            };
+            let options = [
+                Vec2::new(-probe.y * sign, probe.x * sign),
+                Vec2::new(probe.y * sign, -probe.x * sign),
+                Vec2::new(-probe.x, -probe.y),
+            ];
+            if let Some(v) = options.iter().find(|v| {
+                !blocked(
+                    Vec2::new(f.pos.x + v.x, f.pos.y + v.y),
+                    &self.obstacles,
+                    false,
+                )
+            }) {
+                mx = v.x;
+                my = v.y;
+            }
+        }
         let mv = Vec2::new(mx, my).scaled(1024);
         let aim = Vec2::new(dx, dy).scaled(1024);
         Input {
@@ -250,6 +310,10 @@ impl Battle {
             return;
         }
         self.tick += 1;
+        if self.tick > 5400 {
+            self.finished = true;
+            return;
+        }
         self.effects
             .iter_mut()
             .for_each(|e| e.life = e.life.saturating_sub(1));
@@ -267,9 +331,12 @@ impl Battle {
             self.round_pause -= 1;
             if self.round_pause == 0 {
                 for f in &mut self.fighters {
+                    let genome = f.genome;
                     let kills = f.kills;
                     let deaths = f.deaths;
                     *f = Fighter::new(f.id, f.realm, f.role, f.bot);
+                    f.hp = self.codex.hp[f.realm.index()];
+                    f.genome = genome;
                     f.kills = kills;
                     f.deaths = deaths;
                 }
@@ -302,7 +369,7 @@ impl Battle {
                     f.respawn = f.respawn.saturating_sub(1);
                     if f.respawn == 0 {
                         f.pos = spawn(f.id);
-                        f.hp = f.realm.hp();
+                        f.hp = self.codex.hp[f.realm.index()];
                         f.armor = 50;
                         f.invulnerable = 30;
                     }
@@ -320,7 +387,7 @@ impl Battle {
             ] {
                 *timer = timer.saturating_sub(1);
             }
-            if f.hp > f.realm.hp() && self.tick % 30 == 0 {
+            if f.hp > self.codex.hp[f.realm.index()] && self.tick % 30 == 0 {
                 f.hp -= 1;
             }
             let aim = input.aim();
@@ -339,9 +406,9 @@ impl Battle {
                 } else {
                     f.aim
                 };
-                f.velocity = direction.scaled(154);
+                f.velocity = direction.scaled(194);
                 f.invulnerable = 5;
-                f.dash_cd = f.realm.dash();
+                f.dash_cd = self.codex.dash[f.realm.index()];
                 f.airborne = 6;
                 self.effects.push(Effect {
                     pos: f.pos,
@@ -399,11 +466,7 @@ impl Battle {
                 f.charge -= 1;
             }
             if (input.shoot || heavy) && f.cooldown == 0 && f.charge == 0 {
-                let base_speed = match f.realm {
-                    Realm::Aurelon => 92,
-                    Realm::Skarn => 65,
-                    Realm::Vylde => 77,
-                };
+                let base_speed = self.codex.projectile[f.realm.index()];
                 f.cooldown = [24, 30, 36][f.role.index()];
                 let dmg = if f.rage > 0 { 3 } else { 1 };
                 let aim = if f.aim == Vec2::default() {
@@ -455,6 +518,21 @@ impl Battle {
                 }
             }
         }
+        let charges: Vec<_> = self
+            .fighters
+            .iter()
+            .filter(|f| f.realm == Realm::Skarn && f.invulnerable > 0 && f.dash_cd > 100)
+            .map(|f| (f.id, f.pos, f.aim))
+            .collect();
+        for (id, pos, aim) in charges {
+            for f in &mut self.fighters {
+                if f.id != id && f.realm != Realm::Skarn && f.hp > 0 && pos.dist2(f.pos) < 220 * 220
+                {
+                    f.velocity = aim.scaled(200);
+                    f.airborne = 15;
+                }
+            }
+        }
         let projectiles = std::mem::take(&mut self.projectiles);
         for mut p in projectiles {
             p.life = p.life.saturating_sub(1);
@@ -490,6 +568,23 @@ impl Battle {
                     .obstacles
                     .iter()
                     .any(|o| o.kind == 0 && touches(p.pos, o, 20));
+            let gate_hit = self.siege.as_ref().is_some_and(|s| {
+                s.gate_hp > 0
+                    && p.realm == s.attacker
+                    && p.pos.dist2(Vec2::new(20 * UNIT, 8 * UNIT)) < (UNIT * 3 / 2).pow(2) as i64
+            });
+            if gate_hit {
+                let s = self.siege.as_mut().unwrap();
+                s.gate_hp = (s.gate_hp - p.damage * if s.rage_gate { 3 } else { 2 } / 2).max(0);
+                self.effects.push(Effect {
+                    pos: p.pos,
+                    radius: UNIT,
+                    life: 10,
+                    kind: 0,
+                    realm: p.realm,
+                });
+                continue;
+            }
             let hit = self
                 .fighters
                 .iter()
@@ -556,7 +651,7 @@ impl Battle {
                     for (id, damage) in victims {
                         if damage < 0 {
                             let f = &mut self.fighters[id as usize];
-                            f.hp = (f.hp - damage).min(f.realm.hp());
+                            f.hp = (f.hp - damage).min(self.codex.hp[f.realm.index()]);
                         } else {
                             self.damage(id, damage, p.owner, p.pos);
                             let f = &mut self.fighters[id as usize];
@@ -589,6 +684,27 @@ impl Battle {
                     _ => f.rage = 450,
                 };
                 pickup.next = self.tick + [1050, 750, 2700][pickup.kind as usize];
+            }
+        }
+        if let Some(s) = &mut self.siege {
+            if s.gate_hp == 0 {
+                let center = Vec2::new(24 * UNIT, 8 * UNIT);
+                let inside: Vec<_> = self
+                    .fighters
+                    .iter()
+                    .filter(|f| f.hp > 0 && f.pos.dist2(center) < (2 * UNIT).pow(2) as i64)
+                    .collect();
+                if inside.iter().any(|f| f.realm == s.attacker)
+                    && !inside.iter().any(|f| f.realm != s.attacker)
+                {
+                    s.capture += 1;
+                } else {
+                    s.capture = 0;
+                }
+                if s.capture >= 1800 {
+                    s.captured = true;
+                    self.finished = true;
+                }
             }
         }
         if self.tick >= 5400 {
@@ -666,7 +782,10 @@ pub fn determinism_suite() -> Hash {
         );
         let mut b = a.clone();
         let mut rng = ChaCha8Rng::seed_from_u64(seed ^ 0x4845584b);
-        for tick in 0..180 {
+        for tick in 0..5401 {
+            if a.finished {
+                break;
+            }
             let input = Input {
                 move_x: rng.gen_range(-1024..=1024),
                 move_y: rng.gen_range(-1024..=1024),
@@ -679,6 +798,7 @@ pub fn determinism_suite() -> Hash {
             a.step(&[(0, input)]);
             b.step(&[(0, input)]);
         }
+        assert!(a.finished && b.finished, "unfinished seed {seed}");
         assert_eq!(a.hash(), b.hash(), "seed {seed}");
         combined.update(&a.hash());
     }

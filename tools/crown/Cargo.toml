@@ -1,0 +1,11 @@
+[package]
+name="crown"
+version.workspace=true
+edition.workspace=true
+[dependencies]
+hk-crown={path="../../crates/hk-crown"}
+hk-crypto={path="../../crates/hk-crypto"}
+hk-proto={path="../../crates/hk-proto"}
+serde.workspace=true
+serde_json.workspace=true
+qrcode = {version="0.14",default-features=false,features=["svg"]}

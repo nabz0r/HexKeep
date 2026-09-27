@@ -90,6 +90,19 @@ impl Default for World {
     }
 }
 impl World {
+    pub fn expand_watch(&mut self, rings: u32, now: u64) {
+        for id in neighbors(self.current, rings) {
+            self.cells.entry(id).or_insert(Cell {
+                id,
+                last_watch: now,
+                continuous: 0,
+                clear: false,
+                bastion: None,
+                battles: 0,
+            });
+        }
+    }
+
     pub fn enter(&mut self, cell: u64, now: u64) {
         if CellIndex::try_from(cell).is_err() {
             return;
@@ -107,8 +120,11 @@ impl World {
         }
     }
     pub fn elapse(&mut self, now: u64, seconds: u32) {
+        self.elapse_radius(now, seconds, 2);
+    }
+    pub fn elapse_radius(&mut self, now: u64, seconds: u32, radius: u32) {
         self.seconds += seconds as u64;
-        let watched = neighbors(self.current, 2);
+        let watched = neighbors(self.current, radius);
         for c in self.cells.values_mut() {
             if now.saturating_sub(c.last_watch) > 1800 {
                 c.clear = false;
@@ -216,4 +232,17 @@ mod tests {
         w.elapse(70, 1);
         assert!(!w.banner);
     }
+}
+
+pub fn parent_cell(cell: u64) -> Option<u64> {
+    CellIndex::try_from(cell)
+        .ok()?
+        .parent(Resolution::Nine)
+        .map(u64::from)
+}
+pub fn public_memory_cell(cell: u64) -> Option<u64> {
+    CellIndex::try_from(cell)
+        .ok()?
+        .center_child(Resolution::Ten)
+        .map(u64::from)
 }

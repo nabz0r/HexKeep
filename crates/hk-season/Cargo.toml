@@ -1,0 +1,14 @@
+[package]
+name="hk-season"
+version.workspace=true
+edition.workspace=true
+[dependencies]
+hk-proto={path="../hk-proto"}
+hk-crypto={path="../hk-crypto"}
+hk-crown={path="../hk-crown"}
+hk-world={path="../hk-world"}
+hk-ledger={path="../hk-ledger"}
+serde.workspace=true
+serde_json.workspace=true
+borsh.workspace=true
+blake3.workspace=true

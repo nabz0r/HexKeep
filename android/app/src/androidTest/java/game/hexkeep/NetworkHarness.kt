@@ -23,7 +23,7 @@ class NetworkHarness {
         ActivityScenario.launch<MainActivity>(Intent(instrumentation.targetContext,MainActivity::class.java)).use{scenario->
             SystemClock.sleep(800)
             scenario.onActivity{it.engine.connect(address!!)}
-            var last=0;var participants=0;val until=SystemClock.elapsedRealtime()+42000
+            var last=0;var participants=0;val until=SystemClock.elapsedRealtime()+65000
             while(SystemClock.elapsedRealtime()<until){
                 var json=""
                 scenario.onActivity{json=it.engine.networkReport()}
@@ -31,11 +31,12 @@ class NetworkHarness {
                 assertTrue("Network failure: $json",state.isNull("error"))
                 participants=maxOf(participants,state.getInt("participants"))
                 val tick=state.getInt("tick")
-                if(tick>last){output.appendText(json+"\n");last=tick}
+                if(tick>last){output.appendText(state.put("elapsed_ms",SystemClock.elapsedRealtime()).toString()+"\n");last=tick}
                 SystemClock.sleep(100)
             }
+            scenario.onActivity{File(it.getExternalFilesDir(null),"v02-network-render.json").writeText(it.renderMetrics())}
             assertEquals(10,participants)
-            assertTrue("Too few ticks: $last",last>=300)
+            assertTrue("Too few ticks: $last",last>=1200)
         }
     }
 }

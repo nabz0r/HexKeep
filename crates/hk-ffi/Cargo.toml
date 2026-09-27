@@ -11,3 +11,5 @@ hk-apu = {path = "../hk-apu"}
 hk-sim = {path = "../hk-sim"}
 hk-proto = {path = "../hk-proto"}
 serde_json.workspace = true
+hk-crypto={path="../hk-crypto"}
+blake3.workspace=true

@@ -1,32 +1,77 @@
-# Protocoles d’acceptation
+# Validation de la v0.2
 
-Exécutés le 27 septembre 2026, Android 15 / API 35 sur deux AVD ARM64 Pixel 5 ; APK cible API 36. Les AVD ont été créés pour ce projet. Aucun téléphone physique ou opérateur mobile n’a été utilisé.
+Exécution locale du 27 septembre 2026. Deux AVD Pixel 5 ARM64 sous Android 15 / API 35, macOS ARM64, exécution x86_64 par Rosetta. Aucun téléphone physique, modem 4G ou lecteur biométrique matériel n'a été testé. Les valeurs ci-dessous ne qualifient pas un déploiement de production.
 
-| Critère | État et preuve |
-|---|---|
-| A1 Solo hors ligne | Parcours Android en mode avion : installation, consentement, royaume/rôle, mots et vérification, entrée au tutoriel, déplacement tactile, sortie vers carte, fondation, chiffrement et restauration. Test Rust supplémentaire de victoire au tutoriel avec des entrées normales. Réouverture après arrêt forcé vérifiée séparément. |
-| A2 Deux appareils | Transport et combat testés ; duel complet entre deux processus indépendants, résultat signé 2/2 et rejeu identique. Deux Android participent aussi au test à dix. mDNS intermittent dans le banc d’essai ; connexion IP fonctionnelle. BLE et preuve de co-présence absents : A2 intégral non validé. |
-| A3 Dix joueurs | Deux émulateurs Android + huit processus libp2p : 33 points de contrôle communs, jusqu’au tick 990, tous identiques. Autre test à dix processus : 31 points identiques jusqu’au tick 930. Ni siège ni Course de Mémoire : A3 intégral non validé. |
-| A4 Internet/4G | Non exécuté ; DCUtR, QUIC et relais non implémentés. |
-| A5 Couronne | Non implémenté. Aucun Sceau produit. |
-| A6 Parjure | Non implémenté ; prod entièrement verrouillé. |
-| A7 Partition 30 min | Fusion déterministe unitaire testée ; scénario réseau complet de partition non exécuté. |
-| A8 Déterminisme | 10 000 scénarios aléatoires de 180 ticks, rejoués deux fois, identiques sur macOS ARM64, exécution x86_64 et Android ARM64. Cela ne constitue pas 10 000 duels complets ni une couverture exhaustive du moteur. |
-| A9 Identité/SSO | BIP39 et toutes les combinaisons 3-sur-5 testées dans Rust ; Keystore + sauvegarde chiffrée testés sur Android. Biométrie sur matériel réel, attestation et SSO du Trône non validés. |
-| A10 Performance | Rendu et transport observés sur AVD ; aucune mesure de milieu de gamme 2021 ou de consommation Phare. Non validé. |
+| Critère | Résultat observé | Portée |
+|---|---|---|
+| A1 Solo hors ligne | Installation, création du Nom, tutoriel tactile, carte, fondation, sauvegarde Keystore chiffrée et réouverture réussis sur les deux AVD en mode avion. Mise à jour depuis la v0.1 également essayée. | Validé sur ce banc Android. |
+| A2 Deux appareils | Duel complet entre deux processus via un relais v2 réel, signé 2/2, 596 ticks, rejeu identique. Les deux Android participent au test à dix. | mDNS en moins de 5 s et BLE entre téléphones physiques non qualifiés. |
+| A3 Dix joueurs | Deux Android + huit processus, 65 s : 44 checkpoints identiques jusqu’au tick 1320 en 1080p ; 54 jusqu’au tick 1620 en 720p. Aucun état divergent ni arrêt réseau sur ces deux essais finaux. Test de dix processus : 36 checkpoints communs identiques jusqu'au tick 1080. Siège à dix combattants : Porte détruite, ennemi contestant la Cour, victoire à 1800 ticks de capture ; Mémoire lâchée au seuil simulé de 14 km/h. | Siège et Mémoire validés par les tests du moteur ; aucun essai de dix humains dehors. |
+| A4 Internet | Transport Relay v2, circuit chiffré et duel cosigné testés ; TCP, QUIC et DCUtR inclus. | Deux opérateurs 4G et leurs latences non testés. |
+| A5 Couronne | Cérémonie CLI réalisée ; Genèse, certificats, Merkle et signatures contrôlés. Trône Android, Sceau, Ban après Sceau, import par un autre client, Rollback et saison testés. Haute Cour vérifie la preuve et son rejeu. | Tests locaux ; partage de la délégation DEV explicitement assumé. |
+| A6 Parjure | La production est verrouillée. | Non validé : contrôle de l'attestation de production et de la signature de l'APK à terminer. |
+| A7 Partition | Deux histoires séparées, temps logique de trente minutes, réunion puis même état canonique et Sceau : test réussi. | Le scénario réel de deux groupes déconnectés pendant trente minutes n'a pas été exécuté. |
+| A8 Déterminisme | 10 000 combats complets, chacun rejoué deux fois, empreinte identique en ARM64, x86_64 et dans Android ARM64. Le moteur termine au plus tard après trois minutes de simulation ; cela inclut les parties finies par cette limite. | Test reproductible, pas preuve exhaustive du moteur. |
+| A9 Identité | BIP39, toutes les combinaisons de trois parts sur cinq, chiffrement des parts, restauration DEV, certificats Nom/appareil/session. P-256 réellement signée dans Android Keystore et vérifiée par Rust. | Biométrie matérielle et retour de trois parts entre gardiens humains non qualifiés. |
+| A10 Performance/Phare | Phare poursuivant ses ticks après mise en arrière-plan, arrêté sans Wi-Fi, vérifié sur AVD. En combat réseau : 28,9–29,3 images/s en 1080p et 53.7–54.6 images/s en 720p. Le Phare au premier plan a rendu 43.8 images/s pendant la dernière vérification, simultanée au test natif sur le second AVD. Le rendu des deux AVD utilise le GPU logiciel SwiftShader ; les performances physiques ne sont pas extrapolées. | Aucune consommation physique mesurée ; aucune garantie de 60 i/s sur milieu de gamme 2021. |
 
-## Reproduire les tests locaux
+## Suite du moteur
 
-`cargo test --workspace --locked --release -- --nocapture` : 27 tests réussis au moment de la livraison. Le test de transport ouvre des sockets temporaires de développement.
+49 tests Rust réussis, dont migration de sauvegarde v0.1, neuf combinaisons, 10 000 combats complets, sessions invalides/expirées, Shamir/chiffrement, Sceaux/Merkle/révocation de Trône, siège, garde anti-Sybil, saison et cosmétiques sans avantage statistique. Le test de réception dans le désordre impose une commande manquante suivie de commandes ultérieures : la prédiction s'arrête à sa fenêtre, puis rattrape exactement la simulation ordonnée lorsque l'entrée arrive. Un autre test détecte un seul pair silencieux même si les autres continuent d'émettre.
 
-`cargo test -p hk-sim --release --target x86_64-apple-darwin -- --nocapture` : exécuté via la compatibilité x86_64 de macOS. Empreinte attendue : `54f7ff9666521f8b0d41b95742763a1abc94268013332efbe700bfb6289c15cc`.
+Empreinte du déterminisme :
 
-`cd android && ./gradlew connectedDevDebugAndroidTest` : parcours Android et déterminisme natif. Le test UI utilise les coordonnées du Pixel 5 de test, 2340×1080 en paysage ; adapter le générateur de gestes sur un autre format. `NetworkHarness` est ignoré sans argument `peerAddress`.
+```
+dd62be09d7256250da027202439f46ee4080d3a4d0787ffa51c0ab6034f09181
+```
 
-Pour le test réseau Android, lancer huit `hexkeep-sim peer` dans la même Marche, le premier avec `--autostart 9`. Lancer NetworkHarness sur deux AVD en lui passant `/ip4/10.0.2.2/tcp/<port-hôte>`. Comparer les empreintes de `network-checks.jsonl` aux lignes CHECK des huit pairs. Après fermeture volontaire des AVD, les autres pairs interrompent la partie : les messages de forfait à ce moment sont attendus.
+Preuve publique fournie, `examples/cosigned-duel.json` : 596 ticks, deux cosignataires ; empreinte :
 
-`hexkeep-sim replay examples/cosigned-duel.json` : doit produire le hash `f3c658281962f9eafa04ffcf2e85ddeae54458d4f31ec62441e9018ce31e0eef`, tick 1334, signatures 2/2, sans finalité de Couronne. Les participants et la cellule de cet exemple sont des données de test.
+```
+4eaa31bd5bb2e7dfa920eb782062ea8fe12d602376d36b90f97b1e4c214b4b10
+```
 
-## Vérifications manuelles restantes
+## Reproduire
 
-Installer sur un appareil physique, vérifier biométrie et code, refus des permissions, GPS extérieur, multigestes simultanés, audio et retour haptique, réception après perte Wi-Fi, lecteurs d’écran et tailles atypiques. Tester les quotas mémoire et batterie avant tout pilote public. Exécuter les scénarios A4–A10 manquants après leur implémentation. Ne pas transformer ces protocoles écrits en résultats de tests prétendument exécutés.
+```sh
+cargo test --workspace --locked --release
+cargo test -p hk-sim --release --target x86_64-apple-darwin ten_thousand_replays -- --nocapture
+cargo build --release -p hexkeep-sim -p hexkeep-relay -p crown
+target/release/hexkeep-sim replay examples/cosigned-duel.json
+python3 scripts/network-smoke.py direct 10 50
+python3 scripts/network-smoke.py relay 2 90
+```
+
+Pour Android, construire `assembleDevDebugAndroidTest`, installer son APK et l'APK signée de l'application avec le même certificat. Les tests sont lancés avec `am instrument` et AndroidJUnitRunner. `GameplayTest` couvre le solo et le déterminisme, `ExpansionTest` la campagne/Keystore/boutique/Trône, `PhareTest` la veille. Le Phare exige Wi-Fi, secteur et autorisation GPS précise, y compris sur l'émulateur.
+
+`python3 scripts/android-ten.py` requiert les AVD `emulator-5554` et `emulator-5556`, profils créés et le même Codex initial que les huit pairs CLI. Ne pas modifier/sceller un Codex dans un seul profil juste avant ce test : le refus d'un autre Codex est intentionnel. Le script compare des états calculés séparément. Sa fermeture volontaire des processus met fin à l'essai ; elle ne constitue pas une victoire cosignée.
+
+Les coordonnées tactiles du test solo correspondent au Pixel 5 de test en paysage 2340×1080. Le moteur vérifie aussi le rendu des écrans de campagne aux largeurs internes 400, 520, 584 et 640.
+
+## Échecs rencontrés et corrigés
+
+- APK unsigned non installable ; DEV limitée aux architectures 64 bits et Android 9 : livraison principale signée, trois ABI, Android 8 minimum.
+- Résolution DNS lisant un fichier absent sous Android : utilisation du résolveur de la plateforme pour les noms, transport natif initialisé sans ce fichier.
+- Adresse de circuit de relais contenant deux fois le Peer ID : normalisation corrigée, puis duel Relay v2 terminé et vérifié.
+- Nom de Maison DEV trop long : corrigé, puis parcours Android réussi.
+- Paquet reçu hors ordre entraînant un dépassement du rollback, puis des forfaits en cascade : progression limitée aux entrées contiguës et retransmission bornée des entrées manquantes.
+- Vérifications de certificats répétées à haute fréquence : cache borné de chaînes validées, signature et expiration encore vérifiées pour chaque paquet ; tests de falsification après cache réussis.
+- Réservation arrivant avant Identify au relais : annonce immédiate de ses adresses d'écoute, nouveau duel cosigné réussi.
+- Phare refusé alors que le banc était encore en mode avion : arrêt conforme à sa règle ; essai réussi après réactivation du Wi-Fi.
+
+Les 49 tests du moteur, les deux essais mixtes à dix, le duel final par relais et les parcours Android finaux sont verts. Aucun échec automatisé final n'est laissé sans correction. Les critères non qualifiés A4, A6, A7 réel, A9 matériel/social complet et A10 ne sont pas déclarés réussis. A2 et A3 restent partiels sur matériel physique.
+
+## Contrôles de paquet
+
+Signature APK v2 vérifiée ; cible API 36, minimum API 26, trois bibliothèques natives ARMv7/ARM64/x86_64. Alignement ZIP vérifié avec des pages de 16 Kio. La DEV release n'a pas l'indicateur `debuggable`, bien que sa clé soit volontairement une clé de développement. Voir les sorties originales `v02-signature.txt` et `v02-package.txt` dans la validation livrée.
+
+Le banc à dix enregistre l'heure monotone de chaque checkpoint et le nombre de trames rendues. L'objectif d'acceptation du test de 65 secondes est au moins 1 200 ticks et 40 checkpoints communs, sans erreur réseau. Les scripts effacent uniquement leurs anciennes sorties de test pour qu'un résultat précédent ne puisse pas masquer un nouvel échec.
+
+## Mesures brutes du banc
+
+- 1080p, 5554: 28.86 images/s ; 22.50 ticks/s mesurés ; 924 trames >33ms ; 66.29 secondes.
+- 1080p, 5556: 29.33 images/s ; 22.01 ticks/s mesurés ; 902 trames >33ms ; 65.80 secondes.
+- 720p, 5554: 53.67 images/s ; 26.61 ticks/s mesurés ; 118 trames >33ms ; 65.76 secondes.
+- 720p, 5556: 54.59 images/s ; 26.73 ticks/s mesurés ; 97 trames >33ms ; 65.87 secondes.
+
+La fréquence logique cible reste 30 Hz ; la progression réellement observée ci-dessus est inférieure quand le banc ralentit. Le critère complet de fluidité A3/A10 sur téléphones reste donc à qualifier, même si les états réseau sont cohérents.

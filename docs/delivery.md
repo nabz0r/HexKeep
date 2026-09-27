@@ -1,50 +1,50 @@
-# Livraison du 27 septembre 2026
+# HEXKEEP v0.2 — La Première Nuit
 
-**Une alpha dev installable et jouable est livrée. Le cahier des charges complet M0–M7 n’est pas terminé.** Le mode de production est volontairement verrouillé ; l’APK à installer est `app-dev-debug.apk`.
+Livraison DEV du 27 septembre 2026. L'APK principale est `HEXKEEP-v0.2.apk`, signée, sans indicateur de débogage, version 2 / 0.2.0-premiere-nuit, Android 8 minimum, ARM64, ARMv7 et x86_64. La v0.2 ouvre les parcours DEV des jalons M0 à M7. Elle ne constitue pas une qualification de production ni une affirmation de compatibilité avec tous les téléphones.
 
-## Fichiers
+## Installation corrigée
 
-- `artifacts/app-dev-debug.apk` : APK signé avec la clé Android de développement, ARM64 et x86_64, Android 9 minimum, cible 36.
-- `artifacts/app-prod-release-unsigned.apk` : variante unsigned, écran de production fermé. Aucune Genèse officielle ou attestation de production n’est simulée.
-- `artifacts/hexkeep-source.zip` : dépôt source, tests, assets originaux, documentation et exemple de preuve cosignée.
-- `artifacts/SHA256SUMS` : empreintes des livrables.
+L'APK unsigned n'est pas installable : Android exige une signature. L'ancienne DEV excluait Android 8 et les téléphones ARM 32 bits. La nouvelle livraison contient les trois architectures, utilise une signature vérifiée et conserve l'identifiant `game.hexkeep.dev` et le certificat de la DEV précédente pour permettre sa mise à jour. L'extraction des bibliothèques natives est activée. Une erreur de résolution réseau propre à Android, qui empêchait le démarrage du pair, a aussi été corrigée.
 
-## Jalons
+Installation neuve et mise à jour depuis la v0.1 ont réussi sur les émulateurs Android disponibles. Le motif exact des échecs sur les téléphones de l'utilisateur reste inconnu : aucun de ces téléphones n'est connecté au banc de test.
 
-| Jalon | Livraison réelle |
-|---|---|
-| M0 | Workspace Rust, projet Android Kotlin/Gradle, UniFFI, écran titre, synthèse audio et CI écrite. Build local réussi ; la CI distante n’a pas été exécutée. |
-| M1 | Combat jouable, neuf combinaisons royaume/rôle, armure, dash, compétences, pickups, IA et tutoriel. Les détails de physique et l’équilibrage ne reproduisent pas encore intégralement le Codex cible. |
-| M2 | Carte H3, veille au premier plan, Noir, fondation dev, chronique, journal signé et sauvegarde chiffrée. Boucle solo fonctionnelle. Garde collective/bastions de production non finalisés. |
-| M3 | BIP39, Nom Ed25519, récupération de mots, chiffrement Keystore, ouverture par biométrie/code si configuré. Shamir testé comme bibliothèque. Hiérarchie appareil/session et attestation hors ligne manquantes. |
-| M4 | libp2p local chiffré, découverte mDNS, connexion IP, présence de bannière, petits journaux, combats déterministes et preuves cosignées. mDNS non fiable sur tout le banc d’essai ; BLE absent. |
-| M5 | Combat réseau à dix vérifié avec deux AVD + huit processus. Pas de transport Internet mobile, siège, Course de Mémoire, Phare ou reprise après partition de trente minutes. |
-| M6 | Non livré : CLI crown, Trône, Haute Cour, Genèse, Sceaux, Édits, Merkle, révocations et attestations prod. |
-| M7 | Lore original, rangs et 30 Proclamations documentés. Aucun achat, boutique, Maison, saison jouable, Nuit Longue ou Chronique scellée. Un thème principal et des effets simples seulement ; orchestration musicale complète restante. Traduction anglaise partielle. |
+## Jalons livrés
 
-## Résultats vérifiés
+| Jalon | Présent et vérifié dans la DEV | Qualification restante |
+|---|---|---|
+| M0 | Workspace Rust, Android Kotlin, UniFFI, rendu pixel, audio original, automatisation de construction. | La CI distante n'a pas été exécutée. |
+| M1 | Neuf combinaisons royaume/rôle, combat, esquive, compétences, IA, tutoriel, évolution, Codex réglable ; 10 000 combats complets déterministes. | Équilibrage et accessibilité sur téléphones physiques. |
+| M2 | Monde H3, veille, Noir, bastions, garde collective, carte et sauvegarde chiffrée persistante. | Le stockage est un snapshot chiffré ; placement sûr OSM et journal disque append-only non réalisés. |
+| M3 | Nom Ed25519, BIP39, appareil P-256 Android Keystore, session Ed25519 24 h, biométrie/code, Shamir 3-sur-5 et parts chiffrées. | Vérification complète des racines d'attestation Google et restauration entre trois gardiens humains non qualifiées. |
+| M4 | TCP/Noise, QUIC, mDNS, gossip, synchronisation paginée, duel, chaînes d'entrées, preuve cosignée et rejeu vérifiable. | Découverte radio/mDNS sur de vrais téléphones à mesurer. |
+| M5 | Dix participants, rollback limité, siège Porte/Cour, Courses de Mémoire et chute, BLE tournant, Phare, relais v2/DCUtR, fusion de registres. | Deux opérateurs 4G, partition réseau réelle de 30 min et rencontres BLE physiques non testés. |
+| M6 | CLI crown hors ligne, Genèse, certificats de Trône, 15 types d'Édits, Merkle, Sceaux, Ban/Rollback, Haute Cour avec lecture de preuve et verdict. | Chaîne Parjure de production, révocation d'appareil en réseau et procédures de racine sur matériel isolé incomplètes. |
+| M7 | Saison I, 40 paliers gratuits et 40 de pass, Nuit Longue, Chronique scellée, catalogue DEV, Maisons, héraldique 16×16, apparences équipables, intégration Billing 8. | Boutique gratuite de test ; validation des achats/licences et remboursements Play, fondation de Maison à trois humains et diffusion complète des cosmétiques restent à terminer. |
 
-- **27 tests Rust verts**, dont primitives cryptographiques, Shamir, fold, H3, veille/Noir, simulation, rollback et transport TCP/Noise réel.
-- Deux tests Android réussis sur chacun des deux AVD : cycle solo hors ligne et déterminisme natif.
-- Test mixte : **deux Android + huit pairs**, 33 empreintes communes identiques jusqu’au tick 990. Test à dix processus : 31 empreintes communes identiques jusqu’au tick 930.
-- Duel terminé au tick **1334**, résultats **cosignés 2/2**, même hash reproduit séparément à partir de chacune des deux preuves.
-- Déterminisme : **10 000 scénarios de 180 ticks rejoués deux fois**, même empreinte sur ARM64, x86_64 et Android ARM64. La durée limitée est explicite ; il ne s’agit pas de 10 000 parties terminées.
-- APK installé et relancé, signature v2 vérifiée et alignement ZIP pour pages de 16 Kio vérifié.
+L'entraînement, la lisibilité des objectifs, le mouvement et la progression purement cosmétique s'inspirent de principes documentés chez de grands jeux. Les personnages, graphismes et musiques restent ceux de HEXKEEP ; voir `design-heritage.md`.
 
-Aucun test automatisé final n’est rouge. Le test de découverte seule à dix processus a échoué ; le repli par connexion directe a réussi et cette limite est conservée dans le rapport. Les critères non exécutés ou incomplets ne sont pas comptés comme réussis. Les détails et les protocoles restants figurent dans `test-protocols.md`.
+## Validation
 
-## Écarts principaux et justification
+49 tests Rust sont verts. Deux essais de 65 secondes avec deux Android et huit pairs donnent respectivement 44 et 54 checkpoints communs identiques. Le duel par relais se termine avec deux signatures et se rejoue à l'identique. Le solo hors ligne, le Keystore, la boutique/maison/Trône et le Phare passent sur la dernière APK. Le déterminisme de 10 000 combats complets concorde en ARM64, x86_64 et Android ARM64.
 
-Le réseau est exclusivement dev. Il utilise des clés de Nom directement, et des messages signés individuellement, sans certificats de session ni chaîne d’entrées conforme au protocole final. Le snapshot chiffré remplace provisoirement le stockage append-only compacté. Les fondations sont celles du terrain de développement ; aucun placement réel sûr selon OSM n’est revendiqué. Le calcul de garde et l’évolution génétique existent comme primitives testées mais ne gouvernent pas encore toute la boucle collective.
+Aucun test automatisé final n'est rouge. Les essais physiques et de production qui n'ont pas pu être exécutés restent explicitement non qualifiés.
 
-Le combat est une implémentation d’alpha : dash amorti, trajectoires et IA simplifiées, pas de charge Skarn qui renverse au contact, pas d’interpolation visuelle complète, arène à motifs bornés. Les rencontres dev sont limitées à trois minutes ; les duels peuvent se terminer avant par trois rounds. Les PR de réseau ne sont pas attribués ; les victoires solo sont honorifiques et ne changent aucune statistique. Aucun achat n’existe.
+Les résultats mesurés, empreintes et commandes sont consignés dans `test-protocols.md`. Les fichiers de preuve et journaux finaux accompagnent la livraison dans `validation/`. Un scénario non exécuté n'est pas compté comme réussi. Les échecs intermédiaires ont servi à corriger le code ; ils ne sont pas effacés des journaux de travail.
 
-Ces choix rendent le jeu testé concret et installable tout en conservant l’isolation de production. Ils ne sont pas une déclaration d’équivalence au MMO final.
+## Écarts et limites
 
-## Risques ouverts
+- Le monde DEV inclut une délégation de Trône partagée et des compagnons de test explicitement indiqués. Le certificat expire après trente jours. La racine privée n'est ni dans l'APK ni dans le dépôt.
+- Les modes de déplacement DEV permettent le test sans GPS. Ils ne prouvent aucune présence physique. Les Maisons et le Serment des Cinq ont un parcours local de démonstration, distinct des primitives cryptographiques réelles.
+- Le rejeu prouve la cohérence du combat et ses signatures, pas l'absence d'assistance au tir. L'échange historique applique un délai de confidentialité ; un pair privé de l'historique complet d'un Sceau le refuse provisoirement.
+- La traduction anglaise est partielle. L'orchestration audio, les catégories de cosmétiques et leurs interactions sociales ne couvrent pas chaque détail du prompt maître. Les statistiques sont des observations locales, pas une mesure de rétention ou de revenus fictive.
+- Aucune publication Play, aucun paiement et aucun serveur d'autorité public ne sont actifs. La production reste fermée. Le fichier unsigned demandé est livré pour les développeurs uniquement.
 
-- **Critique avant production :** attestation, certificats, autorité de Couronne, finalité et validation des événements collectifs manquantes. Garder prod fermé.
-- **Élevé :** sécurité anti-Sybil/DoS non auditée, Internet mobile non pris en charge, limites de découverte LAN, absence des systèmes de siège/Mémoires/Phare et de reprise de partition.
-- **Moyen :** équilibrage, accessibilité complète, anglais complet, consommation et performance sur téléphones réels non validés. Un duel interrompu ne possède pas de résultat cosigné complet.
+## Risques ouverts, par gravité
 
-Aucun serveur d’autorité, compte externe, paiement, publication Play ou clé de Couronne réelle n’a été créé. Les fichiers synchronisés du projet sous `sources/` n’ont pas été modifiés.
+**Critique avant une production ouverte :** attestation officielle, identification de l'APK autorisée, révocation complète des appareils, contrôle des licences/achats et autorité de Couronne non partagée. La DEV ne doit pas être promue en production en changeant simplement un drapeau.
+
+**Élevé avant un pilote public :** audit anti-Sybil/DoS, quotas sous charge, reconnexions et NAT mobiles réels, concurrence de plusieurs Trônes, récupération sociale complète sur plusieurs téléphones. Un abandon ou une déconnexion ne fournit pas une preuve de fin cosignée complète.
+
+**Moyen :** batterie, Bluetooth, biométrie matérielle, formats d'écran atypiques, accessibilité, anglais complet et équilibre. Les mesures AVD ne valent pas une garantie de 60 i/s sur un téléphone de 2021.
+
+Les sources synchronisées du projet sous `sources/` n'ont pas été modifiées.

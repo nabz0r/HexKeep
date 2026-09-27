@@ -9,3 +9,4 @@ serde.workspace = true
 blake3.workspace = true
 rand.workspace = true
 rand_chacha.workspace = true
+hk-crown={path="../hk-crown"}

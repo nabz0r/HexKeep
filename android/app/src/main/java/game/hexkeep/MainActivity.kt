@@ -39,7 +39,8 @@ import javax.crypto.spec.GCMParameterSpec
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class Vault(private val activity: Activity) {
+class Vault(private val activity: Context) {
+    companion object { private val diskLock = Any() }
     private val store = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
     private val file = AtomicFile(File(activity.filesDir,"state.hk"))
     private val alias="hexkeep-state-v1"
@@ -54,26 +55,29 @@ class Vault(private val activity: Activity) {
                 .build())
         }.generateKey()
     }
-    @Synchronized fun read():String {
+    fun read():String { synchronized(diskLock) {
         if(!file.baseFile.exists()) return ""
         val bytes=file.readFully()
         require(bytes.size>29 && bytes[0]==1.toByte()) { "Format de sauvegarde incorrect" }
         val cipher=Cipher.getInstance("AES/GCM/NoPadding")
         cipher.init(Cipher.DECRYPT_MODE,key(),GCMParameterSpec(128,bytes.copyOfRange(1,13)))
         return cipher.doFinal(bytes.copyOfRange(13,bytes.size)).toString(Charsets.UTF_8)
-    }
-    @Synchronized fun write(snapshot:String) {
+    } }
+    fun write(snapshot:String) { synchronized(diskLock) {
         val cipher=Cipher.getInstance("AES/GCM/NoPadding");cipher.init(Cipher.ENCRYPT_MODE,key())
         val encrypted=byteArrayOf(1)+cipher.iv+cipher.doFinal(snapshot.toByteArray(Charsets.UTF_8))
         val stream=file.startWrite()
         try {stream.write(encrypted);file.finishWrite(stream)}catch(e:Exception){file.failWrite(stream);throw e}
-    }
+    } }
 }
 
 class MainActivity : Activity(), LocationListener {
-    internal lateinit var engine: Engine
+    lateinit var engine: Engine
     private lateinit var surface: GameSurface
     private lateinit var vault: Vault
+    private var authContinuation:(()->Unit)?=null
+    private var ble:BleLantern?=null
+    private var shop:PlayShop?=null
     private var ready=false
     private var audioRunning=AtomicBoolean(false)
     private var authSignal: CancellationSignal?=null
@@ -91,6 +95,7 @@ class MainActivity : Activity(), LocationListener {
         authenticate {openGame()}
     }
     private fun authenticate(done:()->Unit) {
+        authContinuation=done
         val keyguard=getSystemService(KeyguardManager::class.java)
         if(!keyguard.isDeviceSecure){done();return}
         if(Build.VERSION.SDK_INT>=30){
@@ -106,31 +111,57 @@ class MainActivity : Activity(), LocationListener {
             startActivityForResult(keyguard.createConfirmDeviceCredentialIntent("HEXKEEP","Prononcer son Nom"),77)
         }
     }
-    override fun onActivityResult(requestCode:Int,resultCode:Int,data:Intent?){super.onActivityResult(requestCode,resultCode,data);if(requestCode==78 && resultCode==RESULT_OK && data?.data!=null){contentResolver.openOutputStream(data.data!!)?.use{it.write(engine.proof().toByteArray())};return};if(requestCode==77){if(resultCode==RESULT_OK){if(!ready)openGame()}else if(!ready)finish()}}
+    override fun onActivityResult(requestCode:Int,resultCode:Int,data:Intent?){
+        super.onActivityResult(requestCode,resultCode,data)
+        if(resultCode!=RESULT_OK){if(requestCode==77&&!ready)finish();return}
+        try{when(requestCode){
+            78->data?.data?.let{uri->contentResolver.openOutputStream(uri)?.use{it.write(engine.proof().toByteArray())}}
+            79->data?.data?.let{uri->contentResolver.openInputStream(uri)?.use{stream->val out=java.io.ByteArrayOutputStream();val chunk=ByteArray(8192);while(out.size()<=16*1024*1024){val n=stream.read(chunk);if(n<0)break;out.write(chunk,0,n)};val bytes=out.toByteArray();if(bytes.size>16*1024*1024)engine.notice("Dossier trop volumineux.")else engine.importExchange(bytes.toString(Charsets.UTF_8))}}
+            77->authContinuation?.invoke()
+        }}catch(e:Exception){if(ready)engine.notice("Fichier inaccessible : aucun état remplacé.")}
+    }
     private fun openGame() {
         var failed=false
         val snapshot=try{vault.read()}catch(e:Exception){failed=true;Log.e("HEXKEEP","Encrypted save could not be opened",e);""}
-        engine=Engine(snapshot,BuildConfig.DEV_NETWORK)
+        engine=GameRuntime.engine?.takeIf{it.phare()}?:Engine(snapshot,BuildConfig.DEV_NETWORK).also{if(it.phare())it.stopPhare("Phare interrompu : réactive-le après la réouverture.")}
+        GameRuntime.engine=engine
+        try{DeviceIdentity.certify(this,engine)}catch(e:Exception){engine.notice("Keystore indisponible : identité DEV active.")}
         if(failed)engine.setStorageError()
         surface=GameSurface(this,engine,::persist,::action,::feedback,::protect)
         setContentView(surface);ready=true
         if(resumed)startAudio()
     }
-    internal fun persist() {
+    fun persist() {
         if(!ready)return
         try{vault.write(engine.snapshot())}catch(e:Exception){Log.e("HEXKEEP","Save failed",e);engine.notice("Sauvegarde impossible : déverrouille l'appareil.")}
     }
+    fun renderMetrics():String=surface.pixel.metrics()
     private fun protect(sensitive:Boolean){runOnUiThread{if(sensitive)window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)else window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)}}
-    private fun action(id:Int){runOnUiThread{when(id){1->requestGps();2->authenticate{};3->{if(multicast==null){multicast=(applicationContext.getSystemService(Context.WIFI_SERVICE)as WifiManager).createMulticastLock("HEXKEEP peers").apply{setReferenceCounted(false);acquire()}}};6->startActivityForResult(Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("application/json").putExtra(Intent.EXTRA_TITLE,"hexkeep-rejeu.json"),78)}}}
+    private fun action(id:Int){runOnUiThread{when(id){
+        1->requestGps()
+        2->authenticate{}
+        3->{if(multicast==null){multicast=(applicationContext.getSystemService(Context.WIFI_SERVICE)as WifiManager).createMulticastLock("HEXKEEP peers").apply{setReferenceCounted(false);acquire()}}}
+        6->startActivityForResult(Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("application/json").putExtra(Intent.EXTRA_TITLE,"hexkeep-dossier.json"),78)
+        8->authenticate{engine.throneUnlock()}
+        9->startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("application/json"),79)
+        10->try{DeviceIdentity.certify(this,engine);engine.notice("Appareil certifié. Session renouvelée.")}catch(_:Exception){engine.notice("Clé matérielle indisponible en DEV.")}
+        11->requestBle()
+        12->{shop?.close();shop=PlayShop(this,engine).also{it.inspect(engine.nativeText())}}
+        13->{if(engine.phare()){if(checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED){engine.stopPhare("Active le GPS avant de lancer le Phare.");requestGps()}else{try{startForegroundService(Intent(this,PhareService::class.java))}catch(_:Exception){engine.stopPhare("Le système refuse la veille en arrière-plan.")}}}else stopService(Intent(this,PhareService::class.java))}
+        14->{val input=android.widget.EditText(this);input.hint="/ip4/.../tcp/.../p2p/...";android.app.AlertDialog.Builder(this).setTitle("Pair ou relais").setView(input).setPositiveButton("Connecter"){_,_->connectAddress(input.text.toString(),false)}.setNeutralButton("Réserver un relais"){_,_->connectAddress(input.text.toString(),true)}.setNegativeButton("Retour",null).show()}
+    }}}
+    private fun connectAddress(value:String,relay:Boolean){Thread({try{var address=value.trim();val parts=address.split("/");if(parts.size>3&&parts[1]in listOf("dns","dns4","dns6")){val resolved=java.net.InetAddress.getAllByName(parts[2]).firstOrNull{parts[1]=="dns"||(parts[1]=="dns4"&&it is java.net.Inet4Address)||(parts[1]=="dns6"&&it is java.net.Inet6Address)}?:throw IllegalArgumentException("DNS");address="/${if(resolved is java.net.Inet4Address)"ip4"else"ip6"}/${resolved.hostAddress}/"+parts.drop(3).joinToString("/")};if(relay)engine.reserveRelay(address)else engine.connect(address)}catch(_:Exception){engine.notice("Adresse indisponible. Vérifie le pair ou le relais.")}},"HEXKEEP system DNS").start()}
+    private fun requestBle(){val permissions=if(Build.VERSION.SDK_INT>=31)arrayOf(Manifest.permission.BLUETOOTH_SCAN,Manifest.permission.BLUETOOTH_ADVERTISE,Manifest.permission.BLUETOOTH_CONNECT)else arrayOf(Manifest.permission.ACCESS_FINE_LOCATION);if(permissions.any{checkSelfPermission(it)!=PackageManager.PERMISSION_GRANTED}){requestPermissions(permissions,32);return};ble?.stop();ble=BleLantern(this,engine).also{it.start()}}
     private fun feedback(){runOnUiThread{getSystemService(Vibrator::class.java)?.vibrate(VibrationEffect.createOneShot(18,80))}}
     private fun requestGps(){
         if(checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED){requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION),31);return}
         try{locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,3000,4f,this);engine.notice("Recherche GPS. La partie continue hors ligne.")}
         catch(e:Exception){engine.notice("GPS indisponible. La carte DEV reste jouable.")}
     }
-    override fun onRequestPermissionsResult(requestCode:Int,permissions:Array<out String>,results:IntArray){super.onRequestPermissionsResult(requestCode,permissions,results);if(requestCode==31){if(results.isNotEmpty()&&results[0]==PackageManager.PERMISSION_GRANTED)requestGps()else engine.notice("GPS refusé : utilise la carte de développement.")}}
+    override fun onRequestPermissionsResult(requestCode:Int,permissions:Array<out String>,results:IntArray){super.onRequestPermissionsResult(requestCode,permissions,results);if(requestCode==32){if(results.all{it==PackageManager.PERMISSION_GRANTED})requestBle()else engine.bleStatus("Co-présence BLE non autorisée.")};if(requestCode==31){if(results.isNotEmpty()&&results[0]==PackageManager.PERMISSION_GRANTED)requestGps()else engine.notice("GPS refusé : utilise la carte de développement.")}}
     override fun onLocationChanged(location:Location){
         if(!ready||!resumed||location.accuracy>100f)return
+        engine.memorySpeed((location.speed.coerceAtLeast(0f)*1000).toUInt())
         val old=lastLocation
         if(old!=null){val seconds=(location.elapsedRealtimeNanos-old.elapsedRealtimeNanos)/1_000_000_000.0;if(seconds<=0)return;if(old.distanceTo(location)/seconds>8){engine.notice("Déplacement trop rapide : position ignorée.");return}}
         lastLocation=location
@@ -151,9 +182,9 @@ class MainActivity : Activity(), LocationListener {
             try{track.play();while(running.get()){val pcm=engine.audio(735u);track.write(pcm,0,pcm.size)}}catch(e:Exception){Log.w("HEXKEEP","Audio interrupted",e)}finally{track.stop();track.release()}
         },"HEXKEEP audio").start()
     }
-    override fun onPause(){resumed=false;audioRunning.set(false);if(ready){engine.touch(0,3u,0,0);engine.pauseNetwork();multicast?.let{if(it.isHeld)it.release()};multicast=null;surface.onPause();if(engine.dirty())persist()};locationManager.removeUpdates(this);super.onPause()}
-    override fun onResume(){super.onResume();resumed=true;window.decorView.systemUiVisibility=5894;if(ready){surface.onResume();startAudio()}}
-    override fun onDestroy(){audioRunning.set(false);authSignal?.cancel();super.onDestroy()}
+    override fun onPause(){resumed=false;GameRuntime.foreground=false;audioRunning.set(false);if(ready){engine.touch(0,3u,0,0);if(!engine.phare()){engine.pauseNetwork();ble?.stop()};multicast?.let{if(it.isHeld)it.release()};multicast=null;surface.onPause();if(engine.dirty())persist()};locationManager.removeUpdates(this);super.onPause()}
+    override fun onResume(){super.onResume();resumed=true;GameRuntime.foreground=true;window.decorView.systemUiVisibility=5894;if(ready){surface.onResume();startAudio()}}
+    override fun onDestroy(){shop?.close();ble?.stop();audioRunning.set(false);authSignal?.cancel();super.onDestroy()}
     @Deprecated("Back compatibility") override fun onBackPressed(){if(ready){engine.back()}else super.onBackPressed()}
 }
 
@@ -178,6 +209,11 @@ class PixelRenderer(private val engine:Engine,private val save:()->Unit,private 
     @Volatile var top=0;private set
     private var physicalHeight=0
     private var program=0;private var texture=0;private var last=0L;private var accumulator=0L;private var frames=0;private var protected=false
+    private var metricStart=0L
+    private var metricElapsed=0L
+    private var metricFrames=0L
+    private var slowFrames=0L
+    @Synchronized fun metrics():String=org.json.JSONObject().put("frames",metricFrames).put("seconds",if(metricStart==0L)0.0 else metricElapsed/1e9).put("over_33ms",slowFrames).toString()
     private var buffer:ByteBuffer=ByteBuffer.allocateDirect(640*240*4)
     private val vertices=ByteBuffer.allocateDirect(64).order(ByteOrder.nativeOrder()).asFloatBuffer().apply{put(floatArrayOf(-1f,-1f,0f,1f,1f,-1f,1f,1f,-1f,1f,0f,0f,1f,1f,1f,0f));position(0)}
     override fun onSurfaceCreated(gl:GL10?,config:EGLConfig?){
@@ -191,7 +227,7 @@ class PixelRenderer(private val engine:Engine,private val save:()->Unit,private 
         glBindTexture(GL_TEXTURE_2D,texture);glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,logicalWidth,240,0,GL_RGBA,GL_UNSIGNED_BYTE,null)
     }
     override fun onDrawFrame(gl:GL10?){
-        val now=System.nanoTime();accumulator+=(now-last).coerceAtMost(166_666_665L);last=now
+        val now=System.nanoTime();if(metricStart==0L)metricStart=now;metricFrames++;metricElapsed+=(now-last).coerceIn(0,100_000_000L);if(now-last>33_333_333L)slowFrames++;accumulator+=(now-last).coerceAtMost(166_666_665L);last=now
         while(accumulator>=33_333_333L){engine.tick((System.currentTimeMillis()/1000).toULong());accumulator-=33_333_333L}
         val data=engine.frame(logicalWidth);buffer.clear();buffer.put(data);buffer.position(0)
         glClear(GL_COLOR_BUFFER_BIT);glViewport(left,physicalHeight-top-240*scale,logicalWidth*scale,240*scale)

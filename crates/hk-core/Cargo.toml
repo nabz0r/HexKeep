@@ -15,3 +15,7 @@ serde_json.workspace = true
 rand.workspace = true
 blake3.workspace = true
 hk-net = {path = "../hk-net"}
+
+hk-crown = {path="../hk-crown"}
+hk-season = {path="../hk-season"}
+borsh.workspace = true

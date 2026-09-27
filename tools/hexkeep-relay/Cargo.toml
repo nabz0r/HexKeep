@@ -1,0 +1,8 @@
+[package]
+name="hexkeep-relay"
+version.workspace=true
+edition.workspace=true
+[dependencies]
+libp2p = {version="0.56",features=["tokio","tcp","quic","noise","yamux","relay","identify","ping","macros"]}
+tokio = {version="1",features=["rt","macros"]}
+futures="0.3"

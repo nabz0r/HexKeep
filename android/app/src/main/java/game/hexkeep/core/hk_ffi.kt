@@ -758,6 +758,34 @@ internal interface UniffiForeignFutureCompleteVoid : com.sun.jna.Callback {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // For large crates we prevent `MethodTooLargeException` (see #2340)
 // N.B. the name of the extension is very misleading, since it is 
 // rather `InterfaceTooLargeException`, caused by too many methods 
@@ -779,6 +807,12 @@ fun uniffi_hk_ffi_checksum_method_engine_audio(
 ): Short
 fun uniffi_hk_ffi_checksum_method_engine_back(
 ): Short
+fun uniffi_hk_ffi_checksum_method_engine_beacon(
+): Short
+fun uniffi_hk_ffi_checksum_method_engine_ble_observed(
+): Short
+fun uniffi_hk_ffi_checksum_method_engine_ble_status(
+): Short
 fun uniffi_hk_ffi_checksum_method_engine_connect(
 ): Short
 fun uniffi_hk_ffi_checksum_method_engine_debug_status(
@@ -791,7 +825,17 @@ fun uniffi_hk_ffi_checksum_method_engine_frame(
 ): Short
 fun uniffi_hk_ffi_checksum_method_engine_haptic(
 ): Short
+fun uniffi_hk_ffi_checksum_method_engine_identity_challenge(
+): Short
+fun uniffi_hk_ffi_checksum_method_engine_identity_public(
+): Short
+fun uniffi_hk_ffi_checksum_method_engine_import_exchange(
+): Short
 fun uniffi_hk_ffi_checksum_method_engine_location(
+): Short
+fun uniffi_hk_ffi_checksum_method_engine_memory_speed(
+): Short
+fun uniffi_hk_ffi_checksum_method_engine_native_text(
 ): Short
 fun uniffi_hk_ffi_checksum_method_engine_network_addresses(
 ): Short
@@ -803,13 +847,25 @@ fun uniffi_hk_ffi_checksum_method_engine_notice(
 ): Short
 fun uniffi_hk_ffi_checksum_method_engine_pause_network(
 ): Short
+fun uniffi_hk_ffi_checksum_method_engine_phare(
+): Short
 fun uniffi_hk_ffi_checksum_method_engine_proof(
 ): Short
+fun uniffi_hk_ffi_checksum_method_engine_reserve_relay(
+): Short
 fun uniffi_hk_ffi_checksum_method_engine_sensitive(
+): Short
+fun uniffi_hk_ffi_checksum_method_engine_session_certify(
+): Short
+fun uniffi_hk_ffi_checksum_method_engine_session_request(
 ): Short
 fun uniffi_hk_ffi_checksum_method_engine_set_storage_error(
 ): Short
 fun uniffi_hk_ffi_checksum_method_engine_snapshot(
+): Short
+fun uniffi_hk_ffi_checksum_method_engine_stop_phare(
+): Short
+fun uniffi_hk_ffi_checksum_method_engine_throne_unlock(
 ): Short
 fun uniffi_hk_ffi_checksum_method_engine_tick(
 ): Short
@@ -878,6 +934,12 @@ fun uniffi_hk_ffi_fn_method_engine_audio(`ptr`: Pointer,`count`: Int,uniffi_out_
 ): RustBuffer.ByValue
 fun uniffi_hk_ffi_fn_method_engine_back(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
 ): Unit
+fun uniffi_hk_ffi_fn_method_engine_beacon(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_hk_ffi_fn_method_engine_ble_observed(`ptr`: Pointer,`bytes`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): Unit
+fun uniffi_hk_ffi_fn_method_engine_ble_status(`ptr`: Pointer,`message`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): Unit
 fun uniffi_hk_ffi_fn_method_engine_connect(`ptr`: Pointer,`address`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Unit
 fun uniffi_hk_ffi_fn_method_engine_debug_status(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
@@ -890,8 +952,18 @@ fun uniffi_hk_ffi_fn_method_engine_frame(`ptr`: Pointer,`width`: Int,uniffi_out_
 ): RustBuffer.ByValue
 fun uniffi_hk_ffi_fn_method_engine_haptic(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
+fun uniffi_hk_ffi_fn_method_engine_identity_challenge(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_hk_ffi_fn_method_engine_identity_public(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+fun uniffi_hk_ffi_fn_method_engine_import_exchange(`ptr`: Pointer,`data`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
 fun uniffi_hk_ffi_fn_method_engine_location(`ptr`: Pointer,`lat`: Int,`lng`: Int,`mock`: Byte,uniffi_out_err: UniffiRustCallStatus, 
 ): Unit
+fun uniffi_hk_ffi_fn_method_engine_memory_speed(`ptr`: Pointer,`speed`: Int,uniffi_out_err: UniffiRustCallStatus, 
+): Unit
+fun uniffi_hk_ffi_fn_method_engine_native_text(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
 fun uniffi_hk_ffi_fn_method_engine_network_addresses(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 fun uniffi_hk_ffi_fn_method_engine_network_peers(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
@@ -902,14 +974,26 @@ fun uniffi_hk_ffi_fn_method_engine_notice(`ptr`: Pointer,`message`: RustBuffer.B
 ): Unit
 fun uniffi_hk_ffi_fn_method_engine_pause_network(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
 ): Unit
+fun uniffi_hk_ffi_fn_method_engine_phare(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+): Byte
 fun uniffi_hk_ffi_fn_method_engine_proof(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
+fun uniffi_hk_ffi_fn_method_engine_reserve_relay(`ptr`: Pointer,`address`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): Unit
 fun uniffi_hk_ffi_fn_method_engine_sensitive(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
+fun uniffi_hk_ffi_fn_method_engine_session_certify(`ptr`: Pointer,`signature`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): Byte
+fun uniffi_hk_ffi_fn_method_engine_session_request(`ptr`: Pointer,`public`: RustBuffer.ByValue,`attestation`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
 fun uniffi_hk_ffi_fn_method_engine_set_storage_error(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
 ): Unit
 fun uniffi_hk_ffi_fn_method_engine_snapshot(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
+fun uniffi_hk_ffi_fn_method_engine_stop_phare(`ptr`: Pointer,`message`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): Unit
+fun uniffi_hk_ffi_fn_method_engine_throne_unlock(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+): Unit
 fun uniffi_hk_ffi_fn_method_engine_tick(`ptr`: Pointer,`time`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Unit
 fun uniffi_hk_ffi_fn_method_engine_touch(`ptr`: Pointer,`id`: Int,`phase`: Byte,`x`: Int,`y`: Int,uniffi_out_err: UniffiRustCallStatus, 
@@ -1049,6 +1133,15 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_hk_ffi_checksum_method_engine_back() != 40154.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if (lib.uniffi_hk_ffi_checksum_method_engine_beacon() != 24209.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_hk_ffi_checksum_method_engine_ble_observed() != 8051.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_hk_ffi_checksum_method_engine_ble_status() != 19129.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if (lib.uniffi_hk_ffi_checksum_method_engine_connect() != 29984.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
@@ -1067,7 +1160,22 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_hk_ffi_checksum_method_engine_haptic() != 31962.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if (lib.uniffi_hk_ffi_checksum_method_engine_identity_challenge() != 37128.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_hk_ffi_checksum_method_engine_identity_public() != 15254.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_hk_ffi_checksum_method_engine_import_exchange() != 31076.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if (lib.uniffi_hk_ffi_checksum_method_engine_location() != 57094.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_hk_ffi_checksum_method_engine_memory_speed() != 8889.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_hk_ffi_checksum_method_engine_native_text() != 51434.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_hk_ffi_checksum_method_engine_network_addresses() != 13500.toShort()) {
@@ -1085,16 +1193,34 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_hk_ffi_checksum_method_engine_pause_network() != 48825.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if (lib.uniffi_hk_ffi_checksum_method_engine_phare() != 26670.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if (lib.uniffi_hk_ffi_checksum_method_engine_proof() != 2364.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if (lib.uniffi_hk_ffi_checksum_method_engine_reserve_relay() != 39188.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if (lib.uniffi_hk_ffi_checksum_method_engine_sensitive() != 28793.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_hk_ffi_checksum_method_engine_session_certify() != 8663.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_hk_ffi_checksum_method_engine_session_request() != 42179.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_hk_ffi_checksum_method_engine_set_storage_error() != 17578.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_hk_ffi_checksum_method_engine_snapshot() != 48195.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_hk_ffi_checksum_method_engine_stop_phare() != 32513.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_hk_ffi_checksum_method_engine_throne_unlock() != 61419.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_hk_ffi_checksum_method_engine_tick() != 32196.toShort()) {
@@ -1547,6 +1673,12 @@ public interface EngineInterface {
     
     fun `back`()
     
+    fun `beacon`(): kotlin.ByteArray
+    
+    fun `bleObserved`(`bytes`: kotlin.ByteArray)
+    
+    fun `bleStatus`(`message`: kotlin.String)
+    
     fun `connect`(`address`: kotlin.String)
     
     fun `debugStatus`(): kotlin.String
@@ -1559,7 +1691,17 @@ public interface EngineInterface {
     
     fun `haptic`(): kotlin.UByte
     
+    fun `identityChallenge`(): kotlin.ByteArray
+    
+    fun `identityPublic`(): kotlin.ByteArray
+    
+    fun `importExchange`(`data`: kotlin.String): kotlin.String
+    
     fun `location`(`lat`: kotlin.Int, `lng`: kotlin.Int, `mock`: kotlin.Boolean)
+    
+    fun `memorySpeed`(`speed`: kotlin.UInt)
+    
+    fun `nativeText`(): kotlin.String
     
     fun `networkAddresses`(): List<kotlin.String>
     
@@ -1571,13 +1713,25 @@ public interface EngineInterface {
     
     fun `pauseNetwork`()
     
+    fun `phare`(): kotlin.Boolean
+    
     fun `proof`(): kotlin.String
     
+    fun `reserveRelay`(`address`: kotlin.String)
+    
     fun `sensitive`(): kotlin.Boolean
+    
+    fun `sessionCertify`(`signature`: kotlin.ByteArray): kotlin.Boolean
+    
+    fun `sessionRequest`(`public`: kotlin.ByteArray, `attestation`: kotlin.String): kotlin.ByteArray
     
     fun `setStorageError`()
     
     fun `snapshot`(): kotlin.String
+    
+    fun `stopPhare`(`message`: kotlin.String)
+    
+    fun `throneUnlock`()
     
     fun `tick`(`time`: kotlin.ULong)
     
@@ -1710,6 +1864,40 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     
     
 
+    override fun `beacon`(): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
+    callWithPointer {
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_beacon(
+        it, _status)
+}
+    }
+    )
+    }
+    
+
+    override fun `bleObserved`(`bytes`: kotlin.ByteArray)
+        = 
+    callWithPointer {
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_ble_observed(
+        it, FfiConverterByteArray.lower(`bytes`),_status)
+}
+    }
+    
+    
+
+    override fun `bleStatus`(`message`: kotlin.String)
+        = 
+    callWithPointer {
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_ble_status(
+        it, FfiConverterString.lower(`message`),_status)
+}
+    }
+    
+    
+
     override fun `connect`(`address`: kotlin.String)
         = 
     callWithPointer {
@@ -1781,6 +1969,42 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     
 
+    override fun `identityChallenge`(): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
+    callWithPointer {
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_identity_challenge(
+        it, _status)
+}
+    }
+    )
+    }
+    
+
+    override fun `identityPublic`(): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
+    callWithPointer {
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_identity_public(
+        it, _status)
+}
+    }
+    )
+    }
+    
+
+    override fun `importExchange`(`data`: kotlin.String): kotlin.String {
+            return FfiConverterString.lift(
+    callWithPointer {
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_import_exchange(
+        it, FfiConverterString.lower(`data`),_status)
+}
+    }
+    )
+    }
+    
+
     override fun `location`(`lat`: kotlin.Int, `lng`: kotlin.Int, `mock`: kotlin.Boolean)
         = 
     callWithPointer {
@@ -1790,6 +2014,29 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
 }
     }
     
+    
+
+    override fun `memorySpeed`(`speed`: kotlin.UInt)
+        = 
+    callWithPointer {
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_memory_speed(
+        it, FfiConverterUInt.lower(`speed`),_status)
+}
+    }
+    
+    
+
+    override fun `nativeText`(): kotlin.String {
+            return FfiConverterString.lift(
+    callWithPointer {
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_native_text(
+        it, _status)
+}
+    }
+    )
+    }
     
 
     override fun `networkAddresses`(): List<kotlin.String> {
@@ -1850,6 +2097,18 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     
     
 
+    override fun `phare`(): kotlin.Boolean {
+            return FfiConverterBoolean.lift(
+    callWithPointer {
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_phare(
+        it, _status)
+}
+    }
+    )
+    }
+    
+
     override fun `proof`(): kotlin.String {
             return FfiConverterString.lift(
     callWithPointer {
@@ -1862,12 +2121,47 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     
 
+    override fun `reserveRelay`(`address`: kotlin.String)
+        = 
+    callWithPointer {
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_reserve_relay(
+        it, FfiConverterString.lower(`address`),_status)
+}
+    }
+    
+    
+
     override fun `sensitive`(): kotlin.Boolean {
             return FfiConverterBoolean.lift(
     callWithPointer {
     uniffiRustCall() { _status ->
     UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_sensitive(
         it, _status)
+}
+    }
+    )
+    }
+    
+
+    override fun `sessionCertify`(`signature`: kotlin.ByteArray): kotlin.Boolean {
+            return FfiConverterBoolean.lift(
+    callWithPointer {
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_session_certify(
+        it, FfiConverterByteArray.lower(`signature`),_status)
+}
+    }
+    )
+    }
+    
+
+    override fun `sessionRequest`(`public`: kotlin.ByteArray, `attestation`: kotlin.String): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
+    callWithPointer {
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_session_request(
+        it, FfiConverterByteArray.lower(`public`),FfiConverterString.lower(`attestation`),_status)
 }
     }
     )
@@ -1895,6 +2189,28 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
+    
+
+    override fun `stopPhare`(`message`: kotlin.String)
+        = 
+    callWithPointer {
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_stop_phare(
+        it, FfiConverterString.lower(`message`),_status)
+}
+    }
+    
+    
+
+    override fun `throneUnlock`()
+        = 
+    callWithPointer {
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_throne_unlock(
+        it, _status)
+}
+    }
+    
     
 
     override fun `tick`(`time`: kotlin.ULong)

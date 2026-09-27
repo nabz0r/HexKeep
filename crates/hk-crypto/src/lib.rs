@@ -90,3 +90,4 @@ mod tests {
         assert!(recover(&shares[..2]).is_err());
     }
 }
+pub mod identity;

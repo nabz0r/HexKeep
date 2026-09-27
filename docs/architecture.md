@@ -1,9 +1,40 @@
-# Architecture livrée
+# Architecture v0.2
 
-Kotlin possède le cycle Android, les permissions, le GPS, le Keystore AES-GCM, l’entrée multitouch, AudioTrack et GLSurfaceView. UniFFI transporte commandes et images vers Rust. `hk-ppu` fabrique un tampon RGBA de hauteur 240 ; GL le présente avec filtrage NEAREST et facteur entier, centré. La simulation fonctionne à 30 Hz ; le rendu vise 60 Hz. Le retard accumulé est borné pour éviter une explosion de rattrapage après une pause.
+Le cœur de combat est Rust : calcul entier Q24.8, horloge logique 30 Hz, RNG ChaCha8 déterministe. Android fournit l'écran OpenGL ES 2, AudioTrack, les entrées tactiles, GPS, Bluetooth, Keystore, biométrie, fichiers et service de veille. Le rendu conserve une hauteur de 240 pixels et une mise à l'échelle entière avec filtrage nearest.
 
-`hk-proto` définit les entiers fixes, entrées et royaumes. `hk-sim` possède le combat, les projectiles, armure, pickups et IA. `hk-world` convertit les positions locales en H3 et applique veille/Noir/fondations. `hk-crypto` fournit Ed25519, BIP39 et Shamir. `hk-ledger` signe et ordonne le DAG de développement. `hk-net` utilise libp2p TCP, Noise, Yamux, mDNS, gossipsub, identify et ping ; il conserve les états de rollback. `hk-core` relie les modules et dessine tous les écrans. `hk-apu` synthétise quatre voix. Aucun SDK d’analytics, de publicité, d’authentification distante ou de crash reporting.
+## Modules
 
-Le thread GL cadence le jeu ; le thread AudioTrack tire le PCM ; un runtime Tokio dédié possède les sockets. Les accès au cœur sont sérialisés. Les clés privées ne quittent pas la sauvegarde chiffrée et la mémoire du processus. La couche transport utilise aussi une identité éphémère libp2p. Tous les joueurs exécutent le combat ; le premier pair ne dispose d’aucune autorité persistante. Le choix initial des participants par le challenger reste un protocole dev simplifié.
+| Module | Responsabilité |
+|---|---|
+| hk-proto | Types, coordonnées, domaines et hashes |
+| hk-sim | Combat, IA, évolution, Codex et siège |
+| hk-world | H3 9/8/7, veille, Noir, bastions, garde fixe |
+| hk-crypto | Ed25519, BIP39, Shamir, P-256, X25519/AEAD, témoignages |
+| hk-ledger | Événements signés, DAG et fold déterministe |
+| hk-net | libp2p, rollback, entrées chaînées, preuves et rejeu |
+| hk-crown | Genèse, certificats, Édits, Sceaux, Merkle, réconciliation |
+| hk-season | Mémoires, garde collective, saison, cosmétiques et Maisons |
+| hk-core | Parcours du jeu, écrans, état persistant et raccordement |
+| hk-ppu / hk-apu | Pixel art et synthèse originale à quatre canaux |
+| hk-ffi | Frontière UniFFI, accès synchronisés au cœur |
+| crown | Cérémonie entièrement hors ligne |
+| hexkeep-relay | Circuits réseau aveugles et temporaires |
+| hexkeep-sim | Pairs indépendants, rejeu, déterminisme et export statistique |
 
-La conversion GPS→H3 et le rendu sont hors simulation. Le combat n’utilise aucun flottant, et les états sont sérialisés Borsh avant BLAKE3. Le temps local n’est utilisé que pour la veille provisoire dev. Aucun état n’est présenté comme scellé.
+Aucun serveur n'est consulté pour décider d'un résultat. Les participants simulent et cosignent ; le Trône décide de la finalité du registre qu'il connaît. Les réplicas refusent un Sceau dont ils ne possèdent pas les événements nécessaires au recalcul.
+
+## Stockage et cycle Android
+
+L'état v0.1 est migré par ajout des champs de campagne. Le Nom est conservé. Snapshot JSON chiffré AES-GCM avec clé non exportable Android Keystore, écriture AtomicFile. Sur appareil sécurisé, le déverrouillage passe par biométrie ou code. Une corruption ne provoque pas de remise à zéro silencieuse. Le DAG signé est conservé dans ce snapshot ; un journal physique append-only séparé n'est pas encore utilisé.
+
+Les sessions de trafic sont éphémères, certifiées par la P-256 de l'appareil. La racine de Couronne reste hors téléphone. La DEV contient une délégation de test partagée, explicitement impropre à la production.
+
+Sans Phare, mise en pause = arrêt audio/GPS/réseau, sauvegarde et interruption honnête du combat. Le Phare garde une simulation et un service réseau visibles pendant la pause, sur secteur/Wi-Fi, avec ancre locale. Aucune boucle en double entre activité et service.
+
+## Séparation du combat et de la progression
+
+Le Codex scellé détermine les paramètres de combat communs. Les achats, rangs, maisons et XP ne modifient pas la simulation. Les Mémoires affectent uniquement la garde collective ; les Murs dimensionnent la Porte. Les replays sont rejoués avant d'être admis en Haute Cour.
+
+## Frontières de livraison
+
+Cette version couvre un parcours DEV des fonctions M0 à M7. Les essais de laboratoire ne certifient pas un déploiement commercial : attestation Google complète, signature officielle, paiements / remboursements réels, qualification radio sur deux opérateurs et consommation sur téléphone doivent encore être traités avant production. Les limites détaillées et les preuves de test figurent dans le rapport.

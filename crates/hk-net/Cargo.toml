@@ -10,6 +10,8 @@ hk-ledger = {path = "../hk-ledger"}
 borsh.workspace = true
 serde.workspace = true
 blake3.workspace = true
-libp2p = {version = "0.56", features = ["tokio", "tcp", "noise", "yamux", "mdns", "gossipsub", "identify", "ping", "macros"]}
+libp2p = {version = "0.56", features = ["tokio", "tcp", "noise", "yamux", "mdns", "gossipsub", "identify", "ping", "macros", "quic", "relay", "dcutr", "autonat", "kad", "dns"]}
 tokio = {version = "1", features = ["rt", "sync", "time", "macros", "net"]}
 futures = "0.3"
+serde_json.workspace=true
+hk-crown={path="../hk-crown"}

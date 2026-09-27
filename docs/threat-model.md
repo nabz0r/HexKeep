@@ -16,3 +16,11 @@ Critique : absence de chaîne d’attestation Android hors ligne, certificats P-
 Moyen : paramètres de combat non équilibrés sur un panel humain ; un pair interrompu produit une preuve incomplète ; pas de reprise de combat après fermeture ; pas de témoin BLE.
 
 Les signatures prouvent un auteur, pas la véracité de son récit. Un hash identique prouve un calcul identique pour les entrées données, pas l’absence d’assistance de visée. Aucune protection anti-triche absolue n’est revendiquée.
+
+## État v0.2
+
+Les signatures de session, expirations, parts chiffrées, chaînes d'entrées, rejeux complets, chaînes d'Édits, roots Merkle, bans et rollbacks ont des tests exécutables. Les imports de finalité sont transactionnels ; une autre Genèse, une fourche ou un registre incomplet sont refusés.
+
+La clé opérationnelle de Trône DEV est volontairement distribuée aux testeurs. Elle n'offre donc **aucune séparation d'administration entre testeurs**. La racine n'est pas dans l'APK. La production est fermée plutôt que d'accepter des appareils non qualifiés.
+
+La verification P-256 prouve la possession de la clé liée au Nom ; elle ne remplace pas la validation Google de la chaîne d'attestation, du démarrage vérifié, de la signature APK et des révocations. Cette validation de production, le durcissement complet contre l'abus de trafic et l'analyse anti-assistance restent des travaux distincts. Les bots et GPS fictifs permis en DEV ne sont pas des preuves d'équité sur appareils adversariaux.

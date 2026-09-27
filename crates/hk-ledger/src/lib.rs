@@ -9,6 +9,9 @@ pub enum Kind {
     Victory,
     Banner,
     Generation,
+    Capture,
+    Memory,
+    Lantern,
 }
 #[derive(Clone, Debug, Serialize, Deserialize, BorshSerialize, BorshDeserialize)]
 pub struct Body {
@@ -146,7 +149,10 @@ impl Ledger {
                 Kind::Foundation => {
                     out.bastions.entry(b.cell).or_insert(b.realm);
                 }
-                Kind::Victory => {
+                Kind::Capture => {
+                    out.bastions.insert(b.cell, b.realm);
+                }
+                Kind::Victory | Kind::Memory | Kind::Lantern => {
                     let p = out.points.entry(b.author).or_default();
                     *p = p.saturating_add(b.value.min(100));
                 }

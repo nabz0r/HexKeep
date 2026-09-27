@@ -11,3 +11,11 @@ Risques résiduels : corrélation d’une cellule avec un nom, observation d’I
 L’écran des mots est protégé contre la capture d’écran Android. Les mots sont affichés volontairement à leur propriétaire ; les noter hors ligne. Effacer les données de l’application détruit la copie locale. Désinstaller ne révoque pas les clés dont d’autres pairs possèdent déjà les événements signés.
 
 L’affichage initial explique 16+, l’attention au monde réel, l’interdiction de jouer en conduisant et le respect des propriétés privées. Le placement réel sécurisé selon OpenStreetMap reste à faire. La carte par défaut est explicitement un terrain d’entraînement dev, pas une instruction de déplacement physique.
+
+## Compléments v0.2
+
+Le Bluetooth diffuse un jeton de session tournant et un royaume. La clé de Nom n'est pas mise dans la balise. Les témoignages signés restent soumis au contrôle de co-présence. Le refus de permission conserve l'accès au solo. La Course demande un consentement explicite avant diffusion d'une cellule H3 de résolution 10. Aucun point GPS exact n'est envoyé au réseau.
+
+Le Phare utilise une notification persistante et une commande Arrêter ; le service exige secteur et Wi-Fi et conserve une ancre GPS locale. Son démarrage conserve le choix de bannière. Il n'y a pas de permission de localisation permanente. La boutique DEV ne débite aucun paiement et ne recueille pas de coordonnées bancaires ; l'interrogation facultative du catalogue utilise le SDK Google Play Billing.
+
+Les preuves de combat incluent des positions dans l'arène fictive, pas les coordonnées physiques. Les trois preuves complètes les plus récentes sont conservées localement ; l'export de dossier est une action du joueur. Les certificats publics lient les sessions au Nom auprès des pairs de la partie. La DEV ne doit pas être utilisée comme outil de suivi de personnes réelles.
