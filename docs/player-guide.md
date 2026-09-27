@@ -1,3 +1,5 @@
+> **0.6 · Les Lanternes du Refuge** : l’édition Play est solo, hors ligne et sans GPS. Le réseau et les fonctions de royaume décrits plus bas concernent la DEV. Les deux éditions conservent désormais une aventure après fermeture : touche Reprendre au titre, puis reprends depuis la pause. L’aide et les réglages sont disponibles dans le menu de pause ; le prologue peut être revu depuis Comment jouer. Désinstaller efface la progression locale. [Choisir une édition](installation.md).
+
 # L’Éveil des Veilleurs — guide 0.5
 
 Tu es un veilleur. Éline garde le refuge ; tu portes sa dernière carte. Rapporte une lumière, une mémoire, puis de quoi équiper ton prochain départ. L’écran annonce toujours ton prochain objectif.

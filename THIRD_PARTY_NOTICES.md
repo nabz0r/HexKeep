@@ -23,3 +23,7 @@ Les fontes utilisées par l’interface sont celles de la plateforme Android ; a
 ## Références de conception
 
 WoW, League of Legends, Dark Age of Camelot et Quake III sont cités uniquement comme références de conception. Aucun de leurs fichiers graphiques, musicaux, narratifs ni code source n’est incorporé. Les liens et les choix propres à HEXKEEP figurent dans `docs/design-v04.md`.
+
+## Complément 0.6
+
+Le refuge et le visuel Google Play ont été créés avec l’outil intégré Imagegen ; prompts et fichiers dans `docs/art/v06-direction.md`. L’icône adaptative dérive du dessin vectoriel original du dépôt. AndroidX Annotation 1.9.1 (Apache-2.0) accompagne les bindings Android UniFFI. L’édition Play exclut le SDK Google Play Billing. Les notices de `LICENSES/` sont intégrées à l’APK lors de la construction et accessibles dans les crédits.

@@ -1,0 +1,25 @@
+# Vie privée — édition Play
+
+HEXKEEP — Les Lanternes du Refuge
+Édition hors ligne 0.6 · 27 septembre 2026
+
+Cette politique concerne uniquement l’édition Play (game.hexkeep) de HEXKEEP, projet maintenu sur github.com/nabz0r/HexKeep. L’édition DEV possède sa propre politique.
+
+Ce qui reste sur ton appareil
+Le jeu conserve une identité aléatoire locale, un nom de veilleur, ton serment, ta progression, tes objets, tes découvertes, l’aventure en cours et tes réglages. Les positions décrivent un monde imaginaire. Aucune localisation réelle n’est utilisée.
+
+Aucune transmission par le jeu
+Cette édition n’a pas d’autorisation Internet, de GPS, de Bluetooth, de publicité, d’analyse d’usage ni d’achat intégré. Elle n’envoie pas de données à un serveur et ne crée pas de compte en ligne. Les services du système Android et du magasin restent soumis à leurs propres politiques.
+
+Sauvegarde et conservation
+La progression est chiffrée sur l’appareil avec Android Keystore. La copie est mise à jour régulièrement et lorsque l’application passe en arrière-plan. La sauvegarde automatique Android est désactivée. Aucun transfert vers un autre téléphone ni récupération de progression à distance n’est proposé dans cette version.
+
+Suppression
+Les données restent présentes jusqu’à l’effacement des données de HEXKEEP dans les réglages Android ou à sa désinstallation. Cette action est définitive. Une mise à jour installée par-dessus avec la même signature conserve la progression.
+
+Permissions
+La vibration sert au retour tactile et peut être désactivée dans les réglages. Aucun accès aux contacts, photos, microphone ou caméra n’est demandé.
+
+Contact et modifications
+Pour contacter le projet ou signaler un problème de confidentialité : https://github.com/nabz0r/HexKeep/issues
+Ne publie aucune donnée personnelle ou sauvegarde dans un signalement public. Toute évolution du traitement des données devra être décrite ici avant sa distribution.

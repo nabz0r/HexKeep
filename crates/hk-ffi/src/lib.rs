@@ -14,6 +14,19 @@ impl Engine {
             audio: Mutex::new(hk_apu::Apu::default()),
         })
     }
+    #[uniffi::constructor]
+    pub fn offline(snapshot: String) -> Arc<Self> {
+        Arc::new(Self {
+            game: Mutex::new(hk_core::Game::new_offline(&snapshot)),
+            audio: Mutex::new(hk_apu::Apu::default()),
+        })
+    }
+    pub fn can_save(&self) -> bool {
+        !self.game.lock().unwrap().storage_error
+    }
+    pub fn retry_save(&self) {
+        self.game.lock().unwrap().dirty = true;
+    }
     pub fn presentation(&self, width: i32) -> String {
         self.game.lock().unwrap().presentation(width)
     }

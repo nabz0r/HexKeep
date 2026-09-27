@@ -1,0 +1,267 @@
+   Compiling hk-proto v0.6.0 (/Users/n/.codex/.chatgpt-projects/g-p-6ab83bd4da808191b19fbaa70f9dda7e/hexkeep/crates/hk-proto)
+   Compiling hk-apu v0.6.0 (/Users/n/.codex/.chatgpt-projects/g-p-6ab83bd4da808191b19fbaa70f9dda7e/hexkeep/crates/hk-apu)
+   Compiling hk-ppu v0.6.0 (/Users/n/.codex/.chatgpt-projects/g-p-6ab83bd4da808191b19fbaa70f9dda7e/hexkeep/crates/hk-ppu)
+   Compiling hexkeep-relay v0.6.0 (/Users/n/.codex/.chatgpt-projects/g-p-6ab83bd4da808191b19fbaa70f9dda7e/hexkeep/tools/hexkeep-relay)
+   Compiling hk-bindgen v0.6.0 (/Users/n/.codex/.chatgpt-projects/g-p-6ab83bd4da808191b19fbaa70f9dda7e/hexkeep/tools/bindgen)
+   Compiling hk-crypto v0.6.0 (/Users/n/.codex/.chatgpt-projects/g-p-6ab83bd4da808191b19fbaa70f9dda7e/hexkeep/crates/hk-crypto)
+   Compiling hk-world v0.6.0 (/Users/n/.codex/.chatgpt-projects/g-p-6ab83bd4da808191b19fbaa70f9dda7e/hexkeep/crates/hk-world)
+   Compiling hk-ledger v0.6.0 (/Users/n/.codex/.chatgpt-projects/g-p-6ab83bd4da808191b19fbaa70f9dda7e/hexkeep/crates/hk-ledger)
+   Compiling hk-crown v0.6.0 (/Users/n/.codex/.chatgpt-projects/g-p-6ab83bd4da808191b19fbaa70f9dda7e/hexkeep/crates/hk-crown)
+   Compiling hk-sim v0.6.0 (/Users/n/.codex/.chatgpt-projects/g-p-6ab83bd4da808191b19fbaa70f9dda7e/hexkeep/crates/hk-sim)
+   Compiling hk-net v0.6.0 (/Users/n/.codex/.chatgpt-projects/g-p-6ab83bd4da808191b19fbaa70f9dda7e/hexkeep/crates/hk-net)
+   Compiling hk-season v0.6.0 (/Users/n/.codex/.chatgpt-projects/g-p-6ab83bd4da808191b19fbaa70f9dda7e/hexkeep/crates/hk-season)
+   Compiling crown v0.6.0 (/Users/n/.codex/.chatgpt-projects/g-p-6ab83bd4da808191b19fbaa70f9dda7e/hexkeep/tools/crown)
+   Compiling hk-core v0.6.0 (/Users/n/.codex/.chatgpt-projects/g-p-6ab83bd4da808191b19fbaa70f9dda7e/hexkeep/crates/hk-core)
+   Compiling hk-ffi v0.6.0 (/Users/n/.codex/.chatgpt-projects/g-p-6ab83bd4da808191b19fbaa70f9dda7e/hexkeep/crates/hk-ffi)
+   Compiling hexkeep-sim v0.6.0 (/Users/n/.codex/.chatgpt-projects/g-p-6ab83bd4da808191b19fbaa70f9dda7e/hexkeep/tools/hexkeep-sim)
+    Finished `release` profile [optimized] target(s) in 1m 22s
+     Running unittests src/main.rs (target/release/deps/crown-4f8e94ae25d8aff9)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/release/deps/hexkeep_relay-2fab9d3d87dec4bc)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/release/deps/hexkeep_sim-5f5a2ab6ff72ed93)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/release/deps/hk_apu-32001cfad148b757)
+
+running 3 tests
+test tests::music_and_effects_are_independent ... ok
+test tests::continuous_blocks ... ok
+test tests::bounded_audio ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running unittests src/main.rs (target/release/deps/hk_bindgen-150674ec3a601157)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/release/deps/hk_core-06c72a41f4d85c70)
+
+running 24 tests
+test adventure::tests::inventory_migration_equipment_salvage ... ok
+test network::silence_tests::one_silent_participant_is_not_hidden_by_other_traffic ... ok
+test discoveries::tests::full_bag_converts_loot_and_reports_that_conversion ... ok
+test adventure::eveil_tests::difficulty_unlocks_and_forging_updates_collection ... ok
+test adventure::tests::pve_loadout_is_not_applied_to_pvp ... ok
+test adventure::eveil_tests::field_equipment_pauses_and_never_grants_free_health ... ok
+test adventure::tests::leaving_a_replay_unlocks_the_refuge_without_awarding_its_kills ... ok
+test discoveries::tests::found_caches_are_kept_on_retreat_and_not_awarded_twice ... ok
+test adventure::tests::rewards_are_consumed_once_and_inventory_resumes_combat ... ok
+test adventure::eveil_tests::legacy_journey_migration_preserves_values_and_equipment ... ok
+test discoveries::tests::sites_reward_once_immediately_and_memories_survive_reload ... ok
+test presentation::tests::expedition_stops_after_three_lost_lights ... ok
+test discoveries::tests::marked_ground_can_be_escaped_or_dodged_and_hits_only_once ... ok
+test tests::malformed_save_never_overwritten ... ok
+test presentation::tests::guided_start_and_manual_controls_are_safe ... ok
+test presentation::tests::old_save_migrates_without_changing_identity_or_progress ... ok
+test release::tests::play_is_solo_and_does_not_unlock_the_production_network ... ok
+test tests::all_screens_render ... ok
+test tests::onboarding_and_touch ... ok
+test tests::solo_save_roundtrip ... ok
+test release::tests::old_saves_migrate_and_invalid_checkpoints_fail_closed ... ok
+test tests::tutorial_can_be_won_without_changing_combat_stats ... ok
+test release::tests::adventure_checkpoint_preserves_combat_loot_and_pause_without_double_reward ... ok
+test presentation::tests::all_three_realms_can_complete_expedition_and_claim_once ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/milestones.rs (target/release/deps/milestones-570f12060506d15c)
+
+running 8 tests
+test siege_gate_capture_and_contestation ... ok
+test balance_editor_changes_only_after_seal ... ok
+test cosmetic_edicts_wait_for_seal_and_revoke ... ok
+test v01_save_migrates_and_m7_persists ... ok
+test all_expansion_screens_at_every_supported_width ... ok
+test purchased_cosmetics_cannot_change_combat ... ok
+test throne_ban_propagation_rollback_and_season ... ok
+test thirty_minute_partition_reconciles ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running unittests src/lib.rs (target/release/deps/hk_crown-6d1a0c3ccbb0a824)
+
+running 3 tests
+test tests::expiry_and_revoke ... ok
+test tests::partition_merge_and_forgery ... ok
+test tests::ban_only_after_seal_and_rollback ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/release/deps/hk_crypto-e310111e985b63fc)
+
+running 7 tests
+test tests::all_three_of_five ... ok
+test tests::twenty_four_words ... ok
+test tests::signatures_are_separated ... ok
+test identity::tests::beacon_rotates ... ok
+test identity::tests::encrypted_recovery ... ok
+test identity::tests::hierarchy_expiry_tamper ... ok
+test identity::recovery_tests::five_guardians_three_recovers_owner ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/release/deps/hk_ffi-7da523b22d63980b)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/release/deps/hk_ledger-75cbd25312fecc70)
+
+running 2 tests
+test tests::missing_parent ... ok
+test tests::merge_order_and_tamper ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/release/deps/hk_net-885020daa1a2555e)
+
+running 6 tests
+test tests::packet_authentication ... ok
+test tests::conflicting_inputs_abort ... ok
+test tests::reordered_input_cannot_escape_rollback_window ... ok
+test tests::rollback_matches_ordered ... ok
+test tests::cached_chain_does_not_accept_modified_or_expired_packets ... ok
+test transport_tests::real_noise_tcp_transport ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+     Running unittests src/lib.rs (target/release/deps/hk_ppu-d39d742889f250a0)
+
+running 1 test
+test tests::boundaries ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/release/deps/hk_proto-f0449113803b755b)
+
+running 2 tests
+test tests::domains ... ok
+test tests::square_roots ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/release/deps/hk_season-70544658d7d91394)
+
+running 4 tests
+test tests::sybil_three_devices_limit ... ok
+test tests::memory_drops_and_collective_bonus_only ... ok
+test tests::tiers_and_test_receipts ... ok
+test tests::house_requires_distinct_signed_members ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/release/deps/hk_sim-e5a151e222718214)
+
+running 10 tests
+test tests::armor_damage ... ok
+test tests::evolution_bounded ... ok
+test navigation::tests::swept_dash_cannot_tunnel ... ok
+test navigation::gameplay_tests::analogue_is_proportional_and_release_brakes ... ok
+test navigation::tests::actor_can_leave_a_wall_margin_and_rounded_corner ... ok
+test navigation::gameplay_tests::every_spawn_is_walkable ... ok
+test navigation::tests::route_goes_around_wall ... ok
+test navigation::gameplay_tests::all_enemy_roles_can_navigate_a_barrier ... ok
+test tests::roles_and_realms ... ok
+test tests::ten_thousand_replays has been running for over 60 seconds
+test tests::ten_thousand_replays ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 137.97s
+
+     Running unittests src/lib.rs (target/release/deps/hk_world-7a7d0b785d408ec9)
+
+running 5 tests
+test tests::guard_saturates ... ok
+test tests::geometry ... ok
+test tests::banner_delay ... ok
+test tests::memory_speed ... ok
+test tests::darkness_and_watch ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_apu
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_core
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_crown
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_crypto
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_ffi
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_ledger
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_net
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_ppu
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_proto
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_season
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_sim
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_world
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

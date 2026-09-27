@@ -1,0 +1,21 @@
+
+game.hexkeep.PlayReleaseTest:
+Error in unreadableVaultIsNeverOverwrittenOnPause(game.hexkeep.PlayReleaseTest):
+org.junit.ComparisonFailure: expected:<[committed-test-state]> but was:<[]>
+	at org.junit.Assert.assertEquals(Assert.java:117)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at game.hexkeep.PlayReleaseTest.unreadableVaultIsNeverOverwrittenOnPause(PlayReleaseTest.kt:111)
+
+
+Time: 0.007
+There was 1 failure:
+1) unreadableVaultIsNeverOverwrittenOnPause(game.hexkeep.PlayReleaseTest)
+org.junit.ComparisonFailure: expected:<[committed-test-state]> but was:<[]>
+	at org.junit.Assert.assertEquals(Assert.java:117)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at game.hexkeep.PlayReleaseTest.unreadableVaultIsNeverOverwrittenOnPause(PlayReleaseTest.kt:111)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+
+

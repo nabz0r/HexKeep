@@ -240,7 +240,7 @@ pub fn contract_name(kind: u8) -> &'static str {
         "La piste du passeur",
     ][kind.min(4) as usize]
 }
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Drop {
     pub pos: Vec2,
     pub collected: bool,

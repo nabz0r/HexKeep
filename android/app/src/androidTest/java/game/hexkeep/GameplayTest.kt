@@ -3,7 +3,6 @@ package game.hexkeep
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.lifecycle.Lifecycle
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.SystemClock
@@ -17,23 +16,30 @@ import java.io.File
 @RunWith(AndroidJUnit4::class)
 class GameplayTest {
     private val instrumentation=InstrumentationRegistry.getInstrumentation()
-    private var scale=2f
+    private var left=0f;private var scale=2f
     private var vw=1170f
     private var top=0f
     private lateinit var engine:game.hexkeep.core.Engine
     private lateinit var activity:MainActivity
     private fun onActivity(block:(MainActivity)->Unit){instrumentation.runOnMainSync{block(activity)}}
-    private fun tap(x:Float,y:Float){val t=SystemClock.uptimeMillis();instrumentation.uiAutomation.injectInputEvent(MotionEvent.obtain(t,t,MotionEvent.ACTION_DOWN,x*scale,y*scale+top,0),false);SystemClock.sleep(60);instrumentation.uiAutomation.injectInputEvent(MotionEvent.obtain(t,SystemClock.uptimeMillis(),MotionEvent.ACTION_UP,x*scale,y*scale+top,0),false);SystemClock.sleep(200)}
+    private fun inject(event:MotionEvent){try{assertTrue("Touch event rejected",instrumentation.uiAutomation.injectInputEvent(event,true))}finally{event.recycle()}}
+    private fun awaitCooldown(field:String){
+        val deadline=SystemClock.uptimeMillis()+3000
+        var fighter=JSONObject(engine.presentation(584)).getJSONObject("battle").getJSONArray("fighters").getJSONObject(0)
+        while(fighter.getInt(field)==0&&SystemClock.uptimeMillis()<deadline){SystemClock.sleep(20);fighter=JSONObject(engine.presentation(584)).getJSONObject("battle").getJSONArray("fighters").getJSONObject(0)}
+        assertTrue("Action never reached the simulation ($field): $fighter",fighter.getInt(field)>0)
+    }
+    private fun tap(x:Float,y:Float){val t=SystemClock.uptimeMillis();inject(MotionEvent.obtain(t,t,MotionEvent.ACTION_DOWN,left+x*scale,y*scale+top,0).apply{source=android.view.InputDevice.SOURCE_TOUCHSCREEN});SystemClock.sleep(60);inject(MotionEvent.obtain(t,SystemClock.uptimeMillis(),MotionEvent.ACTION_UP,left+x*scale,y*scale+top,0).apply{source=android.view.InputDevice.SOURCE_TOUCHSCREEN});SystemClock.sleep(200)}
     private fun capture(name:String){SystemClock.sleep(350);val image=instrumentation.uiAutomation.takeScreenshot();val f=File(instrumentation.targetContext.getExternalFilesDir(null),"v05-$name.png");f.outputStream().use{image.compress(Bitmap.CompressFormat.PNG,100,it)}}
-    private fun point(down:Long,action:Int,points:List<Triple<Int,Float,Float>>){val props=points.map{MotionEvent.PointerProperties().apply{id=it.first;toolType=MotionEvent.TOOL_TYPE_FINGER}}.toTypedArray();val coords=points.map{MotionEvent.PointerCoords().apply{x=it.second*scale;y=it.third*scale+top;pressure=1f;size=1f}}.toTypedArray();instrumentation.uiAutomation.injectInputEvent(MotionEvent.obtain(down,SystemClock.uptimeMillis(),action,points.size,props,coords,0,0,1f,1f,0,0,android.view.InputDevice.SOURCE_TOUCHSCREEN,0),false);SystemClock.sleep(60)}
+    private fun point(down:Long,action:Int,points:List<Triple<Int,Float,Float>>){val props=points.map{MotionEvent.PointerProperties().apply{id=it.first;toolType=MotionEvent.TOOL_TYPE_FINGER}}.toTypedArray();val coords=points.map{MotionEvent.PointerCoords().apply{x=left+it.second*scale;y=it.third*scale+top;pressure=1f;size=1f}}.toTypedArray();inject(MotionEvent.obtain(down,SystemClock.uptimeMillis(),action,points.size,props,coords,0,0,1f,1f,0,0,android.view.InputDevice.SOURCE_TOUCHSCREEN,0));SystemClock.sleep(60)}
     @Test fun soloOfflineLifecycle(){
         var identity="";var storedXp=0
         ActivityScenario.launch<MainActivity>(Intent(instrumentation.targetContext,MainActivity::class.java)).use{scenario->
             SystemClock.sleep(1400)
-            scenario.onActivity{activity=it;engine=it.engine;scale=minOf(it.window.decorView.height/540f,it.window.decorView.width/960f);top=(it.window.decorView.height-540*scale)/2;vw=it.window.decorView.width/scale;identity=JSONObject(it.engine.snapshot()).getJSONArray("secret").toString()}
+            scenario.onActivity{activity=it;engine=it.engine;val viewport=JSONObject(it.renderMetrics()).getJSONObject("viewport");scale=viewport.getDouble("scale").toFloat();left=viewport.getDouble("left").toFloat();top=viewport.getDouble("top").toFloat();vw=viewport.getDouble("width").toFloat();identity=JSONObject(it.engine.snapshot()).getJSONArray("secret").toString()}
             capture("title")
             // Replaying the introduction also exercises upgrades from a v0.2 identity.
-            onActivity{it.engine.uiAction("settings")};SystemClock.sleep(200);capture("settings");tap(150f,470f);SystemClock.sleep(1200);capture("intro-1")
+            onActivity{it.engine.uiAction("continue");it.engine.uiAction("home");it.engine.uiAction("settings")};SystemClock.sleep(200);capture("settings");tap(150f,384f);tap(vw-180,496f);SystemClock.sleep(1200);capture("intro-1")
             tap(vw-190,440f);SystemClock.sleep(700);capture("intro-2");tap(vw-190,440f);SystemClock.sleep(700);capture("intro-3");tap(vw-190,440f);capture("heroes")
             tap(vw/2,265f);tap(vw-200,447f)
             capture("first-combat-frame")
@@ -48,21 +54,35 @@ class GameplayTest {
             // Two pointers: movement remains held while triggering the dash.
             point(down,MotionEvent.ACTION_POINTER_DOWN or (1 shl MotionEvent.ACTION_POINTER_INDEX_SHIFT),listOf(Triple(0,138f,435f),Triple(1,vw-91,445f)))
             point(down,MotionEvent.ACTION_POINTER_UP or (1 shl MotionEvent.ACTION_POINTER_INDEX_SHIFT),listOf(Triple(0,138f,435f),Triple(1,vw-91,445f)))
-            SystemClock.sleep(100)
-            run{val f=JSONObject(engine.presentation(584)).getJSONObject("battle").getJSONArray("fighters").getJSONObject(0);assertTrue("Movement failed: $f before=$beforeX",f.getJSONObject("pos").getInt("x")>beforeX);assertTrue("Dash failed: $f",f.getInt("dash_cd")>0)}
+            // Input delivery and simulation ticks are asynchronous. Observe the
+            // one requested action instead of assuming a shared runner ticks in 100 ms.
+            awaitCooldown("dash_cd")
+            run{val f=JSONObject(engine.presentation(584)).getJSONObject("battle").getJSONArray("fighters").getJSONObject(0);assertTrue("Movement failed: $f before=$beforeX",f.getJSONObject("pos").getInt("x")>beforeX)}
             point(down,MotionEvent.ACTION_CANCEL,listOf(Triple(0,138f,435f)));tap(vw-199,445f)
-            run{val f=JSONObject(engine.presentation(584)).getJSONObject("battle").getJSONArray("fighters").getJSONObject(0);assertTrue(f.getInt("skill_cd")>0)}
-            capture("prologue-combat");tap(vw-60,40f);capture("pause");tap(vw/2,if(JSONObject(engine.presentation(584)).getInt("screen")==12)446f else 350f)
+            awaitCooldown("skill_cd")
+            capture("prologue-combat");tap(vw-60,40f);capture("pause");if(JSONObject(engine.presentation(584)).getInt("screen")==12)tap(vw/2,446f)else{tap(vw/2,370f);instrumentation.uiAutomation.rootInActiveWindow.findAccessibilityNodeInfosByText("Retourner au refuge").last().performAction(android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK);SystemClock.sleep(350)}
             onActivity{assertEquals(7,JSONObject(it.engine.presentation(584)).getInt("screen"))}
-            capture("refuge");tap(140f,470f);capture("map");tap(vw*.40f+57f,303f);assertFalse(JSONObject(engine.presentation(584)).getBoolean("selected_current"));tap(vw-268,312f);assertTrue(JSONObject(engine.presentation(584)).getString("message").contains("Rejoins"));tap(vw-110,60f)
+            capture("refuge");tap(140f,470f);capture("map");tap(vw*.40f+57f,303f);assertFalse(JSONObject(engine.presentation(584)).getBoolean("selected_current"));if(BuildConfig.OFFLINE_EDITION){tap(vw-268,425f);assertTrue(JSONObject(engine.presentation(584)).getBoolean("selected_current"))}else{tap(vw-268,312f);assertTrue(JSONObject(engine.presentation(584)).getString("message").contains("Rejoins"))};tap(vw-110,60f)
             tap(200f,400f);capture("journal");tap(180f,408f);SystemClock.sleep(900);capture("expedition")
-            onActivity{assertEquals(8,JSONObject(it.engine.presentation(584)).getInt("battle_mode"))}
-            scenario.moveToState(Lifecycle.State.CREATED);SystemClock.sleep(300)
+            assertEquals(8,JSONObject(engine.presentation(584)).getInt("battle_mode"))
+            // Use Android Home: ActivityScenario waits for UI idleness before changing
+            // state, which can keep a continuously animated battle running for a minute.
+            assertTrue(instrumentation.uiAutomation.performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_HOME))
+            SystemClock.sleep(500)
             var pausedTick=0
             onActivity{val p=JSONObject(it.engine.presentation(584));assertEquals(14,p.getInt("screen"));pausedTick=p.getJSONObject("battle").getInt("tick")}
             SystemClock.sleep(600)
             onActivity{assertEquals(pausedTick,JSONObject(it.engine.presentation(584)).getJSONObject("battle").getInt("tick"))}
-            scenario.moveToState(Lifecycle.State.RESUMED);SystemClock.sleep(300);tap(vw/2,275f);SystemClock.sleep(200)
+            instrumentation.targetContext.startActivity(Intent(instrumentation.targetContext,MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT))
+            // Android 8 defers app switches briefly after Home. Wait for the real window,
+            // rather than sending a touch while the launcher still owns input focus.
+            val focusDeadline=SystemClock.uptimeMillis()+10000
+            var focused=false
+            while(!focused&&SystemClock.uptimeMillis()<focusDeadline){onActivity{focused=it.hasWindowFocus()};if(!focused)SystemClock.sleep(50)}
+            assertTrue("Game did not regain input focus",focused)
+            SystemClock.sleep(200)
+            onActivity{val viewport=JSONObject(it.renderMetrics()).getJSONObject("viewport");scale=viewport.getDouble("scale").toFloat();left=viewport.getDouble("left").toFloat();top=viewport.getDouble("top").toFloat();vw=viewport.getDouble("width").toFloat()}
+            tap(vw/2,224f);SystemClock.sleep(200)
             onActivity{assertEquals(6,JSONObject(it.engine.presentation(584)).getInt("screen"));it.engine.uiAction("home")}
             SystemClock.sleep(250)
             onActivity{

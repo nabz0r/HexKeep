@@ -29,7 +29,7 @@ class NightSurface(
     private val serif=Typeface.create("serif",Typeface.NORMAL)
     private val sans=Typeface.create("sans-serif",Typeface.NORMAL)
     private val bold=Typeface.create("sans-serif-medium",Typeface.NORMAL)
-    private val art=BitmapFactory.decodeStream(activity.assets.open("art/keep.png"))
+    private val art=BitmapFactory.decodeStream(activity.assets.open("art/v06/refuge.png"))
     private val floor=BitmapFactory.decodeStream(activity.assets.open("art/courtyard.png"))
     private val atlas=BitmapFactory.decodeStream(activity.assets.open("art/characters.png"))
     private val ruins=BitmapFactory.decodeStream(activity.assets.open("art/ruins.png"))
@@ -63,6 +63,11 @@ class NightSurface(
     private var fogKey=""
     private var viewportScale=2f
     private var viewportTop=0f
+    private var viewportLeft=0f
+    private var safeInsets=Rect()
+    private var helpOpen=false
+    private var settingsReturn="home"
+    private var reduceMotion=false
     private var vw=1170f
     private var intro=-1
     private var heroChoice=false
@@ -95,7 +100,8 @@ class NightSurface(
     init {
         isFocusable=true;isFocusableInTouchMode=true
         autoAim=prefs.getBoolean("autoAim",false)
-        contentDescription="HEXKEEP — L’Éveil des Veilleurs"
+        reduceMotion=prefs.getBoolean("reduceMotion",false)
+        contentDescription="HEXKEEP — Les Lanternes du Refuge"
         worker.execute{actorAnimator.warmUp()}
         worker.scheduleAtFixedRate({
             if(active&&!destroyed.get()) try {
@@ -113,20 +119,39 @@ class NightSurface(
             } catch(e:Exception) { android.util.Log.e("HEXKEEP","Presentation update failed",e) }
         },0,33_333_333,TimeUnit.NANOSECONDS)
     }
+    fun suspendForInterruption(){clearInput();if(snapshot.optInt("screen")==6)command("pause")}
     fun onPause(){active=false;clearInput();if(snapshot.optInt("screen")==6&&!snapshot.optBoolean("online"))engine.uiAction("pause")}
     fun onResume(){active=true;invalidate()}
     fun close(){destroyed.set(true);active=false;worker.shutdownNow();clearInput()}
-    fun back(){clearInput();when{snapshot.optInt("screen") in listOf(40,42)->command("inventory_back");snapshot.optInt("screen")==41->command("home");intro>=0->{intro=-1;heroChoice=false};heroChoice->{heroChoice=false;if(firstChoice)intro=2 else engine.uiAction("home")};worldMap->{worldMap=false};snapshot.optInt("screen")==6->engine.uiAction("pause");snapshot.optInt("screen")==14->engine.uiAction("resume");snapshot.optInt("screen")==12->engine.uiAction("finish");snapshot.optInt("screen") in listOf(0,7)->activity.finish();else->engine.back()}}
+    fun back(){clearInput();when{helpOpen->{helpOpen=false};snapshot.optInt("screen")==10->{command(settingsReturn)};snapshot.optInt("screen") in listOf(40,42)->command("inventory_back");snapshot.optInt("screen")==41->command("home");intro>=0->{intro=-1;heroChoice=false};heroChoice->{heroChoice=false;if(firstChoice)intro=2 else engine.uiAction("home")};worldMap->{worldMap=false};snapshot.optInt("screen")==6->engine.uiAction("pause");snapshot.optInt("screen")==14->engine.uiAction("resume");snapshot.optInt("screen")==12->engine.uiAction("finish");snapshot.optInt("screen") in listOf(0,7)->activity.finish();else->engine.back()}}
 
-    fun metrics():String=JSONObject().put("frames",frames).put("seconds",if(metricStart==0L)0.0 else (System.nanoTime()-metricStart)/1e9).put("over_33ms",slowFrames).put("renderer","Android hardware Canvas").put("animation",actorAnimator.metrics()).toString()
+    fun metrics():String{
+        // Input injection uses screen coordinates; older Android versions offset the content view.
+        val origin=IntArray(2);getLocationOnScreen(origin)
+        return JSONObject().put("frames",frames).put("seconds",if(metricStart==0L)0.0 else (System.nanoTime()-metricStart)/1e9).put("over_33ms",slowFrames).put("renderer","Android hardware Canvas").put("animation",actorAnimator.metrics()).put("viewport",JSONObject().put("left",viewportLeft+origin[0]).put("top",viewportTop+origin[1]).put("scale",viewportScale).put("width",vw)).toString()
+    }
     private fun clearInput(){input=StickInput();movePointer=-1;aimPointer=-1;attackPointer=-1;attackHeld=false;attackRequest.set(false);dashRequest.set(false);skillRequest.set(false);focused=null;engine.controls(0,0,0,0,false,false,false);engine.touch(0,3u,0,0)}
-    private fun command(name:String){clearInput();engine.uiAction(name)}
-    override fun onSizeChanged(w:Int,h:Int,oldw:Int,oldh:Int){viewportScale=min(h/540f,w/960f).coerceAtLeast(.1f);viewportTop=(h-540*viewportScale)/2;vw=w/viewportScale;logicalWidth=((vw/2).toInt()/8*8).coerceIn(400,640)}
+    private fun command(name:String){
+        clearInput()
+        if(name=="settings")settingsReturn=if(snapshot.optJSONObject("battle")!=null)"continue"else if(snapshot.optBoolean("created"))"home"else"continue"
+        if(name=="resume")action(19)
+        engine.uiAction(name)
+    }
+    override fun onApplyWindowInsets(insets:android.view.WindowInsets):android.view.WindowInsets {
+        if(android.os.Build.VERSION.SDK_INT>=30){val v=insets.getInsets(android.view.WindowInsets.Type.systemBars() or android.view.WindowInsets.Type.displayCutout());safeInsets=Rect(v.left,v.top,v.right,v.bottom)}
+        else {safeInsets=Rect(insets.systemWindowInsetLeft,insets.systemWindowInsetTop,insets.systemWindowInsetRight,insets.systemWindowInsetBottom);if(android.os.Build.VERSION.SDK_INT>=28)insets.displayCutout?.let{safeInsets.left=max(safeInsets.left,it.safeInsetLeft);safeInsets.right=max(safeInsets.right,it.safeInsetRight);safeInsets.top=max(safeInsets.top,it.safeInsetTop);safeInsets.bottom=max(safeInsets.bottom,it.safeInsetBottom)}}
+        updateViewport(width,height);invalidate();return insets
+    }
+    private fun updateViewport(w:Int,h:Int){
+        val availableW=(w-safeInsets.left-safeInsets.right).coerceAtLeast(1);val availableH=(h-safeInsets.top-safeInsets.bottom).coerceAtLeast(1)
+        viewportScale=min(availableH/540f,availableW/960f).coerceAtLeast(.1f);viewportTop=safeInsets.top+(availableH-540*viewportScale)/2;viewportLeft=safeInsets.left.toFloat();vw=availableW/viewportScale;logicalWidth=((vw/2).toInt()/8*8).coerceIn(400,640)
+    }
+    override fun onSizeChanged(w:Int,h:Int,oldw:Int,oldh:Int){updateViewport(w,h)}
 
     override fun onDraw(c:Canvas){
         super.onDraw(c)
         val now=System.nanoTime();if(metricStart==0L)metricStart=now;if(lastFrame!=0L&&now-lastFrame>33_333_333)slowFrames++;lastFrame=now;frames++
-        if(viewportTop>0)c.drawColor(ink);c.save();c.translate(0f,viewportTop);c.scale(viewportScale,viewportScale);buttons.clear()
+        c.drawColor(ink);c.save();c.translate(viewportLeft,viewportTop);c.scale(viewportScale,viewportScale);buttons.clear()
         val screen=snapshot.optInt("screen",0)
         if(screen!=seenScreen){seenScreen=screen;screenStarted=SystemClock.uptimeMillis();recentHp.clear();damage.clear()}
         when {
@@ -152,8 +177,9 @@ class NightSurface(
             if(screen==40||screen==42){panel(c,48f,101f,vw-96,22f,0xf0152630.toInt());fitText(c,message,60f,117f,12f,ivory,vw-120)}
             else{panel(c,vw/2-260,482f,520f,40f,0xe8152630.toInt());fitText(c,message,vw/2,507f,14f,ivory,490f,Paint.Align.CENTER)}
         }
+        if(helpOpen)help(c)
         c.restore()
-        if(active){if(screen==6||screen==14)postInvalidateOnAnimation()else postInvalidateDelayed(50)}
+        if(active){if(screen==6)postInvalidateOnAnimation()else postInvalidateDelayed(50)}
     }
     private fun fill(c:Canvas,color:Int){paint.shader=null;paint.color=color;paint.style=Paint.Style.FILL;c.drawRect(0f,0f,vw,540f,paint)}
     private fun panel(c:Canvas,x:Float,y:Float,w:Float,h:Float,color:Int=0xde10212b.toInt(),stroke:Int=0x305da3ab){paint.shader=null;paint.style=Paint.Style.FILL;paint.color=color;c.drawRoundRect(x,y,x+w,y+h,if(h<30)4f else 12f,if(h<30)4f else 12f,paint);if(stroke!=0){paint.style=Paint.Style.STROKE;paint.strokeWidth=1f;paint.color=stroke;c.drawRoundRect(x,y,x+w,y+h,if(h<30)4f else 12f,if(h<30)4f else 12f,paint);paint.style=Paint.Style.FILL}}
@@ -175,25 +201,25 @@ class NightSurface(
         paint.shader=null;paint.color=Color.WHITE;paint.alpha=255;backdrop?.let{c.drawBitmap(it,null,RectF(0f,0f,vw,540f),paint)};embers(c)
     }
 
-    private fun embers(c:Canvas){val t=SystemClock.uptimeMillis()/1000f;for(i in 0..27){val x=((i*173.3f+sin(t*.2+i)*24)%vw).toFloat();val y=540f-((t*(7+i%7)+i*51)%540);paint.color=Color.argb(65+(i%4)*25,235,175,86);c.drawCircle(x,y,if(i%5==0)1.6f else .8f,paint)}}
+    private fun embers(c:Canvas){if(reduceMotion)return;val t=SystemClock.uptimeMillis()/1000f;for(i in 0..27){val x=((i*173.3f+sin(t*.2+i)*24)%vw).toFloat();val y=540f-((t*(7+i%7)+i*51)%540);paint.color=Color.argb(65+(i%4)*25,235,175,86);c.drawCircle(x,y,if(i%5==0)1.6f else .8f,paint)}}
     private fun ornament(c:Canvas,x:Float,y:Float){line(c,x,y,x+45,y,gold);val p=Path();p.moveTo(x+56,y-5);p.lineTo(x+61,y);p.lineTo(x+56,y+5);p.lineTo(x+51,y);p.close();paint.color=gold;c.drawPath(p,paint);line(c,x+67,y,x+112,y,gold)}
-    private fun title(c:Canvas){background(c,0f);text(c,"L’ÉVEIL DES VEILLEURS",64f,91f,14f,gold,bold);ornament(c,64f,112f);text(c,"HEXKEEP",58f,208f,76f,ivory,serif);paragraph(c,"Là où personne ne veille, le monde s’éteint.",66f,252f,450f,22f,ivory,30f);paragraph(c,"Porte la lumière. Réveille les forteresses. Laisse une trace dans la nuit.",66f,308f,370f,18f,muted,26f)
-        button(c,"begin",if(snapshot.optBoolean("intro_seen"))"Reprendre la veille  ›"else"Entrer dans la nuit  ›",64f,382f,310f,58f,true){if(snapshot.optBoolean("intro_seen"))command("continue")else beginIntro()}
+    private fun title(c:Canvas){background(c,0f);text(c,"LES LANTERNES DU REFUGE",64f,91f,14f,gold,bold);ornament(c,64f,112f);text(c,"HEXKEEP",58f,208f,76f,ivory,serif);paragraph(c,"Là où personne ne veille, le monde s’éteint.",66f,252f,450f,22f,ivory,30f);paragraph(c,"Porte la lumière. Réveille les forteresses. Laisse une trace dans la nuit.",66f,308f,370f,18f,muted,26f)
+        button(c,"begin",if(snapshot.optBoolean("resumable"))"Reprendre mon aventure  ›"else if(snapshot.optBoolean("intro_seen"))"Reprendre la veille  ›"else"Entrer dans la nuit  ›",64f,382f,310f,58f,true){if(snapshot.optBoolean("intro_seen")||snapshot.optBoolean("resumable"))command("continue")else beginIntro()}
         button(c,"settings","Réglages",394f,382f,144f,58f){command("settings")}
-        text(c,"CHAPITRE I  /  LA DERNIÈRE LANTERNE",66f,480f,12f,muted,bold);text(c,"0.5 • L’ÉVEIL DES VEILLEURS",vw-44,506f,11f,muted,sans,Paint.Align.RIGHT)
+        text(c,"CHAPITRE I  /  LA DERNIÈRE LANTERNE",66f,480f,12f,muted,bold);text(c,"0.6 • ${if(BuildConfig.OFFLINE_EDITION)"AVENTURE HORS LIGNE"else"ÉDITION DEV"}",vw-44,506f,11f,muted,sans,Paint.Align.RIGHT)
     }
     private fun beginIntro(){intro=0;introStarted=SystemClock.uptimeMillis();heroChoice=false;worldMap=false;clearInput()}
-    private fun introduction(c:Canvas){background(c,.16f);val elapsed=(SystemClock.uptimeMillis()-introStarted)/1000f;val fade=(elapsed/1.2f).coerceIn(0f,1f);val titles=arrayOf("Le monde oublie.","Une lumière demeure.","À toi de veiller.");val body=arrayOf("Les routes ont disparu sous la brume. Les noms se sont effacés des pierres. Une à une, les forteresses ont cessé de répondre.","Au cœur des ruines, une lanterne brûle encore. Elle n’attend ni roi, ni armée. Seulement quelqu’un pour la porter.","Rallume les trois balises. Apprends les mouvements des ombres. Puis affronte le gardien de la dernière porte.");text(c,"PROLOGUE   /   0${intro+1}",68f,123f,13f,gold,bold);text(c,titles[intro],64f,216f,46f,Color.argb((255*fade).toInt(),238,234,220),serif);paragraph(c,body[intro],68f,275f,min(530f,vw*.55f),22f,ivory,34f);for(i in 0..2)line(c,68f+i*51,420f,101f+i*51,420f,if(i<=intro)gold else 0xff3e5054.toInt(),3f)
+    private fun introduction(c:Canvas){background(c,.16f);val elapsed=(SystemClock.uptimeMillis()-introStarted)/1000f;val fade=if(reduceMotion)1f else (elapsed/1.2f).coerceIn(0f,1f);val titles=arrayOf("Le monde oublie.","Une lumière demeure.","À toi de veiller.");val body=arrayOf("Les routes ont disparu sous la brume. Les noms se sont effacés des pierres. Une à une, les forteresses ont cessé de répondre.","Au cœur des ruines, une lanterne brûle encore. Elle n’attend ni roi, ni armée. Seulement quelqu’un pour la porter.","Rallume les trois balises. Apprends les mouvements des ombres. Puis affronte le gardien de la dernière porte.");text(c,"PROLOGUE   /   0${intro+1}",68f,123f,13f,gold,bold);text(c,titles[intro],64f,216f,46f,Color.argb((255*fade).toInt(),238,234,220),serif);paragraph(c,body[intro],68f,275f,min(530f,vw*.55f),22f,ivory,34f);for(i in 0..2)line(c,68f+i*51,420f,101f+i*51,420f,if(i<=intro)gold else 0xff3e5054.toInt(),3f)
         button(c,"intro-next",if(intro==2)"Choisir mon veilleur  ›"else"Continuer  ›",vw-316,410f,248f,58f,true){if(intro<2){intro++;introStarted=SystemClock.uptimeMillis()}else{intro=-1;heroChoice=true;firstChoice=true}}
         button(c,"intro-skip","Passer",vw-164,38f,112f,44f){intro=-1;heroChoice=true;firstChoice=true}
     }
     private fun portrait(c:Canvas,index:Int,x:Float,y:Float,w:Float,h:Float,alpha:Int=255,flip:Boolean=false){val cell=atlas.width/3;val row=atlas.height/2;val src=Rect(index%3*cell,index/3*row,(index%3+1)*cell,(index/3+1)*row);paint.shader=null;paint.alpha=alpha;paint.color=Color.WHITE;c.save();if(flip)c.scale(-1f,1f,x+w/2,y+h/2);c.drawBitmap(atlas,src,RectF(x,y,x+w,y+h),paint);c.restore();paint.alpha=255}
     private fun heroes(c:Canvas){background(c,.57f);text(c,"CHOISIS TA LUMIÈRE",48f,52f,13f,gold,bold);text(c,"Trois serments. Une même nuit.",46f,98f,32f,ivory,serif);val gap=18f;val cw=(vw-96-gap*2)/3;val names=arrayOf("Aurelon","Skarn","Vylde");val details=arrayOf("L’aube • équilibre et précision","Le givre • endurance et impact","La sève • mobilité et entraide");val chosen=snapshot.optInt("realm");for(i in 0..2){val x=48+i*(cw+gap);panel(c,x,126f,cw,274f,if(i==chosen)0xde253a40.toInt()else 0xb50e212c.toInt(),if(i==chosen)gold else 0x40567479);portrait(c,i,x+cw/2-104,125f,208f,208f);text(c,names[i],x+cw/2,352f,28f,if(i==chosen)gold else ivory,serif,Paint.Align.CENTER);fitText(c,details[i],x+cw/2,381f,14f,muted,cw-26,Paint.Align.CENTER);buttons.add(Button("hero$i",RectF(x,126f,x+cw,400f)){engine.hero(i.toUByte(),snapshot.optInt("role").toUByte())})}
-        val roles=arrayOf("Foudre · impulsion","Rempart · rempart de pierre","Lien · soin de proximité");val role=snapshot.optInt("role");button(c,"role-cycle",roles[role],48f,421f,min(390f,vw*.43f),52f){engine.hero(chosen.toUByte(),((role+1)%3).toUByte())};button(c,"hero-ready",if(firstChoice)"Allumer ma lanterne  ›"else"Reprendre la veille  ›",vw-368,421f,320f,52f,true){heroChoice=false;if(firstChoice){firstChoice=false;command("prologue")}else command("home")};fitText(c,"Ton Nom reste sur cet appareil. Note tes 24 mots dans les réglages pour le retrouver ailleurs.",48f,507f,14f,muted,vw-96)
+        val roles=arrayOf("Foudre · impulsion","Rempart · rempart de pierre","Lien · soin de proximité");val role=snapshot.optInt("role");button(c,"role-cycle",roles[role],48f,421f,min(390f,vw*.43f),52f){engine.hero(chosen.toUByte(),((role+1)%3).toUByte())};button(c,"hero-ready",if(firstChoice)"Allumer ma lanterne  ›"else"Reprendre la veille  ›",vw-368,421f,320f,52f,true){heroChoice=false;if(firstChoice){firstChoice=false;command("prologue")}else command("home")};fitText(c,if(BuildConfig.OFFLINE_EDITION)"Trois origines, trois rôles. Tu peux changer ton serment au refuge. Progression sauvegardée sur cet appareil."else"Les 24 mots restaurent ton identité, pas le butin local. Conserve cet appareil et sa sauvegarde.",48f,507f,14f,muted,vw-96)
     }
     private fun home(c:Canvas){
         background(c,.27f);val j=snapshot.optJSONObject("journey")?:JSONObject()
-        text(c,"HEXKEEP",47f,65f,30f,ivory,serif);text(c,"L’ÉVEIL DES VEILLEURS  /  0.5",49f,90f,11f,gold,bold)
+        text(c,"HEXKEEP",47f,65f,30f,ivory,serif);text(c,"LES LANTERNES DU REFUGE  /  0.6",49f,90f,11f,gold,bold)
         button(c,"gear","Réglages",vw-191,36f,143f,45f){command("settings")}
         fitText(c,"${snapshot.optString("name")}  •  Niveau ${j.optInt("level",1)}",49f,160f,16f,teal,440f)
         text(c,"Retrouve les chemins.",45f,214f,39f,ivory,serif)
@@ -202,11 +228,11 @@ class NightSurface(
         button(c,"map","Explorer la marche",48f,448f,216f,52f){worldMap=true}
         button(c,"inventory","Sac & équipement",278f,448f,218f,52f){command("inventory")}
         val x=vw-374;panel(c,x,132f,326f,300f,0xe00d222c.toInt());text(c,"TON VEILLEUR",x+24,167f,12f,gold,bold)
-        text(c,"${j.optInt("discovered")} marches découvertes",x+24,206f,23f,ivory,serif)
+        text(c,if(BuildConfig.OFFLINE_EDITION)"${j.optInt("victories")} ${if(j.optInt("victories")>1)"veilles accomplies"else"veille accomplie"}"else"${j.optInt("discovered")} marches découvertes",x+24,206f,23f,ivory,serif)
         text(c,"${snapshot.optInt("xp")} éclats  •  ${j.optInt("dust")} poussières",x+24,235f,15f,muted)
         button(c,"hero","Identité & serment",x+20,262f,286f,45f){firstChoice=false;heroChoice=true}
-        button(c,"network","Jouer avec des veilleurs  ›",x+20,318f,286f,45f){command("network")}
-        button(c,"campaign","Forteresse & chroniques",x+20,374f,286f,43f){command("campaign")}
+        button(c,"network",if(BuildConfig.OFFLINE_EDITION)"Les gestes du veilleur  ›"else"Jouer avec des veilleurs  ›",x+20,318f,286f,45f){if(BuildConfig.OFFLINE_EDITION)helpOpen=true else command("network")}
+        button(c,"campaign",if(BuildConfig.OFFLINE_EDITION)"${j.optInt("collection")} / 36 objets · ${j.optJSONArray("secrets")?.length()?:0} / 9 mémoires"else"Forteresse & chroniques",x+20,374f,286f,43f){command(if(BuildConfig.OFFLINE_EDITION)"codex"else"campaign")}
         button(c,"codex","Carnet & secrets  ›",x,448f,326f,45f){command("codex")};fitText(c,nextGoal(j),48f,530f,13f,gold,vw-96)
     }
     private fun rarity(n:Int)=intArrayOf(muted,teal,0xff8fb4ff.toInt(),0xffd29ffa.toInt())[n.coerceIn(0,3)]
@@ -354,9 +380,17 @@ class NightSurface(
     private fun map(c:Canvas){background(c,.68f);header(c,"Les marches oubliées","Territoire autour du refuge"){worldMap=false};val cells=snapshot.optJSONArray("cells")?:JSONArray();val radius=33f;val cx=vw*.40f;val cy=303f;for(i in 0 until cells.length()){val cell=cells.getJSONObject(i);val q=cell.optInt("q");val r=cell.optInt("r");val x=cx+sqrt(3f)*radius*.5f*(q+r);val y=cy+1.5f*radius*(q-r);val p=Path();for(j in 0..5){val a=(j*60-30)*PI/180;val xx=x+cos(a).toFloat()*(radius-2);val yy=y+sin(a).toFloat()*(radius-2);if(j==0)p.moveTo(xx,yy)else p.lineTo(xx,yy)};p.close();paint.color=if(cell.optBoolean("current"))0xff947846.toInt()else if(cell.optBoolean("clear"))0xff294d51.toInt()else 0xff152c37.toInt();c.drawPath(p,paint);paint.style=Paint.Style.STROKE;paint.strokeWidth=1f;paint.color=if(cell.optBoolean("selected"))gold else 0xff40616a.toInt();c.drawPath(p,paint);paint.style=Paint.Style.FILL;if(cell.optBoolean("current")){glow(c,x,y,35f,gold,80);text(c,"◆",x,y+8,22f,ivory,sans,Paint.Align.CENTER)}else if(!cell.isNull("bastion"))text(c,"◇",x,y+7,22f,teal,sans,Paint.Align.CENTER)else text(c,if(cell.optBoolean("discovered"))arrayOf("✦","⌖","◇")[cell.optInt("poi")]else "?",x,y+6,18f,if(cell.optBoolean("discovered"))teal else muted,sans,Paint.Align.CENTER);buttons.add(Button("cell$i",RectF(x-radius*.8f,y-radius*.8f,x+radius*.8f,y+radius*.8f)){command("cell:"+cell.optString("id"))})}
         val x=vw-350;panel(c,x,139f,302f,326f);fitText(c,(0 until cells.length()).map{cells.getJSONObject(it)}.find{it.optBoolean("selected")}?.optString("region")?:"Les marches",x+23,180f,23f,ivory,256f);text(c,if(snapshot.optBoolean("selected_current"))"Ici se tient ton veilleur."else"Une marche voisine t’appelle.",x+23,211f,15f,muted)
         button(c,"map-expedition","Événements de ma marche  ›",x+20,232f,262f,46f,true){worldMap=false;command("journal")}
-        button(c,"map-found","Fonder",x+20,291f,124f,43f){if(snapshot.optBoolean("selected_current"))command("found")else engine.notice("Rejoins cette marche avant d’y fonder un bastion.")};button(c,"map-banner",if(snapshot.optBoolean("banner"))"Bannière ●"else"Bannière ○",x+154,291f,128f,43f){command("banner")}
-        button(c,"map-walk",if(snapshot.optBoolean("selected_current"))"Utiliser ma position GPS"else"Voyager ici · simulation",x+20,347f,262f,43f){command(if(snapshot.optBoolean("selected_current"))"gps"else"walk")}
-        button(c,"map-campaign","Forteresse & chroniques",x+20,403f,262f,43f){worldMap=false;command("campaign")};text(c,if(snapshot.optBoolean("gps"))"Position issue du GPS • Reprends ta marche pour découvrir les lieux voisins."else "Exploration simulée • Active le GPS pour découvrir les marches autour de toi.",48f,508f,13f,muted)
+        if(BuildConfig.OFFLINE_EDITION){
+            paragraph(c,"Choisis un hexagone, puis voyage vers ses ruines. Chaque région garde des histoires à retrouver.",x+23,309f,256f,17f,muted,25f)
+            button(c,"map-walk",if(snapshot.optBoolean("selected_current"))"Tu es ici"else"Voyager vers cette marche  ›",x+20,403f,262f,44f){command("walk")}
+            text(c,"Un monde imaginaire à explorer librement. Aucune localisation réelle n’est utilisée.",48f,508f,14f,muted)
+        }else{
+            button(c,"map-found","Fonder",x+20,291f,124f,43f){if(snapshot.optBoolean("selected_current"))command("found")else engine.notice("Rejoins cette marche avant d’y fonder un bastion.")}
+            button(c,"map-banner",if(snapshot.optBoolean("banner"))"Bannière ●"else"Bannière ○",x+154,291f,128f,43f){command("banner")}
+            button(c,"map-walk",if(snapshot.optBoolean("selected_current"))"Utiliser ma position GPS"else"Voyager ici · simulation",x+20,347f,262f,43f){command(if(snapshot.optBoolean("selected_current"))"gps"else"walk")}
+            button(c,"map-campaign","Forteresse & chroniques",x+20,403f,262f,43f){worldMap=false;command("campaign")}
+            fitText(c,if(snapshot.optBoolean("gps"))"Position issue du GPS • Reprends ta marche pour découvrir les lieux voisins."else "Exploration simulée • Active le GPS pour découvrir les marches autour de toi.",48f,508f,13f,muted,vw-96)
+        }
     }
 
     private fun party(c:Canvas){
@@ -385,7 +419,38 @@ class NightSurface(
         }
         text(c,"Les histoires se construisent avec les autres veilleurs.",48f,508f,14f,muted)
     }
-    private fun settings(c:Canvas){background(c,.7f);header(c,"À ton rythme","Ambiance et commandes"){command(if(snapshot.optBoolean("created"))"home"else"continue")};val x=48f;val w=(vw-120)/2;val yy=132f;val toggles=listOf(Triple("music","Musique d’ambiance",snapshot.optBoolean("music")),Triple("effects","Sons de combat",snapshot.optBoolean("effects")),Triple("haptics","Vibrations",snapshot.optBoolean("haptics")));toggles.forEachIndexed{i,t->button(c,t.first,"${t.second}   ${if(t.third)"●"else"○"}",x,yy+i*76,w,60f){command(t.first)}};button(c,"aim","Attaque automatique   ${if(autoAim)"●"else"○"}",x,360f,w,60f){autoAim=!autoAim;prefs.edit().putBoolean("autoAim",autoAim).apply()};val xx=x+w+24;panel(c,xx,132f,w,288f);text(c,"Prends la nuit en main.",xx+24,176f,26f,ivory,serif);paragraph(c,"À gauche, déplace-toi. À droite, vise en glissant. Maintiens ATTAQUE pour viser une ombre visible, ou glisse depuis ce bouton pour viser toi-même. Esquive et pouvoir restent accessibles pendant le déplacement.",xx+24,216f,w-48,18f,muted,28f);button(c,"intro","Revoir le prologue",48f,446f,225f,49f){beginIntro()};button(c,"identity","Mon Nom & sauvegarde",289f,446f,259f,49f){command("identity")};button(c,"contrast","Contraste renforcé   ${if(snapshot.optBoolean("accessible"))"●"else"○"}",vw-348,446f,300f,49f){command("contrast")}}
+    private fun settings(c:Canvas){
+        background(c,.65f);header(c,"À ton rythme","Ambiance · confort · confidentialité"){command(settingsReturn)}
+        val w=(vw-120)/2;val right=72+w
+        val toggles=listOf(Triple("music","Musique d’ambiance",snapshot.optBoolean("music")),Triple("effects","Sons de combat",snapshot.optBoolean("effects")),Triple("haptics","Vibrations",snapshot.optBoolean("haptics")))
+        toggles.forEachIndexed{i,t->button(c,t.first,"${t.second}   ${if(t.third)"Activé"else"Désactivé"}",48f,131f+i*71,w,56f){command(t.first)}}
+        button(c,"aim","Attaque automatique   ${if(autoAim)"Activée"else"Désactivée"}",right,131f,w,56f){autoAim=!autoAim;prefs.edit().putBoolean("autoAim",autoAim).apply()}
+        button(c,"contrast","Contraste renforcé   ${if(snapshot.optBoolean("accessible"))"Activé"else"Désactivé"}",right,202f,w,56f){command("contrast")}
+        button(c,"motion","Animations d’ambiance   ${if(reduceMotion)"Réduites"else"Complètes"}",right,273f,w,56f){reduceMotion=!reduceMotion;prefs.edit().putBoolean("reduceMotion",reduceMotion).apply()}
+        val cw=(vw-132)/3
+        button(c,"help","Comment jouer",48f,358f,cw,52f){helpOpen=true}
+        button(c,"privacy","Vie privée",66f+cw,358f,cw,52f){action(16)}
+        button(c,"credits","Crédits & licences",84f+cw*2,358f,cw,52f){action(17)}
+        if(BuildConfig.OFFLINE_EDITION){
+            paragraph(c,"Ta progression reste sur cet appareil. L’aventure reprend après fermeture. Désinstaller le jeu efface cette copie locale.",48f,452f,vw-96,17f,ivory,27f)
+        }else{
+            button(c,"identity","Mon Nom & sauvegarde",48f,440f,280f,49f){command("identity")}
+            fitText(c,"Les mots restaurent le Nom, pas l’inventaire local.",350f,470f,16f,muted,vw-398)
+        }
+    }
+    private fun help(c:Canvas){
+        buttons.clear();fill(c,ink);header(c,"Les gestes du veilleur","Une lanterne · cinq aventures · tes propres chemins"){helpOpen=false}
+        val w=(vw-120)/2;val x=72+w
+        val rows=listOf("01  Explorer" to "Glisse à gauche pour te déplacer. Approche les lumières dorées et touche Interagir pour ouvrir les coffres ou écouter les souvenirs.","02  Combattre" to "Maintiens Attaque pour viser une ombre visible. Glisse à droite pour viser toi-même. Sors des zones colorées avec Esquive.","03  Veiller" to "Rejoins les feux bleus et reste dans leur cercle. Le bandeau en haut indique toujours ton objectif. Utilise une fiole lorsque ta vie baisse.","04  Revenir" to "Ouvre le sac pendant l’aventure : le solo se met en pause. Équipe le butin, associe deux objets du même serment et repars plus fort.")
+        rows.forEachIndexed{i,row->val xx=if(i%2==0)48f else x;val yy=132f+i/2*164;panel(c,xx,yy,w,146f);text(c,row.first,xx+22,yy+36,24f,gold,serif);paragraph(c,row.second,xx+22,yy+67,w-44,16f,ivory,24f)}
+        fitText(c,"Trois victoires : Périlleux. Neuf : Éclipse. Explore pour retrouver les mémoires.",48f,501f,15f,teal,vw-388)
+        button(c,"help-replay","Revoir le prologue",vw-314,474f,266f,44f){
+            if(snapshot.optJSONObject("battle")!=null){
+                android.app.AlertDialog.Builder(activity).setTitle("Recommencer le prologue ?").setMessage("Le butin trouvé reste acquis, mais les objectifs de cette aventure seront abandonnés.")
+                    .setPositiveButton("Revoir le prologue"){_,_->command("home");helpOpen=false;beginIntro()}.setNegativeButton("Garder mon aventure",null).show()
+            }else{helpOpen=false;beginIntro()}
+        }
+    }
     private fun glow(c:Canvas,x:Float,y:Float,r:Float,color:Int,alpha:Int=110){paint.shader=RadialGradient(x,y,r,Color.argb(alpha,Color.red(color),Color.green(color),Color.blue(color)),Color.TRANSPARENT,Shader.TileMode.CLAMP);c.drawCircle(x,y,r,paint);paint.shader=null}
     private fun circle(c:Canvas,x:Float,y:Float,r:Float,color:Int,stroke:Float=0f){paint.shader=null;paint.color=color;paint.style=if(stroke>0)Paint.Style.STROKE else Paint.Style.FILL;paint.strokeWidth=stroke;c.drawCircle(x,y,r,paint);paint.style=Paint.Style.FILL}
     private fun battle(c:Canvas,interactive:Boolean=true){
@@ -640,7 +705,20 @@ class NightSurface(
         ability(c,"dash","◇","ESQUIVE",vw-91,445f,player?.optInt("dash_cd")?:0,105f){dashRequest.set(true)};ability(c,"skill","✦",when(player?.optString("role")){"Foudre"->"SURCHARGE";"Rempart"->"PROTECTION";else->"ENTRAVE"},vw-199,445f,player?.optInt("skill_cd")?:0,180f){skillRequest.set(true)}
     }
     private fun ability(c:Canvas,id:String,symbol:String,label:String,x:Float,y:Float,cool:Int,max:Float,run:()->Unit){circle(c,x,y,43f,0xe01b3440.toInt());circle(c,x,y,43f,if(cool==0)gold else 0xff50646d.toInt(),1.8f);if(cool==0)glow(c,x,y,37f,gold,25);text(c,if(cool==0)symbol else String.format(java.util.Locale.US,"%.1fs",cool/30f),x,y+11,if(cool==0)31f else 23f,if(cool==0)gold else muted,serif,Paint.Align.CENTER);if(cool>0){paint.color=gold;paint.style=Paint.Style.STROKE;paint.strokeWidth=3f;c.drawArc(x-43,y-43,x+43,y+43,-90f,360*(1-cool/max),false,paint);paint.style=Paint.Style.FILL};text(c,label,x,y+65f,10f,muted,bold,Paint.Align.CENTER);buttons.add(Button(id,RectF(x-48,y-48,x+48,y+48),run))}
-    private fun pause(c:Canvas){buttons.clear();fill(c,0xbd061018.toInt());panel(c,vw/2-228,112f,456f,315f,0xf7112631.toInt());text(c,"Une respiration.",vw/2,173f,36f,ivory,serif,Paint.Align.CENTER);text(c,if(snapshot.optBoolean("online"))"Le combat continue en ligne."else"La nuit peut attendre un instant.",vw/2,210f,17f,muted,sans,Paint.Align.CENTER);button(c,"resume","Reprendre la veille",vw/2-176,246f,352f,58f,true){command("resume")};button(c,"leave","Retourner au refuge",vw/2-176,324f,352f,52f){command("home")}}
+    private fun pause(c:Canvas){
+        buttons.clear();fill(c,0xbd061018.toInt());panel(c,vw/2-238,75f,476f,396f,0xf7112631.toInt())
+        text(c,"Une respiration.",vw/2,132f,36f,ivory,serif,Paint.Align.CENTER)
+        text(c,if(snapshot.optBoolean("online"))"Le combat continue en ligne."else"Ta lanterne t’attendra ici.",vw/2,169f,17f,muted,sans,Paint.Align.CENTER)
+        button(c,"resume","Reprendre l’aventure  ›",vw/2-190,199f,380f,58f,true){command("resume")}
+        button(c,"pause-settings","Réglages",vw/2-190,275f,183f,50f){command("settings")}
+        button(c,"pause-help","Comment jouer",vw/2+7,275f,183f,50f){helpOpen=true}
+        button(c,"leave","Retourner au refuge",vw/2-190,346f,380f,50f){
+            android.app.AlertDialog.Builder(activity).setTitle("Quitter cette aventure ?")
+                .setMessage("Le butin déjà trouvé est conservé. Les objectifs de cette sortie seront abandonnés.")
+                .setPositiveButton("Retourner au refuge"){_,_->command("home")}.setNegativeButton("Continuer la veille",null).show()
+        }
+        text(c,if(snapshot.optBoolean("online"))""else"Fermer l’application conserve l’aventure en cours.",vw/2,438f,13f,muted,sans,Paint.Align.CENTER)
+    }
     private fun result(c:Canvas){background(c,.54f);val b=snapshot.optJSONObject("battle");val run=snapshot.optJSONObject("expedition");val win=if(run!=null)run.optBoolean("victory")else if(b?.optJSONObject("siege")!=null)b.getJSONObject("siege").optBoolean("captured")else snapshot.optBoolean("tutorial")||(b?.optJSONArray("fighters")?.optJSONObject(0)?.optInt("kills")?:0)>0;val x=vw/2;text(c,if(win)"LA NUIT RECULE"else"LA FLAMME DEMEURE",x,122f,13f,gold,bold,Paint.Align.CENTER);text(c,if(win)"Tu as porté la lumière."else"Chaque veille t’apprend.",x,202f,45f,ivory,serif,Paint.Align.CENTER);val kills=b?.optJSONArray("fighters")?.optJSONObject(0)?.optInt("kills")?:0;val seconds=(b?.optInt("tick")?:0)/30;val lit=run?.optJSONArray("charges");val subtitle=if(run!=null)"${(0..2).count{lit?.optInt(it)==90}} balises réveillées  •  Ombres dissipées : $kills"else"Ombres dissipées : $kills  •  ${seconds/60} min ${seconds%60} s";text(c,subtitle,x,261f,19f,muted,sans,Paint.Align.CENTER);if(run!=null)text(c,"Butin : ${run.optInt("loot_count")+(if(win)1 else 0)} objets  •  ${run.optInt("dust")} poussières",x,300f,17f,teal,sans,Paint.Align.CENTER)else ornament(c,x-56,300f);button(c,"again",if(run!=null)"Examiner mon butin  ›"else "Découvrir le refuge  ›",x-180,342f,360f,61f,true){command("finish");if(run!=null){chosenItem=0;inventoryPage=0;command("inventory")}};button(c,"finish","Retrouver le refuge",x-180,423f,360f,51f){command("finish")}}
     private fun legacy(c:Canvas){background(c,.79f);val commands=snapshot.optJSONArray("ui")?:JSONArray();val logical=snapshot.optInt("width",logicalWidth);val sc=min(2f,(vw-32)/logical);val left=(vw-logical*sc)/2;val top=30f
         c.save();c.translate(left,top);c.scale(sc,sc)
@@ -657,16 +735,16 @@ class NightSurface(
         if(height<=0)return true
         val scale=viewportScale;val phase=event.actionMasked
         if(phase==MotionEvent.ACTION_CANCEL){clearInput();return true}
-        val battle=snapshot.optInt("screen")==6&&intro<0&&!heroChoice
+        val battle=snapshot.optInt("screen")==6&&intro<0&&!heroChoice&&!helpOpen
         for(i in 0 until event.pointerCount){if(phase!=MotionEvent.ACTION_MOVE&&i!=event.actionIndex)continue
-            val id=event.getPointerId(i);val x=event.getX(i)/scale;val y=(event.getY(i)-viewportTop)/scale
+            val id=event.getPointerId(i);val x=(event.getX(i)-viewportLeft)/scale;val y=(event.getY(i)-viewportTop)/scale
             val down=phase==MotionEvent.ACTION_DOWN||phase==MotionEvent.ACTION_POINTER_DOWN
             val up=phase==MotionEvent.ACTION_UP||phase==MotionEvent.ACTION_POINTER_UP
             if(down){
                 val hit=buttons.lastOrNull{it.rect.contains(x,y)}
                 if(hit!=null){if(battle){if(hit.id=="attack"){attackPointer=id;attackHeld=true;attackRequest.set(true)};hit.run()}else{focused=hit;pointerButton=id};continue}
                 if(battle){if(x<vw*.43f&&y>90&&movePointer<0){movePointer=id;moveOrigin=PointF(x,y)}else if(x>vw*.52f&&y>90&&aimPointer<0){aimPointer=id;aimOrigin=PointF(x,y)}}
-                else if(intro<0&&!heroChoice&&snapshot.optInt("screen") !in listOf(0,2,3,7,10,12,14,16,20,40,41,42)){val sc=min(2f,(vw-32)/logicalWidth);val left=(vw-logicalWidth*sc)/2;engine.touch(id,0u,((x-left)/sc).toInt(),((y-30)/sc).toInt())}
+                else if(intro<0&&!heroChoice&&!helpOpen&&snapshot.optInt("screen") !in listOf(0,2,3,7,10,12,14,16,20,40,41,42)){val sc=min(2f,(vw-32)/logicalWidth);val left=(vw-logicalWidth*sc)/2;engine.touch(id,0u,((x-left)/sc).toInt(),((y-30)/sc).toInt())}
             }
             if(battle){if(id==attackPointer){if(up){attackHeld=false;attackPointer=-1}else if(hypot(x-(vw-91),y-326)>25){attackHeld=false;aimPointer=id;aimOrigin=PointF(vw-91,326f)}};if(id==movePointer){if(up){movePointer=-1;input=input.copy(mx=0,my=0)}else{val dx=x-moveOrigin.x;val dy=y-moveOrigin.y;val len=hypot(dx,dy);if(len>65){moveOrigin.x=x-dx/len*65;moveOrigin.y=y-dy/len*65};val power=((len-3)/42).coerceIn(0f,1f);input=input.copy(mx=(dx/len.coerceAtLeast(1f)*power*1024).toInt().toShort(),my=(dy/len.coerceAtLeast(1f)*power*1024).toInt().toShort())}};if(id==aimPointer){if(up){aimPointer=-1;input=input.copy(ax=0,ay=0)}else{val dx=x-aimOrigin.x;val dy=y-aimOrigin.y;val len=hypot(dx,dy);val power=((len-4)/35).coerceIn(0f,1f);input=input.copy(ax=(dx/len.coerceAtLeast(1f)*power*1024).toInt().toShort(),ay=(dy/len.coerceAtLeast(1f)*power*1024).toInt().toShort())}}}
             if(up){if(id==pointerButton){val hit=focused;focused=null;pointerButton=-1;if(hit!=null&&hit.rect.contains(x,y)){performClick();hit.run()}};engine.touch(id,2u,0,0)}
