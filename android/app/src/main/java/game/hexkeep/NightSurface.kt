@@ -224,7 +224,7 @@ class NightSurface(
         button(c,"map","Explorer la marche",48f,448f,216f,52f){worldMap=true}
         button(c,"inventory","Sac & équipement",278f,448f,218f,52f){command("inventory")}
         val x=vw-374;panel(c,x,132f,326f,300f,0xe00d222c.toInt());text(c,"TON VEILLEUR",x+24,167f,12f,gold,bold)
-        text(c,if(BuildConfig.OFFLINE_EDITION)"${j.optInt("victories")} veilles accomplies"else"${j.optInt("discovered")} marches découvertes",x+24,206f,23f,ivory,serif)
+        text(c,if(BuildConfig.OFFLINE_EDITION)"${j.optInt("victories")} ${if(j.optInt("victories")>1)"veilles accomplies"else"veille accomplie"}"else"${j.optInt("discovered")} marches découvertes",x+24,206f,23f,ivory,serif)
         text(c,"${snapshot.optInt("xp")} éclats  •  ${j.optInt("dust")} poussières",x+24,235f,15f,muted)
         button(c,"hero","Identité & serment",x+20,262f,286f,45f){firstChoice=false;heroChoice=true}
         button(c,"network",if(BuildConfig.OFFLINE_EDITION)"Les gestes du veilleur  ›"else"Jouer avec des veilleurs  ›",x+20,318f,286f,45f){if(BuildConfig.OFFLINE_EDITION)helpOpen=true else command("network")}

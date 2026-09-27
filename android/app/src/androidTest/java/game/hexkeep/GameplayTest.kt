@@ -3,7 +3,6 @@ package game.hexkeep
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.lifecycle.Lifecycle
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.SystemClock
@@ -65,7 +64,8 @@ class GameplayTest {
             onActivity{val p=JSONObject(it.engine.presentation(584));assertEquals(14,p.getInt("screen"));pausedTick=p.getJSONObject("battle").getInt("tick")}
             SystemClock.sleep(600)
             onActivity{assertEquals(pausedTick,JSONObject(it.engine.presentation(584)).getJSONObject("battle").getInt("tick"))}
-            scenario.moveToState(Lifecycle.State.RESUMED);SystemClock.sleep(300);tap(vw/2,224f);SystemClock.sleep(200)
+            instrumentation.targetContext.startActivity(Intent(instrumentation.targetContext,MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT))
+            SystemClock.sleep(700);tap(vw/2,224f);SystemClock.sleep(200)
             onActivity{assertEquals(6,JSONObject(it.engine.presentation(584)).getInt("screen"));it.engine.uiAction("home")}
             SystemClock.sleep(250)
             onActivity{
