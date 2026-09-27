@@ -1,13 +1,13 @@
 package game.hexkeep
 
-import android.content.res.AssetManager
+import game.hexkeep.art.PaintedArt
 import android.graphics.*
 import android.os.SystemClock
 import org.json.JSONObject
 import kotlin.math.*
 
 /** Visual events follow authoritative snapshots; display refresh never changes combat timing. */
-class ActorAnimator(private val assets: AssetManager) {
+class ActorAnimator(private val art: PaintedArt) {
     data class Motion(
         var px:Int=0,var py:Int=0,var hp:Int=0,var maximum:Int=0,
         var facingX:Float=1f,var facingY:Float=1f,var distance:Float=0f,
@@ -15,8 +15,6 @@ class ActorAnimator(private val assets: AssetManager) {
         var death:Long=0,var cooldown:Int=0,var dashCd:Int=0,var skillCd:Int=0,
         var cast:Long=0,var dx:Float=0f,var dy:Float=0f
     )
-    private data class Sheet(val bitmap:Bitmap,val frames:List<Rect>,val scale:Float)
-    private val sheets=HashMap<Int,Sheet>()
     private val actors=HashMap<Int,Motion>()
     private var seed=Long.MIN_VALUE
     private var tick=-1
@@ -31,7 +29,6 @@ class ActorAnimator(private val assets: AssetManager) {
     private val playerFrames=HashSet<Int>()
     private var localId=0
     private val observedFrames=HashSet<String>()
-    fun warmUp(){for(i in 0..6)sheet(i)}
     fun state(id:Int)=actors[id]
     fun sync(snapshot:JSONObject) {
         val b=snapshot.optJSONObject("battle")?:return
@@ -69,34 +66,16 @@ class ActorAnimator(private val assets: AssetManager) {
             m.cooldown=f.optInt("cooldown");m.dashCd=f.optInt("dash_cd");m.skillCd=f.optInt("skill_cd")
         }
     }
-    private fun sheet(which:Int):Sheet=sheets.getOrPut(which) {
-        val name=arrayOf("aurelon","skarn","vylde","wolf","wraith","golem","pilleur")[which.coerceIn(0,6)]
-        val bitmap=BitmapFactory.decodeStream(assets.open("art/v05/$name.png"))
-        val w=bitmap.width/4;val h=bitmap.height/3
-        val frames=(0..11).map { index ->
-            val pixels=IntArray(w*h);bitmap.getPixels(pixels,0,w,index%4*w,index/4*h,w,h)
-            var l=w;var r=0;var t=h;var bottom=0
-            for(y in 0 until h)for(x in 0 until w)if((pixels[y*w+x] ushr 24)>40){l=min(l,x);r=max(r,x);t=min(t,y);bottom=max(bottom,y)}
-            if(l>r)Rect(index%4*w,index/4*h,(index%4+1)*w,(index/4+1)*h)
-            else Rect(index%4*w+l,index/4*h+t,index%4*w+r+1,index/4*h+bottom+1)
-        }
-        Sheet(bitmap,frames,1f/frames.take(8).map{it.height()}.average().toFloat())
-    }
-    private fun frame(c:Canvas,s:Sheet,index:Int,x:Float,y:Float,size:Float,flip:Boolean,alpha:Int,paint:Paint) {
-        val source=s.frames[index.coerceIn(0,11)]
-        val scale=size*s.scale
-        val w=source.width()*scale;val h=source.height()*scale
-        val oldAlpha=paint.alpha
-        c.save();if(flip)c.scale(-1f,1f,x,y)
-        paint.alpha=alpha.coerceIn(0,255);c.drawBitmap(s.bitmap,source,RectF(x-w/2,y-h,x+w/2,y),paint)
-        paint.alpha=oldAlpha;c.restore()
+    private fun sheet(which:Int)=if(which<3)art.heroNames[which.coerceIn(0,2)]else art.enemyNames[(which-3).coerceIn(0,3)]
+    private fun frame(c:Canvas,s:String,index:Int,x:Float,y:Float,size:Float,flip:Boolean,alpha:Int,paint:Paint) {
+        art.anchored(c,s,index,x,y,size,flip,alpha,paint.colorFilter)
     }
     fun draw(c:Canvas,paint:Paint,which:Int,id:Int,x:Float,y:Float,size:Float,color:Int,reduced:Boolean=false) {
         val m=actors[id]?:return
         val now=SystemClock.uptimeMillis();val s=sheet(which)
         val back=m.facingY<-.12f;val flip=m.facingX<0
         val walk=if(m.moving)floor(m.distance*2.6f).toInt()%4 else 0
-        val index=when { now<m.dash -> if(back)11 else 10;now<m.attack || now<m.cast -> if(back)9 else 8;else->(if(back)4 else 0)+walk }
+        val index=when { now<m.dash -> if(back)11 else 10;now<m.attack || now<m.cast -> if(which<3){if(back)9 else 8}else{if(back)10 else 9};else->(if(back)4 else 0)+walk }
         if(m.moving&&observedFrames.add("$id:$index"))walkedFrames++
         if(id==localId && m.moving && index<8)playerFrames.add(index)
         if(m.hp<=0) {

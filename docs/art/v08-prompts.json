@@ -1,0 +1,254 @@
+[
+  {
+    "attempt": 1,
+    "asset": "android/app/src/main/assets/art/v08/hero-aurelon.png",
+    "mode": "image_gen / reference-guided generation",
+    "prompt": "Use case: stylized-concept. Asset type: production transparent 2D animation sprite sheet for the original fantasy MMORPG HEXKEEP. The reference is STYLE AND GRID REFERENCE ONLY. Create a NEW, magnificent mature human Dawn Knight: realistic heroic proportions, finely engraved worn silver and antique gold plate armor, deep midnight-blue embroidered mantle, luminous amber belt lantern, elegant longsword, readable face under an ornate open hood. Preserve the reference's exquisite painted game-sprite finish and elevated three-quarter ARPG camera, improve material richness, anatomy and clean silhouette. EXACTLY 12 complete isolated full-body sprites in an exact regular 4-column by 3-row grid, all centered with 8% clear padding in their cell, consistent scale and ground anchor. Row 1 four clearly different WALK cycle poses facing down-right (toward viewer). Row 2 four different WALK cycle poses facing up-right (back visible). Row 3: sword attack toward viewer, sword attack away, low agile dodge toward viewer, low agile dodge away. Same character and equipment in EVERY frame. Beautiful coherent painterly dark high fantasy, clear silver specular edges, hand-painted fabric, warm lantern glow; designed to remain readable at 80 pixels tall in game. Actual transparent alpha background across the sheet, no backdrop, no grid lines, no text, no checkerboard, no base or scenery. All limbs, swords and capes entirely inside each equal cell; do not crop. Square high-resolution atlas. NOT flat vector art, not chibi, not low-poly, not a UI mockup.",
+    "generated_file": "exec-c7c0160d-743d-49a9-870f-cec8ae9e986d.png",
+    "selected": true,
+    "reference": "android/app/src/main/assets/art/v05/aurelon.png"
+  },
+  {
+    "attempt": 2,
+    "asset": "android/app/src/main/assets/art/v08/hero-skarn.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Use case: stylized-concept. Create a NEW Frost Warden sprite atlas, using the reference only for painterly finish and pose layout. A noble female human swordswoman of the northern kingdom, engraved silver plate over dark leather, fur collar, deep glacier blue hooded cloak, a curved silver sword and a small blue lantern. White hair strands, resolute mature face, refined silver clasps and snowflake embroidery. Cooler silver highlights, restrained icy cyan magic. Replace the reference archer with this distinct armored sword-wielding warden. Exactly 12 complete sprites in a precise regular 4-column by 3-row square atlas, full body including weapons in each cell, 10% transparent padding, consistent scale and feet baseline. Row 1 four distinct walking poses toward bottom-right; row 2 four walking poses toward top-right with back visible; row 3 attack toward viewer, attack away, crouching dodge toward viewer, dodge away. Same character and equipment throughout. Genuine transparent alpha, no scenery, no text, no grids, no checkerboard. Exquisite detailed painted fantasy MMORPG assets, realistic heroic proportions, angled top-down ARPG view, readable silhouette at 90px height.",
+    "reference": "android/app/src/main/assets/art/v05/skarn.png",
+    "generated_file": "exec-c9e7d0e9-fbac-4158-a48e-3b507b37cdb2.png",
+    "selected": true
+  },
+  {
+    "attempt": 3,
+    "asset": "android/app/src/main/assets/art/v08/hero-vylde.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Use case: stylized-concept. Create a NEW Verdant Sentinel sprite atlas, using the reference only for painterly finish and pose layout. An elegant adult elf-like human forest ranger with dark braided hair, gilded bronze leaf armor, forest emerald embroidered cloak, leather gauntlets, leaf crown, a long leaf-shaped bronze sword in right hand and a green lantern in left. Earthy warm leather, antique gold, jade highlights, a lived-in handcrafted medieval fantasy costume. Refined anatomy and exquisite materials, NOT cartoon. Replace the staff sorcerer with this new sword ranger. Exactly 12 complete sprites in a precise regular 4-column by 3-row square atlas, full body including weapons in each cell, 10% transparent padding, consistent scale and feet baseline. Row 1 four distinct walking poses toward bottom-right; row 2 four walking poses toward top-right with back visible; row 3 attack toward viewer, attack away, crouching dodge toward viewer, dodge away. Same character and equipment throughout. Genuine transparent alpha, no scenery, no text, no grids, no checkerboard. Exquisite detailed painted fantasy MMORPG assets, realistic heroic proportions, angled top-down ARPG view, readable silhouette at 90px height.",
+    "reference": "android/app/src/main/assets/art/v05/vylde.png",
+    "generated_file": "exec-a08e7355-37ec-435e-b091-2c240e3038f3.png",
+    "selected": true
+  },
+  {
+    "attempt": 4,
+    "asset": "android/app/src/main/assets/art/v08/items-weapons.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Use case: stylized-concept. Asset type: exact 4 columns by 3 rows inventory icon atlas, 12 DIFFERENT weapons for HEXKEEP, painterly dark high fantasy MMORPG item art matching reference materials. Each isolated weapon fully inside its equal square cell with 12% transparent padding, centered, angled diagonally to fill the cell. Order left to right then top to bottom: 1 engraved silver longsword with amber sun guard; 2 elegant recurved wooden bow with a taut string; 3 ember crystal sceptre; 4 bronze crescent battle axe with little bells; 5 slender ice rapier; 6 ancient teal steel spear; 7 moon-sickle scythe; 8 gnarled emerald druid staff; 9 majestic golden flaming greatsword; 10 luminous green enchanted longbow; 11 curved black and silver cat-eye dagger; 12 immense silver oath warhammer with blue runes. Rich metal reflections, carved wood, leather bindings, believable construction, crisp outer silhouettes, each immediately recognizable at small inventory scale. Actual transparent alpha background, no text, no labels, no frames, no tiles, no panels, no gridlines, no extra objects. Square atlas.",
+    "reference": "android/app/src/main/assets/art/v08/hero-aurelon.png",
+    "generated_file": "exec-a790cf9e-a673-473b-82f6-38d78a76b38c.png",
+    "selected": true
+  },
+  {
+    "attempt": 5,
+    "asset": "android/app/src/main/assets/art/v08/floor-forest.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Use case: stylized-concept. Asset type: finished in-game ground painting for a scrolling 2D fantasy MMORPG, landscape 3:2 image. Reference is painterly material and elevated gameplay camera STYLE ONLY. The image is a continuous GROUND PLANE seen from an elevated near-orthographic 65-degree ARPG camera, no horizon, no sky, no perspective vanishing point. Rich detailed hand-painted natural textures, organic irregular pathways and archaeological stonework, world-building through materials. Keep the ENTIRE interior traversable, no buildings, walls, tall trees, large rocks or characters in the interior (these are separate sprites placed by code). Do not put a frame around the image, no UI, labels, writing, grid or hexes. Broad coherent masses with exquisite close detail, not a repeated tiny tile. Balanced visible midtones, clear golden and cool lighting, neither uniformly dark nor oversaturated. The Sylve of Echoes: an ancient moonlit forest sanctuary. Wet grey carved flagstones and irregular pale stone paths mingle with emerald moss, exposed gnarled roots flush with the ground, tiny blue flowers, scattered amber leaves. Shallow turquoise pools and ripples near outer edges, patches of leafy undergrowth at the extreme margins. An old circular sunken seal paved flat into the ground at the upper right, a broad ruined pilgrim trail winding across open forest clearings. Blue-green moonlight and subtle warm dappled light. Match the reference's beautiful realistic painted stones. Dense tactile environmental detail without giant props.",
+    "reference": "android/app/src/main/assets/art/courtyard.png",
+    "generated_file": "exec-2f6dee9c-ab96-440a-a099-cb260c033253.png",
+    "selected": true
+  },
+  {
+    "attempt": 6,
+    "asset": "android/app/src/main/assets/art/v08/floor-desert.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Use case: stylized-concept. Asset type: finished in-game ground painting for a scrolling 2D fantasy MMORPG, landscape 3:2 image. Reference is painterly material and elevated gameplay camera STYLE ONLY. The image is a continuous GROUND PLANE seen from an elevated near-orthographic 65-degree ARPG camera, no horizon, no sky, no perspective vanishing point. Rich detailed hand-painted natural textures, organic irregular pathways and archaeological stonework, world-building through materials. Keep the ENTIRE interior traversable, no buildings, walls, tall trees, large rocks or characters in the interior (these are separate sprites placed by code). Do not put a frame around the image, no UI, labels, writing, grid or hexes. Broad coherent masses with exquisite close detail, not a repeated tiny tile. Balanced visible midtones, clear golden and cool lighting, neither uniformly dark nor oversaturated. The Dunes of Glass: an ancient lost civilization under warm desert light. Honey sandstone mosaic fragments, worn terracotta tiles, rippled pale sand drifts, turquoise glass chips, old flat carved circular star charts. A weathered broad turquoise-and-gold tiled pilgrim path crosses open sandy courtyards. Fine scattered ochre pebbles and shallow channels in the sand at the outer margins, low patches of dry grass. Magical but believable desert archaeology; amber, muted turquoise, ivory sand and aged bronze. No solid black areas.",
+    "reference": "android/app/src/main/assets/art/courtyard.png",
+    "generated_file": "exec-04f765de-ab85-4261-a036-b7117819b8ed.png",
+    "selected": true
+  },
+  {
+    "attempt": 7,
+    "asset": "android/app/src/main/assets/art/v08/floor-frost.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Use case: stylized-concept. Asset type: finished in-game ground painting for a scrolling 2D fantasy MMORPG, landscape 3:2 image. Reference is painterly material and elevated gameplay camera STYLE ONLY. The image is a continuous GROUND PLANE seen from an elevated near-orthographic 65-degree ARPG camera, no horizon, no sky, no perspective vanishing point. Rich detailed hand-painted natural textures, organic irregular pathways and archaeological stonework, world-building through materials. Keep the ENTIRE interior traversable, no buildings, walls, tall trees, large rocks or characters in the interior (these are separate sprites placed by code). Do not put a frame around the image, no UI, labels, writing, grid or hexes. Broad coherent masses with exquisite close detail, not a repeated tiny tile. Balanced visible midtones, clear golden and cool lighting, neither uniformly dark nor oversaturated. The Boreal Crown: a lost high mountain citadel under an aurora. Beautiful blue-slate cobblestones partially buried under powder snow, frozen shallow puddles, silver-blue frost filigree, very faint reflected violet and teal aurora on ice. Ancient circular constellations engraved flat into a broad open plaza. A worn curved causeway of stone and copper inlay across open snowy clearings, scattered small dark pebbles, windswept snow at the margins. Rich painterly materials and solemn high fantasy atmosphere, subtle dawn gold highlights, readable midtones.",
+    "reference": "android/app/src/main/assets/art/courtyard.png",
+    "generated_file": "exec-f965a57d-2d16-499d-96f6-e43a254fa078.png",
+    "selected": true
+  },
+  {
+    "attempt": 8,
+    "asset": "android/app/src/main/assets/art/v08/enemy-ravager.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Create an ORIGINAL high quality hand-painted 2D fantasy MMORPG enemy animation sprite atlas, matching the painterly detail, lighting and quality of the attached knight reference. A ferocious lean dire wolf, midnight fur, plated bronze shoulder armour, torn dark red ribbons, luminous amber eyes. Quadruped animal anatomy. Menacing elegant silhouette, silver claws. Strict 4 columns x 3 rows, EXACTLY 12 equally sized cells, one complete isolated creature in EACH cell. TRUE TRANSPARENT RGBA background, no checkerboard, no text, no frames, no environment or cast shadows. Every creature centered with generous clear gutters and all extremities entirely inside its cell. Top-down three-quarter game camera. Row 1: four consecutive walking/flying animation poses facing down-right. Row 2: four consecutive walking/flying poses facing up-right, visible back. Row 3: front attack windup, front attack strike, back attack strike, hurt/recoil. Consistent identity and scale across cells. Rich hand-painted textures, sophisticated colour, beautiful readable silhouette; polished premium PC fantasy RPG sprites. No geometric placeholders, no pixel art, no blurry low detail.",
+    "reference": "android/app/src/main/assets/art/v08/hero-aurelon.png",
+    "generated_file": "exec-a87f90e5-b314-4c48-8ae8-4de8c2627909.png",
+    "selected": true
+  },
+  {
+    "attempt": 9,
+    "asset": "android/app/src/main/assets/art/v08/enemy-needle.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Create an ORIGINAL high quality hand-painted 2D fantasy MMORPG enemy animation sprite atlas, matching the painterly detail, lighting and quality of the attached knight reference. A sinister floating hooded wraith archer, ragged violet silk robe, bone mask, ornate crescent bow, turquoise magical needle arrows and trailing wisps. Distinct readable hood/bow silhouette. Strict 4 columns x 3 rows, EXACTLY 12 equally sized cells, one complete isolated creature in EACH cell. TRUE TRANSPARENT RGBA background, no checkerboard, no text, no frames, no environment or cast shadows. Every creature centered with generous clear gutters and all extremities entirely inside its cell. Top-down three-quarter game camera. Row 1: four consecutive walking/flying animation poses facing down-right. Row 2: four consecutive walking/flying poses facing up-right, visible back. Row 3: front attack windup, front attack strike, back attack strike, hurt/recoil. Consistent identity and scale across cells. Rich hand-painted textures, sophisticated colour, beautiful readable silhouette; polished premium PC fantasy RPG sprites. No geometric placeholders, no pixel art, no blurry low detail.",
+    "reference": "android/app/src/main/assets/art/v08/hero-aurelon.png",
+    "generated_file": "exec-cbcc6533-9de8-4308-990b-df8d3ced7f9d.png",
+    "selected": true
+  },
+  {
+    "attempt": 10,
+    "asset": "android/app/src/main/assets/art/v08/enemy-bastion.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Create an ORIGINAL high quality hand-painted 2D fantasy MMORPG enemy animation sprite atlas, matching the painterly detail, lighting and quality of the attached knight reference. A huge ancient stone and bronze guardian golem, moss-covered carved armour plates, giant tower shield, amber crystal heart, stone hammer fist. Weighty massive silhouette, sculpted intricate weathered materials. Strict 4 columns x 3 rows, EXACTLY 12 equally sized cells, one complete isolated creature in EACH cell. TRUE TRANSPARENT RGBA background, no checkerboard, no text, no frames, no environment or cast shadows. Every creature centered with generous clear gutters and all extremities entirely inside its cell. Top-down three-quarter game camera. Row 1: four consecutive walking/flying animation poses facing down-right. Row 2: four consecutive walking/flying poses facing up-right, visible back. Row 3: front attack windup, front attack strike, back attack strike, hurt/recoil. Consistent identity and scale across cells. Rich hand-painted textures, sophisticated colour, beautiful readable silhouette; polished premium PC fantasy RPG sprites. No geometric placeholders, no pixel art, no blurry low detail.",
+    "reference": "android/app/src/main/assets/art/v08/hero-aurelon.png",
+    "generated_file": "exec-1c3ce61e-9440-4e2c-bb8c-b213ec550f30.png",
+    "selected": true
+  },
+  {
+    "attempt": 11,
+    "asset": "android/app/src/main/assets/art/v08/enemy-swarm.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Create an ORIGINAL high quality hand-painted 2D fantasy MMORPG enemy animation sprite atlas, matching the painterly detail, lighting and quality of the attached knight reference. A single razorwing dusk moth monster, iridescent emerald and violet wings, ivory insect armour, amber abdomen, delicate antennae, sharp small claws. Sinister fairy wilderness creature, elegant readable wings. Strict 4 columns x 3 rows, EXACTLY 12 equally sized cells, one complete isolated creature in EACH cell. TRUE TRANSPARENT RGBA background, no checkerboard, no text, no frames, no environment or cast shadows. Every creature centered with generous clear gutters and all extremities entirely inside its cell. Top-down three-quarter game camera. Row 1: four consecutive walking/flying animation poses facing down-right. Row 2: four consecutive walking/flying poses facing up-right, visible back. Row 3: front attack windup, front attack strike, back attack strike, hurt/recoil. Consistent identity and scale across cells. Rich hand-painted textures, sophisticated colour, beautiful readable silhouette; polished premium PC fantasy RPG sprites. No geometric placeholders, no pixel art, no blurry low detail.",
+    "reference": "android/app/src/main/assets/art/v08/hero-aurelon.png",
+    "generated_file": "exec-cbcbb9b2-3dd6-4b27-808d-c756d23eaac3.png",
+    "selected": true
+  },
+  {
+    "attempt": 12,
+    "asset": "android/app/src/main/assets/art/v08/items-chests.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Premium hand-painted fantasy MMORPG inventory icons matching attached weapon atlas material and lighting quality. EXACTLY 12 different EQUIPMENT ICONS in strict 4 columns by 3 rows, row-major order: 1 navy watchman's cloak with silver pauldrons, 2 bronze road knight cuirass, 3 violet twilight cape, 4 delicate ivory dew silk robe, 5 green living root armour, 6 brown fur traveller coat, 7 midnight dreamweaver robes, 8 turquoise glass breastplate, 9 constellation blue tunic, 10 golden bell chainmail, 11 black cat nine-lives cape, 12 crimson returner's mantle. Each cell contains ONE item (paired gloves/boots count as one). TRUE transparent RGBA canvas, no checkerboard, no background, no labels, no text, no border, no cast shadows, no body inside clothing. Beautiful rich detailed leather, embroidery, gemstones, engraved metal, clear silhouette and high contrast highlights legible at 48px. Perfectly isolated with WIDE CLEAR GUTTERS of at least 10% cell width, all extremities inside cell. Consistent top-down three-quarter icon style, beautifully painted, polished AAA fantasy loot art. No geometry placeholders.",
+    "reference": "android/app/src/main/assets/art/v08/items-weapons.png",
+    "generated_file": "exec-80d58d68-6aeb-4cc8-b3c7-2bb486460e3f.png",
+    "selected": true
+  },
+  {
+    "attempt": 13,
+    "asset": "android/app/src/main/assets/art/v08/items-amulets.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Premium hand-painted fantasy MMORPG inventory icons matching attached weapon atlas material and lighting quality. EXACTLY 12 different EQUIPMENT ICONS in strict 4 columns by 3 rows, row-major order: 1 radiant golden dawn seal pendant, 2 violet memory crystal pendant, 3 ornate amber compass pendant, 4 silver silent bell pendant, 5 moonseed silver pendant, 6 ice blue frozen tear pendant, 7 lucky carved adventurer die pendant, 8 black bronze ash hourglass pendant, 9 amber lighthouse circular pendant, 10 black cat midnight bell pendant, 11 blue forgotten star pendant, 12 ancient ornate gold key pendant. Each cell contains ONE item (paired gloves/boots count as one). TRUE transparent RGBA canvas, no checkerboard, no background, no labels, no text, no border, no cast shadows, no body inside clothing. Beautiful rich detailed leather, embroidery, gemstones, engraved metal, clear silhouette and high contrast highlights legible at 48px. Perfectly isolated with WIDE CLEAR GUTTERS of at least 10% cell width, all extremities inside cell. Consistent top-down three-quarter icon style, beautifully painted, polished AAA fantasy loot art. No geometry placeholders.",
+    "reference": "android/app/src/main/assets/art/v08/items-weapons.png",
+    "generated_file": "exec-eea69eb4-469a-4703-aee9-94344637fa5b.png",
+    "selected": true
+  },
+  {
+    "attempt": 14,
+    "asset": "android/app/src/main/assets/art/v08/items-helms.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Premium hand-painted fantasy MMORPG inventory icons matching attached weapon atlas material and lighting quality. EXACTLY 12 different EQUIPMENT ICONS in strict 4 columns by 3 rows, row-major order: 1 silver fog full knight helm, 2 living green lichen crown, 3 dark ferryman leather mask, 4 turquoise desert diadem, 5 embroidered navy watcher's hood, 6 translucent glass circlet, 7 ice encrusted blue knight helm, 8 aurora feathered silver mask, 9 black and gold lost king crown, 10 ivory silent face mask, 11 blue starry wizard headwear, 12 crimson silver homecoming helm. Each cell contains ONE item (paired gloves/boots count as one). TRUE transparent RGBA canvas, no checkerboard, no background, no labels, no text, no border, no cast shadows, no body inside clothing. Beautiful rich detailed leather, embroidery, gemstones, engraved metal, clear silhouette and high contrast highlights legible at 48px. Perfectly isolated with WIDE CLEAR GUTTERS of at least 10% cell width, all extremities inside cell. Consistent top-down three-quarter icon style, beautifully painted, polished AAA fantasy loot art. No geometry placeholders.",
+    "reference": "android/app/src/main/assets/art/v08/items-weapons.png",
+    "generated_file": "exec-1083370d-6bea-4214-ad2e-b5fd901fbc93.png",
+    "selected": true
+  },
+  {
+    "attempt": 15,
+    "asset": "android/app/src/main/assets/art/v08/items-gloves.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Premium hand-painted fantasy MMORPG inventory icons matching attached weapon atlas material and lighting quality. EXACTLY 12 different EQUIPMENT ICONS in strict 4 columns by 3 rows, row-major order: 1 silver oath knight gauntlets, 2 living root green bracers and gloves, 3 ember black and orange gauntlets, 4 purple prismatic crystal gauntlets, 5 ivory dew silk gloves, 6 brown traveller fingerless gloves, 7 icy blue northern gauntlets, 8 feathered claw wind gloves, 9 bronze copper plated gauntlets, 10 dark blue cartographer gloves with compass, 11 warm fur refuge mittens, 12 white gold dawn gloves. Each cell contains ONE item (paired gloves/boots count as one). TRUE transparent RGBA canvas, no checkerboard, no background, no labels, no text, no border, no cast shadows, no body inside clothing. Beautiful rich detailed leather, embroidery, gemstones, engraved metal, clear silhouette and high contrast highlights legible at 48px. Perfectly isolated with WIDE CLEAR GUTTERS of at least 10% cell width, all extremities inside cell. Consistent top-down three-quarter icon style, beautifully painted, polished AAA fantasy loot art. No geometry placeholders.",
+    "reference": "android/app/src/main/assets/art/v08/items-weapons.png",
+    "generated_file": "exec-877830f9-fc9e-4f0f-bf3f-e69cf01d12a9.png",
+    "selected": true
+  },
+  {
+    "attempt": 16,
+    "asset": "android/app/src/main/assets/art/v08/items-boots.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Premium hand-painted fantasy MMORPG inventory icons matching attached weapon atlas material and lighting quality. EXACTLY 12 different EQUIPMENT ICONS in strict 4 columns by 3 rows, row-major order: 1 silver navy knight boots, 2 green moss elven boots, 3 bronze desert sandals with shin armour, 4 violet crystal plated boots, 5 soft ivory silk travelling boots, 6 worn brown leather ranger boots, 7 ice blue fur northern boots, 8 black feather agile assassin boots, 9 engraved copper heavy greaves, 10 midnight blue star constellation boots, 11 warm brown refuge fur boots, 12 radiant white gold dawn greaves. Each cell contains ONE item (paired gloves/boots count as one). TRUE transparent RGBA canvas, no checkerboard, no background, no labels, no text, no border, no cast shadows, no body inside clothing. Beautiful rich detailed leather, embroidery, gemstones, engraved metal, clear silhouette and high contrast highlights legible at 48px. Perfectly isolated with WIDE CLEAR GUTTERS of at least 10% cell width, all extremities inside cell. Consistent top-down three-quarter icon style, beautifully painted, polished AAA fantasy loot art. No geometry placeholders.",
+    "reference": "android/app/src/main/assets/art/v08/items-weapons.png",
+    "generated_file": "exec-69f020bb-f02b-4f8e-a518-8bdc6b9fd314.png",
+    "selected": true
+  },
+  {
+    "attempt": 17,
+    "asset": "android/app/src/main/assets/art/v08/boss-forest.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Create an original exceptional hand-painted 2D fantasy MMORPG BOSS animation sprite atlas. Match the painterly rendering and material detail of attached style reference. The Stag Without Dawn: a majestic terrifying gigantic spectral stag with midnight blue fur, intricate ancient bark armour, golden lanterns hanging from enormous branching antlers, luminous turquoise eyes and ethereal blue wisps. A beautiful sovereign of an enchanted forest. Four-legged deer anatomy. STRICT 4 equal columns x 3 equal rows, EXACTLY twelve complete isolated sprites. True transparent RGBA canvas, no background/checkerboard/text/grid/shadows. Maintain 12% clear padding around EACH creature inside EACH cell; no touching neighbours. Top-down three-quarter camera, readable imposing silhouette. Row1 four walking frames facing down-right, row2 four walking frames facing up-right showing back, row3 front attack windup, front attack impact, rear attack impact, hurt recoil. Same creature, scale and design across all12cells. Rich hand-painted texture, exquisite mythology, beautiful colour accents, not low-poly, not pixel art.",
+    "reference": "android/app/src/main/assets/art/v08/hero-aurelon.png",
+    "generated_file": "exec-e93f3bb2-05dc-4227-acee-1c75c3a1f893.png",
+    "selected": true
+  },
+  {
+    "attempt": 18,
+    "asset": "android/app/src/main/assets/art/v08/boss-desert.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Create an original exceptional hand-painted 2D fantasy MMORPG BOSS animation sprite atlas. Match the painterly rendering and material detail of attached style reference. The Prism Matriarch: a magnificent monstrous eight-legged spider queen with faceted amethyst and turquoise crystalline legs, polished obsidian body, intricately engraved ancient gold carapace, luminous amber eyes and crown. Regal ancient desert guardian, clearly spider silhouette. STRICT 4 equal columns x 3 equal rows, EXACTLY twelve complete isolated sprites. True transparent RGBA canvas, no background/checkerboard/text/grid/shadows. Maintain 12% clear padding around EACH creature inside EACH cell; no touching neighbours. Top-down three-quarter camera, readable imposing silhouette. Row1 four walking frames facing down-right, row2 four walking frames facing up-right showing back, row3 front attack windup, front attack impact, rear attack impact, hurt recoil. Same creature, scale and design across all12cells. Rich hand-painted texture, exquisite mythology, beautiful colour accents, not low-poly, not pixel art.",
+    "reference": "android/app/src/main/assets/art/v08/hero-aurelon.png",
+    "generated_file": "exec-e8bdfc40-0241-4939-9940-94f01387b1ac.png",
+    "selected": true
+  },
+  {
+    "attempt": 19,
+    "asset": "android/app/src/main/assets/art/v08/boss-frost.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Create an original exceptional hand-painted 2D fantasy MMORPG BOSS animation sprite atlas. Match the painterly rendering and material detail of attached style reference. The Archon of Last Flames: a towering fallen paladin in elaborately engraved royal silver and dark blue plate armour, crown-shaped great helm, long flowing shredded indigo cloak, giant golden two-handed sword, frozen blue shoulders and an amber lantern glowing in chest. Regal tragic formidable guardian under the aurora. STRICT 4 equal columns x 3 equal rows, EXACTLY twelve complete isolated sprites. True transparent RGBA canvas, no background/checkerboard/text/grid/shadows. Maintain 12% clear padding around EACH creature inside EACH cell; no touching neighbours. Top-down three-quarter camera, readable imposing silhouette. Row1 four walking frames facing down-right, row2 four walking frames facing up-right showing back, row3 front attack windup, front attack impact, rear attack impact, hurt recoil. Same creature, scale and design across all12cells. Rich hand-painted texture, exquisite mythology, beautiful colour accents, not low-poly, not pixel art.",
+    "reference": "android/app/src/main/assets/art/v08/hero-aurelon.png",
+    "generated_file": "exec-30b0f9e7-7751-4ead-a00d-6317b68bf394.png",
+    "selected": true
+  },
+  {
+    "attempt": 20,
+    "asset": "android/app/src/main/assets/art/v08/props-forest.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Create a high-quality hand-painted top-down three-quarter fantasy MMORPG environment prop atlas matching attached ground style. Enchanted ancient forest, dark green oak foliage, mossy slate, gnarled roots, tiny blue flowers, engraved bronze, warm amber lanterns. First two are gnarled leafy oaks. EXACTLY 12 standalone props, strict 4 equal columns x 3 equal rows. Row-major order: 1 tall tree or formation, 2 different tall tree or formation, 3 broad boulder cluster, 4 low flowering shrub, 5 ruined wall section, 6 broken arched gateway, 7 carved slender pillar, 8 small traveller tent with rolled bedding and lantern, 9 unlit ancient beacon shrine on stone plinth, 10 the SAME beacon shrine lit with amber magical flame, 11 closed ornate treasure chest, 12 small precious glowing relic crystal in carved gold mount. TRUE TRANSPARENT RGBA background. Absolutely no environment behind props, no text, no grid, no ground patch; minimal contact shadow only. Each object wholly confined inside its cell, generous padding 15% each side, no overlap. Consistent lighting from upper-left, exquisite painterly details, game-ready clear silhouettes, premium illustrated fantasy RPG quality.",
+    "reference": "android/app/src/main/assets/art/v08/floor-forest.png",
+    "generated_file": "exec-92a77ad0-988b-4864-bd7a-8af5ca762537.png",
+    "selected": false
+  },
+  {
+    "attempt": 21,
+    "asset": "android/app/src/main/assets/art/v08/props-desert.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Create a high-quality hand-painted top-down three-quarter fantasy MMORPG environment prop atlas matching attached ground style. Ancient desert oasis ruins, honey sandstone, turquoise mosaics, golden engraved brass and radiant crystalline prisms. First is a graceful date palm, second a tall turquoise and amethyst crystal formation. EXACTLY 12 standalone props, strict 4 equal columns x 3 equal rows. Row-major order: 1 tall tree or formation, 2 different tall tree or formation, 3 broad boulder cluster, 4 low flowering shrub, 5 ruined wall section, 6 broken arched gateway, 7 carved slender pillar, 8 small traveller tent with rolled bedding and lantern, 9 unlit ancient beacon shrine on stone plinth, 10 the SAME beacon shrine lit with amber magical flame, 11 closed ornate treasure chest, 12 small precious glowing relic crystal in carved gold mount. TRUE TRANSPARENT RGBA background. Absolutely no environment behind props, no text, no grid, no ground patch; minimal contact shadow only. Each object wholly confined inside its cell, generous padding 15% each side, no overlap. Consistent lighting from upper-left, exquisite painterly details, game-ready clear silhouettes, premium illustrated fantasy RPG quality.",
+    "reference": "android/app/src/main/assets/art/v08/floor-desert.png",
+    "generated_file": "exec-4934d219-f188-475c-9d79-4d75714cb6dc.png",
+    "selected": true
+  },
+  {
+    "attempt": 22,
+    "asset": "android/app/src/main/assets/art/v08/props-frost.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Create a high-quality hand-painted top-down three-quarter fantasy MMORPG environment prop atlas matching attached ground style. Ruined northern kingdom, snow-laden dark blue pines, frosted slate, silver carved masonry, blue ice, golden lantern warmth. First two are different tall snow-laden pines. EXACTLY 12 standalone props, strict 4 equal columns x 3 equal rows. Row-major order: 1 tall tree or formation, 2 different tall tree or formation, 3 broad boulder cluster, 4 low flowering shrub, 5 ruined wall section, 6 broken arched gateway, 7 carved slender pillar, 8 small traveller tent with rolled bedding and lantern, 9 unlit ancient beacon shrine on stone plinth, 10 the SAME beacon shrine lit with amber magical flame, 11 closed ornate treasure chest, 12 small precious glowing relic crystal in carved gold mount. TRUE TRANSPARENT RGBA background. Absolutely no environment behind props, no text, no grid, no ground patch; minimal contact shadow only. Each object wholly confined inside its cell, generous padding 15% each side, no overlap. Consistent lighting from upper-left, exquisite painterly details, game-ready clear silhouettes, premium illustrated fantasy RPG quality.",
+    "reference": "android/app/src/main/assets/art/v08/floor-frost.png",
+    "generated_file": "exec-338dc4fe-3905-457d-a580-9025709c017e.png",
+    "selected": true
+  },
+  {
+    "attempt": 23,
+    "asset": "android/app/src/main/assets/art/v08/props-forest.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Edit this exact atlas: REMOVE THE ENTIRE OPAQUE GREEN/BROWN BACKGROUND and replace it with true transparent alpha (RGBA). Preserve all twelve detailed painted objects, their positions and their exact 4-column by 3-row grid layout. Preserve precise object silhouettes and foliage holes, make gaps between every sprite completely transparent. No coloured matte, no backdrop, no checkerboard. Background removal only, leave original object colours and brushwork unchanged. Output transparent sprite atlas.",
+    "reference": "android/app/src/main/assets/art/v08/props-forest.png",
+    "generated_file": "exec-353b8b6b-2b16-43c9-b117-9ca6b3ca8fc4.png",
+    "selected": false
+  },
+  {
+    "attempt": 24,
+    "asset": "android/app/src/main/assets/art/v08/world-atlas.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Create a beautiful hand-painted fantasy MMORPG world map, landscape aspect ratio 3:2. An ancient illuminated parchment atlas with warm ivory paper, fine ink drawing and richly painted miniature landscapes. Big enchanted emerald forest in southwest centred 25% across 65% down; honey desert and turquoise oasis temple in middle/north centred 53% across 37% down; majestic icy northern fortress and snowy mountains in southeast/right centred 78% across 64% down. A small amber-lit refuge castle in upper left. Winding rivers, fine mountain ranges, ruined towers, trails linking these three regions, coastline, soft mist at edges, tasteful antique gold border, small compass rose in lower left. NO WORDS, NO TEXT, NO NUMBERS, NO UI or quest icons. Lovely detailed miniature fantasy cartography with strong coherent composition, painterly illustrated tabletop atlas quality. Preserve clear land shapes for live clickable UI markers.",
+    "reference": "android/app/src/main/assets/art/v08/floor-forest.png",
+    "generated_file": "exec-bcc43b41-4743-4783-8794-812a568bb0b9.png",
+    "selected": true
+  },
+  {
+    "attempt": 25,
+    "asset": "android/app/src/main/assets/art/v08/refuge.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Create a breathtaking hand-painted fantasy MMORPG title-screen environment, landscape 16:9, no text no logo no UI no people. The Last Lantern Refuge at blue hour: majestic ancient gothic citadel and warm timber guildhall at RIGHT centre, many amber lanterns, vaulted arched stone gate, ivy, slate roofs, pale blue mountain mist, glowing windows, cobbled courtyard foreground, planted flowers, rich detailed masonry. At far right a beautiful ornate large golden lantern on pedestal. Leave the LEFT 45% mostly quiet deep midnight-blue mist and distant forest silhouettes so pale menu text can be overlaid. Leave central lower-right courtyard open for a large full-body hero overlay. Sophisticated oil-painted fantasy concept art, magical inviting refuge in dangerous world, beautiful contrast warm gold/cool indigo, premium classic MMORPG nostalgia, cinematic depth and finest craftsmanship. Match attached character's art style, but environment only.",
+    "reference": "android/app/src/main/assets/art/v08/hero-aurelon.png",
+    "generated_file": "exec-4031e6db-1897-46fa-8728-b16db7305630.png",
+    "selected": true
+  },
+  {
+    "attempt": 26,
+    "asset": "android/app/src/main/assets/art/v08/abilities.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Create exactly eight hand-painted premium fantasy MMORPG ability/menu icons, strict 4 columns by 2 rows. Row-major: 1 curved silver sword slashing with amber arc, 2 magical blue ranger boot dodging with speed wisps, 3 radiant golden sunburst spell with star core, 4 ruby healing potion in ornate glass flask, 5 silver knight shield with teal protective rune, 6 ancient leather quest journal with golden clasp, 7 rich brown leather adventurer bag, 8 engraved golden compass with sapphire needle. EACH icon inside its own circular dark midnight stone medallion with ornate carved gold rim, outside each medallion TRUE transparent RGBA, no background/checkerboard/text. Exact regular 4x2 equally sized cells, generous spacing, eight complete circles with no touching or cropping. Detailed painterly materials, magical bright readable cores, beautiful at small UI sizes, matching the reference.",
+    "reference": "android/app/src/main/assets/art/v08/items-weapons.png",
+    "generated_file": "exec-50cbac98-45ba-4da0-abf5-54e8947cb2e1.png",
+    "selected": true
+  },
+  {
+    "attempt": 27,
+    "asset": "android/app/src/main/assets/art/v08/npcs.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Create a hand-painted fantasy RPG character atlas with exactly SIX sprites in a strict 3 columns by 2 rows. Top row THREE beautiful chest-up dialogue portraits: (1) Lio, kind young male forest cartographer with chestnut hair, round spectacles, moss green cloak, map satchel; (2) Saher, dignified elderly brown-skinned desert water keeper, white beard, teal/gold turban and embroidered ivory robes; (3) Iria, courageous woman northern explorer, silver braided hair, fur-lined blue coat, amber lantern. Bottom row the SAME THREE characters as complete full-body top-down three-quarter gameplay sprites facing down-right. EXACT 3x2 regular grid, clear wide gutters, isolated TRUE TRANSPARENT RGBA background, no backdrop no text no checkerboard. Whole bodies fully inside their cells, beautiful painted faces, polished intricate clothing, warm expressive personalities, consistent fantasy MMORPG style with attached reference. All portraits in row1, all fullbody in row2.",
+    "reference": "android/app/src/main/assets/art/v08/hero-aurelon.png",
+    "generated_file": "exec-3e41db6f-6a43-41e0-84a3-5bc1d60401c9.png",
+    "selected": true
+  },
+  {
+    "attempt": 28,
+    "asset": "android/app/src/main/assets/art/v08/props-forest.png",
+    "mode": "image_gen / reference-guided edit",
+    "prompt": "Transform this transparent 4-column by 3-row environment sprite atlas from SNOW biome to enchanted FOREST biome, preserving the true transparent alpha background and exact twelve-cell layout. Replace the two snow pines with two different dark green gnarled leafy oak trees. Replace all snow and ice with lush moss, small blue flowers, ancient roots and ferns. All masonry becomes mossy slate with gold engravings. Tent becomes deep green cloth, shrine flames warm amber. Keep exact object order: row1 oak, different oak, boulder cluster, shrub; row2 ruined wall, ruined arch, pillar, traveller tent; row3 unlit shrine, lit shrine, chest, relic. Hand-painted premium fantasy MMORPG detail. Output MUST have transparent alpha everywhere outside each object, same as reference. No background colour, no atmosphere behind objects, no backdrop, no text. Maintain clear empty gutters between all sprites. This is a transparent production sprite sheet, NOT a scene or presentation board.",
+    "reference": "android/app/src/main/assets/art/v08/props-frost.png",
+    "generated_file": "exec-0c8bd60f-6e75-45c8-bff0-2452bc2e788e.png",
+    "selected": true
+  }
+]

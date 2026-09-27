@@ -8,19 +8,20 @@ import org.json.JSONObject
 
 /** Screen routing and pointer ownership. Simulation, content and equipment rules live in Rust. */
 class FrontierUi(
+    private val art: game.hexkeep.art.PaintedArt,
     private val command: (String) -> Unit,
     private val movement: (Short, Short) -> Unit,
     private val attack: (Boolean) -> Unit,
     private val dash: () -> Unit,
     private val skill: () -> Unit,
 ) {
-    private val u = UiKit()
-    private val layers = EquipmentLayers(u)
-    private val atlas = AtlasScreen(u)
-    private val journal = QuestJournalScreen(u)
+    private val u = UiKit(art)
+    private val layers = EquipmentLayers(u, art)
+    private val atlas = AtlasScreen(u, art)
+    private val journal = QuestJournalScreen(u, art)
     private val inventory = InventoryScreen(u, layers)
-    private val world = FrontierRenderer(u, layers)
-    private val chronicles = ChronicleScreen(u)
+    private val world = FrontierRenderer(u, layers, art)
+    private val chronicles = ChronicleScreen(u, art)
     private var screen = -1
     private var started = 0L
     private var data = JSONObject()
@@ -57,7 +58,7 @@ class FrontierUi(
         JSONObject()
             .put("screen", screen)
             .put("buttons", u.metrics())
-            .put("terrain_bitmaps", 1)
+            .put("art", art.metrics())
             .put("equipment_layers", 6)
 
     fun draw(c: Canvas, w: Float, snapshot: JSONObject, reduced: Boolean) {
@@ -70,6 +71,7 @@ class FrontierUi(
             started = now
             clear()
         }
+        layers.realm = data.optInt("realm")
         u.highContrast = data.optBoolean("accessible")
         u.reset()
         val t = now / 1000f
@@ -106,18 +108,22 @@ class FrontierUi(
         val j = data.obj("journey")
         val run = f.optJSONObject("run")
         u.text(c, "HEXKEEP", 31f, 64f, 34f, u.white, font = u.serif)
-        u.text(c, "0.7  /  LES ÉCHOS DES CONFINS", 33f, 89f, 11f, u.gold, font = u.bold)
+        u.text(c, "0.8  /  LE SERMENT DES LANTERNES", 33f, 89f, 11f, u.gold, font = u.bold)
         u.button(c, "settings", "Réglages", w - 172, 28f, 140f)
         val x = w * .70f
-        u.circle(c, x, 272f, 150f, u.alpha(u.mint, 12))
-        u.circle(c, x, 272f, 144f, u.alpha(u.gold, 65), 1f)
-        u.circle(c, x, 272f, 115f, u.alpha(u.mint, 35), 1f)
-        for (i in 0..5) {
-            val a = i * Math.PI / 3
-            u.polygon(c, x + cos(a).toFloat() * 144, 272 + sin(a).toFloat() * 144, 7f, 4, u.gold)
-        }
-        layers.hero(c, x, 340f, 3.4f, run?.obj("player") ?: JSONObject(), j, t)
-        u.text(c, "SIX FRAGMENTS. UN SEUL SERMENT.", x, 457f, 11f, u.gold, true, u.bold)
+        u.p.shader =
+            RadialGradient(
+                x,
+                330f,
+                190f,
+                intArrayOf(0x40d5a458, 0x00d5a458),
+                null,
+                Shader.TileMode.CLAMP,
+            )
+        c.drawCircle(x, 330f, 190f, u.p)
+        u.p.shader = null
+        layers.hero(c, x, 426f, 3.55f, JSONObject(), j, t)
+        u.text(c, "GARDIEN DE LA DERNIÈRE LUMIÈRE", x, 457f, 11f, u.gold, true, u.bold)
         u.text(
             c,
             "${data.optString("name")} · Niveau ${j.optInt("level",1)}",

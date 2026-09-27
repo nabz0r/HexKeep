@@ -1,31 +1,31 @@
 <div align="center">
 
 # HEXKEEP
-### Les Échos des Confins · v0.7
+### Le Serment des Lanternes · v0.8
 
 *Là où personne ne veille, le monde s’éteint.*
 
-![HEXKEEP — Les Échos des Confins](docs/screenshots/v07-refuge.png)
+![HEXKEEP — Le Serment des Lanternes](docs/screenshots/v08-refuge.png)
 
 **Un action-RPG de lanternes, de ruines et de mémoires. Une édition solo hors ligne préparée pour les tests Google Play.**
 
 [![Android 8+](https://img.shields.io/badge/Android-8%2B-78c8b9?style=for-the-badge)](docs/installation.md)
-[![Version 0.7](https://img.shields.io/badge/version-0.7-e5bc74?style=for-the-badge)](CHANGELOG.md)
+[![Version 0.8](https://img.shields.io/badge/version-0.8-e5bc74?style=for-the-badge)](CHANGELOG.md)
 [![Vérifications](https://github.com/nabz0r/HexKeep/actions/workflows/ci.yml/badge.svg)](https://github.com/nabz0r/HexKeep/actions/workflows/ci.yml)
 
-**[⬇ Prévisualisation Play · solo](downloads/HEXKEEP-v0.7-PLAY-preview.apk)** · **[⬇ Mise à jour DEV](downloads/HEXKEEP-v0.7-DEV.apk)** · [Dossier Google Play](docs/play-release.md) · [Livraison 0.7](docs/delivery-v07.md)
+**[⬇ Prévisualisation Play · solo](downloads/HEXKEEP-v0.8-PLAY-preview.apk)** · **[⬇ Mise à jour DEV](downloads/HEXKEEP-v0.8-DEV.apk)** · [Dossier Google Play](docs/play-release.md) · [Livraison 0.8](docs/delivery-v08.md)
 
 </div>
 
 ---
 
-## Ce que livre la 0.7
+## Ce que livre la 0.8
 
-**Les Échos des Confins** ouvre une campagne de trois grandes régions : la Sylve des Échos, les Dunes de Verre et la Couronne Boréale. Un atlas relie ces biomes, douze missions guident leur découverte et des cinématiques racontent le voyage d’Éline. Les nouveaux décors, personnages et équipements utilisent des formes procédurales originales.
+**Le Serment des Lanternes** redonne aux Confins une direction fantasy peinte : trois héros, sept créatures dont trois gardiens uniques, 72 objets illustrés et trois régions riches en ruines, végétation et lumière. Le refuge, l’atlas et les contrôles reçoivent le même traitement.
 
-Le combat de campagne apporte trois postures, trois frappes rapides suivies d’une finissante, des esquives, un éclat de lumière, des impacts suspendus et cinq nouveaux comportements ennemis. Les trois gardiens évoluent en trois phases. Le sac devient une grille avec glisser-déposer, comparaison, tri et six emplacements visibles sur le veilleur. Les cinq aventures précédentes restent accessibles depuis **Les Marches** ; **Refuge & autres modes** conserve les autres fonctions.
+Les douze missions, cinématiques, combos, postures, six emplacements d’équipement et le sac tactile sont conservés. Les cinq aventures précédentes restent accessibles depuis **Les Marches** ; **Refuge & autres modes** conserve les autres fonctions.
 
-[Changelog](CHANGELOG.md) · [Architecture 0.7](docs/architecture-v07.md) · [Guide de campagne](docs/player-guide-v07.md) · [Direction et références](docs/design-v07.md)
+[Changelog](CHANGELOG.md) · [Architecture 0.8](docs/architecture-v08.md) · [Guide de campagne](docs/player-guide-v07.md) · [Direction artistique et provenance](docs/art/v08-direction.md)
 
 | Édition | Usage | Identifiant |
 |---|---|---|
@@ -35,7 +35,7 @@ Le combat de campagne apporte trois postures, trois frappes rapides suivies d’
 
 **Le jeu n’est pas encore publié sur Google Play.** L’AAB est construit et contrôlé ; la clé d’envoi officielle, la configuration du compte, les déclarations, les tests sur téléphones et l’éventuel test fermé restent nécessaires. Le [dossier de publication](docs/play-release.md) indique chaque étape et ses conditions. L’interface est française. La progression est locale : les deux éditions ne partagent pas leurs données et une désinstallation efface la sauvegarde.
 
-![Atlas des Confins](docs/screenshots/v07-atlas.png)
+![Atlas des Confins](docs/screenshots/v08-atlas.png)
 
 ## Une lumière. Trois serments. Des chemins à retrouver.
 
@@ -53,13 +53,13 @@ Les routes ont disparu sous la brume. Au refuge, Éline conserve une carte dont 
 | Aventure solo suspendue pendant la consultation du sac | Consigne permanente, boussole, mini-carte et annonces de danger | **Neuf mémoires**, bestiaire et trois difficultés à débloquer |
 
 <table>
-<tr><td><img src="docs/screenshots/v07-missions.png" alt="Missions des Confins" /></td><td><img src="docs/screenshots/v07-inventory.png" alt="Sac et six emplacements" /></td></tr>
-<tr><td><img src="docs/screenshots/v07-cinematic.png" alt="Cinématique dans la Sylve" /></td><td><img src="docs/screenshots/v07-touch-battle.png" alt="Combat tactile" /></td></tr>
+<tr><td><img src="docs/screenshots/v08-missions.png" alt="Missions des Confins" /></td><td><img src="docs/screenshots/v08-inventory.png" alt="Sac et six emplacements" /></td></tr>
+<tr><td><img src="docs/screenshots/v08-cinematic.png" alt="Cinématique dans la Sylve" /></td><td><img src="docs/screenshots/v08-touch-battle.png" alt="Combat tactile" /></td></tr>
 </table>
 
 ### Jouer en cinq gestes
 
-1. Installe la [prévisualisation Play](downloads/HEXKEEP-v0.7-PLAY-preview.apk) ou mets à jour la [DEV](downloads/HEXKEEP-v0.7-DEV.apk), sans désinstaller l’ancienne version.
+1. Installe la [prévisualisation Play](downloads/HEXKEEP-v0.8-PLAY-preview.apk) ou mets à jour la [DEV](downloads/HEXKEEP-v0.8-DEV.apk), sans désinstaller l’ancienne version.
 2. Découvre les gestes dans le prologue, puis ouvre **l’atlas des Confins** au refuge.
 3. Accepte les missions secondaires dans le journal. Voyage vers la Sylve, recueille ses mémoires et secours son voyageur.
 4. Maintiens **Attaquer** pour enchaîner trois frappes rapides et une lourde. Change de posture, esquive les annonces rouges et utilise tes fioles. Rallume les trois balises pour appeler le gardien.
@@ -81,7 +81,7 @@ Prérequis : Rust stable, JDK 17, SDK Android 36, NDK `28.2.13676358`, `cargo-nd
 rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
 cargo install cargo-ndk --locked
 scripts/build.sh
-adb install -r artifacts/HEXKEEP-v0.7-DEV.apk
+adb install -r artifacts/HEXKEEP-v0.8-DEV.apk
 ```
 
 `JAVA_HOME`, `ANDROID_HOME` et `ANDROID_NDK_HOME` peuvent désigner tes installations. Le script construit la DEV debug, la DEV release signée, la production réseau verrouillée, la prévisualisation Play et son AAB. La signature officielle Play est configurable par variables d’environnement ; voir le dossier de publication. **La production unsigned n’est pas l’APK à installer.** Une compilation locale utilise ta propre clé debug ; elle peut donc demander une autre installation que le paquet distribué. La clé de distribution DEV n’est pas publiée.

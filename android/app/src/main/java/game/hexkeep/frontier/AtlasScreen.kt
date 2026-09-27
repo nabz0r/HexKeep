@@ -4,7 +4,7 @@ import android.graphics.*
 import kotlin.math.*
 import org.json.JSONObject
 
-class AtlasScreen(private val u: UiKit) {
+class AtlasScreen(private val u: UiKit, private val art: game.hexkeep.art.PaintedArt) {
     var selected = 0
 
     fun draw(c: Canvas, w: Float, data: JSONObject, t: Float) {
@@ -15,23 +15,10 @@ class AtlasScreen(private val u: UiKit) {
         val right = w - 342
         val map = RectF(32f, 104f, right - 20, 444f)
         u.rect(c, map, 0xff112830.toInt(), 16f, u.alpha(u.mint, 50))
-        // Topographic contours and constellation roads keep this an illustrated atlas, not a tile
-        // selector.
         c.save()
         c.clipRect(map)
-        for (i in 0..14) {
-            val path = Path()
-            for (j in 0..35) {
-                val x = map.left + j * map.width() / 35
-                val y = map.top + i * 31 + sin(j * .25 + i * .9) * 24
-                if (j == 0) path.moveTo(x, y.toFloat()) else path.lineTo(x, y.toFloat())
-            }
-            u.p.color = u.alpha(u.mint, 18)
-            u.p.style = Paint.Style.STROKE
-            u.p.strokeWidth = 1f
-            c.drawPath(path, u.p)
-            u.p.style = Paint.Style.FILL
-        }
+        art.frame(c, "world-atlas", 0, map)
+        u.rect(c, map, 0x3206131c, 0f)
         fun point(z: JSONObject) =
             PointF(
                 map.left + map.width() * z.optDouble("map_x").toFloat(),
@@ -52,25 +39,39 @@ class AtlasScreen(private val u: UiKit) {
             val p = point(z)
             val color = u.color(z.array("colors").optString(2))
             val unlocked = z.optBoolean("unlocked")
-            for (j in 0..12) {
-                val a = j * 2.4
-                val rx = p.x + cos(a).toFloat() * (37 + j % 3 * 16)
-                val ry = p.y + sin(a).toFloat() * (29 + j % 4 * 8)
-                if (i == 0) u.polygon(c, rx, ry, 10f, 3, u.alpha(color, 35))
-                else if (i == 1) u.polygon(c, rx, ry, 12f, 4, u.alpha(color, 35), -70f)
-                else u.polygon(c, rx, ry, 14f, 3, u.alpha(color, 35), -90f)
-            }
-            if (selected == i) u.circle(c, p.x, p.y, 34f, u.alpha(color, 35))
-            u.polygon(c, p.x, p.y, 25f, 6, if (unlocked) color else u.muted, 30f, 2f)
-            u.polygon(c, p.x, p.y, 18f, 6, if (unlocked) u.alpha(color, 70) else u.panel, 30f)
+            u.circle(c, p.x, p.y, 29f, 0xdf101a23.toInt())
+            u.circle(
+                c,
+                p.x,
+                p.y,
+                29f,
+                if (selected == i) u.gold else u.alpha(u.gold, 120),
+                if (selected == i) 2.5f else 1f,
+            )
+            art.fit(
+                c,
+                "props-${art.biomeNames[i]}",
+                if (z.optBoolean("complete")) 9 else 8,
+                RectF(p.x - 22, p.y - 31, p.x + 22, p.y + 15),
+                if (unlocked) 255 else 105,
+            )
             u.text(
                 c,
                 if (z.optBoolean("complete")) "✓" else if (unlocked) "0${i+1}" else "×",
                 p.x,
-                p.y + 6,
-                18f,
+                p.y + 23,
+                12f,
                 u.white,
                 true,
+            )
+            u.rect(
+                c,
+                p.x - map.width() * .19f,
+                p.y + 35,
+                map.width() * .38f,
+                27f,
+                0xe5101a23.toInt(),
+                3f,
             )
             u.text(
                 c,
@@ -87,6 +88,7 @@ class AtlasScreen(private val u: UiKit) {
         }
         c.restore()
         u.text(c, "LE REFUGE", map.left + 24, map.top + 32, 11f, u.gold, font = u.bold)
+        u.rect(c, map.left + 16, map.bottom - 38, 310f, 26f, 0xdf101a23.toInt(), 3f)
         u.text(
             c,
             "3 régions • 12 missions • un même serment",
@@ -97,6 +99,7 @@ class AtlasScreen(private val u: UiKit) {
         )
         val z = zones[selected]
         val x = right
+        u.rect(c, x - 12, 104f, 326f, 308f, 0xf0111923.toInt(), 8f, u.alpha(u.gold, 80))
         u.text(c, "RÉGION 0${selected+1}", x, 130f, 11f, u.gold, font = u.bold)
         u.text(c, z.optString("name"), x, 168f, 26f, u.white, font = u.serif, maxWidth = 310f)
         u.text(c, z.optString("biome"), x, 198f, 15f, u.mint)

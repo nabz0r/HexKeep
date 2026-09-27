@@ -1,58 +1,33 @@
 package game.hexkeep.frontier
 
-import android.graphics.Canvas
+import android.graphics.*
+import game.hexkeep.art.PaintedArt
 import kotlin.math.*
 import org.json.JSONObject
 
-/** Six independent, ordered sprite layers. Shapes are code-native procedural assets. */
-class EquipmentLayers(private val u: UiKit) {
+/** Painted character, with six material masks retaining the source brushwork and silhouette. */
+class EquipmentLayers(private val u: UiKit, private val art: PaintedArt) {
+    var realm = 0
     private val rarity =
         intArrayOf(0xffacbfc2.toInt(), 0xff7dd9c1.toInt(), 0xffc9a4ed.toInt(), 0xffefc277.toInt())
+    private val materials =
+        intArrayOf(0xffd0b18b.toInt(), 0xff86acaa.toInt(), 0xffa591bf.toInt(), 0xffb7c5d2.toInt())
+    private val filters = materials.map { LightingColorFilter(it, 0x00161008) }
 
     fun tint(item: JSONObject?) = rarity[(item?.optInt("rarity") ?: 0).coerceIn(0, 3)]
 
     fun icon(c: Canvas, slot: Int, x: Float, y: Float, size: Float, color: Int) {
-        c.save()
-        c.translate(x, y)
-        c.scale(size / 24, size / 24)
-        when (slot) {
-            0 -> {
-                c.rotate(35f)
-                u.rect(c, -2f, -17f, 4f, 28f, color, 1f)
-                u.rect(c, -8f, 5f, 16f, 3f, u.gold, 1f)
-                u.rect(c, -2f, 9f, 4f, 9f, u.muted, 1f)
-            }
-            1 -> {
-                u.polygon(c, 0f, 0f, 17f, 6, color, 30f)
-                u.rect(c, -5f, -15f, 10f, 8f, u.ink, 3f)
-                u.line(c, -7f, -3f, 7f, -3f, u.gold, 2f)
-                u.line(c, 0f, -2f, 0f, 12f, u.gold, 1f)
-            }
-            2 -> {
-                u.circle(c, 0f, -4f, 11f, color, 2f)
-                u.polygon(c, 0f, 8f, 8f, 4, u.gold)
-                u.circle(c, 0f, 8f, 3f, u.ink)
-            }
-            3 -> {
-                u.polygon(c, 0f, 0f, 17f, 6, color, 30f)
-                u.rect(c, -12f, 0f, 24f, 4f, u.ink, 1f)
-                u.rect(c, -2f, -16f, 4f, 10f, u.gold, 1f)
-            }
-            4 -> {
-                u.rect(c, -14f, -10f, 10f, 25f, color, 3f)
-                u.rect(c, 4f, -10f, 10f, 25f, color, 3f)
-                u.rect(c, -12f, 3f, 6f, 3f, u.gold, 1f)
-                u.rect(c, 6f, 3f, 6f, 3f, u.gold, 1f)
-            }
-            else -> {
-                u.rect(c, -13f, -12f, 9f, 23f, color, 2f)
-                u.rect(c, 3f, -12f, 9f, 23f, color, 2f)
-                u.rect(c, -13f, 7f, 13f, 7f, color, 2f)
-                u.rect(c, 3f, 7f, 13f, 7f, color, 2f)
-            }
-        }
-        c.restore()
+        art.fit(
+            c,
+            "items-${art.itemNames[slot.coerceIn(0,5)]}",
+            0,
+            RectF(x - size, y - size, x + size, y + size),
+            105,
+        )
     }
+
+    fun itemIcon(c: Canvas, item: JSONObject, x: Float, y: Float, size: Float) =
+        art.item(c, item, RectF(x - size, y - size, x + size, y + size))
 
     fun hero(
         c: Canvas,
@@ -63,79 +38,101 @@ class EquipmentLayers(private val u: UiKit) {
         journey: JSONObject,
         t: Float,
     ) {
+        val state = player.optString("state")
+        val facing = player.optJSONObject("facing")
+        val back = (facing?.optInt("y") ?: 1) < 0
+        val flip = (facing?.optInt("x") ?: 1) < 0
+        val index =
+            when (state) {
+                "windup" -> if (back) 9 else 8
+                "strike" -> if (back) 9 else 8
+                "hurt" -> if (back) 4 else 0
+                "dead" -> 11
+                "dodge" -> if (back) 11 else 10
+                "move" -> (if (back) 4 else 0) + ((t * 9).toInt() % 4)
+                else -> if (back) 4 else 0
+            }
+        val height = 82f * scale
+        val bob = if (state == "move") sin(t * 16) * scale else sin(t * 2) * .5f * scale
+        val name = art.heroNames[realm.coerceIn(0, 2)]
+        u.p.color = 0x68000000
+        c.drawOval(x - 23 * scale, y - 5 * scale, x + 23 * scale, y + 6 * scale, u.p)
+        val alpha = if (state == "dead") 105 else 255
+        if (state == "dodge")
+            art.anchored(c, name, index, x + (if (flip) 15 else -15) * scale, y, height, flip, 75)
+        val dest = art.anchored(c, name, index, x, y + bob, height, flip, alpha)
         val items = journey.array("items").objects()
         val eq = journey.array("equipped")
-        fun item(slot: Int) = items.firstOrNull { it.optLong("id") == eq.optLong(slot) }
-        val state = player.optString("state")
-        val stance = player.optString("stance", "balanced")
-        val moving = state == "move" || state == "dodge"
-        val bob = if (moving) sin(t * 11) * 1.8f else sin(t * 2) * .5f
-        val leg = if (moving) sin(t * 11) * 4 else 0f
-        c.save()
-        c.translate(x, y)
-        c.scale(scale, scale)
-        val facing = player.optJSONObject("facing")
-        if ((facing?.optInt("x") ?: 1) < 0) c.scale(-1f, 1f)
-        u.circle(c, 0f, 3f, 14f, 0x60000000)
-        c.translate(0f, bob)
-        if (state == "dodge") {
-            u.polygon(c, -10f, -15f, 18f, 3, u.alpha(u.mint, 70), 180f)
-            c.rotate(-15f)
+        // Material regions: head, cuirass, weapon, gloves, boots, amulet. They are clipped copies
+        // of the painted pose, not solid replacement shapes, and follow mirroring/animation.
+        val masks =
+            arrayOf(
+                floatArrayOf(.62f, .28f, 1f, .91f),
+                floatArrayOf(.24f, .29f, .71f, .64f),
+                floatArrayOf(.40f, .31f, .61f, .43f),
+                floatArrayOf(.26f, 0f, .74f, .27f),
+                floatArrayOf(0f, .40f, .35f, .68f),
+                floatArrayOf(.15f, .73f, .81f, 1f),
+            )
+        for (slot in 0..5) {
+            val item = items.firstOrNull { it.optLong("id") == eq.optLong(slot) } ?: continue
+            val m = masks[slot]
+            val l = if (flip) 1 - m[2] else m[0]
+            val r = if (flip) 1 - m[0] else m[2]
+            c.save()
+            c.clipRect(
+                dest.left + dest.width() * l,
+                dest.top + dest.height() * m[1],
+                dest.left + dest.width() * r,
+                dest.top + dest.height() * m[3],
+            )
+            art.anchored(
+                c,
+                name,
+                index,
+                x,
+                y + bob,
+                height,
+                flip,
+                120,
+                filters[(item.optInt("catalog") + item.optInt("motif")) % 4],
+            )
+            c.restore()
         }
-        // Cape, boots, torso, gloves, necklace, helmet, weapon: depth order stays stable.
-        u.polygon(
-            c,
-            0f,
-            -13f,
-            20f,
-            3,
-            if (stance == "assault") 0xff733f4e.toInt() else 0xff244e58.toInt(),
-            -90f,
-        )
-        val boots = tint(item(5))
-        u.rect(c, -10f, -7f + leg, 7f, 12f, boots, 2f)
-        u.rect(c, 3f, -7f - leg, 7f, 12f, boots, 2f)
-        u.polygon(c, 0f, -20f, 12f, 6, tint(item(1)), 30f)
-        u.line(c, 0f, -28f, 0f, -11f, u.alpha(u.ink, 120), 2f)
-        val glove = tint(item(4))
-        u.circle(c, -14f, -20f, 4f, glove)
-        u.circle(c, 14f, -20f, 4f, glove)
-        u.polygon(c, 0f, -24f, 4f, 4, tint(item(2)))
-        u.circle(c, 0f, -24f, 1.8f, u.gold)
-        u.polygon(c, 0f, -36f, 9f, 6, tint(item(3)), 30f)
-        u.rect(c, -6f, -36f, 12f, 3f, u.ink, 1f)
-        val motif = item(3)?.optInt("motif") ?: 0
-        u.polygon(c, 0f, -45f, 3f + motif, 3, u.gold)
-        val angle =
-            when (state) {
-                "windup" -> -75f
-                "strike" -> if (player.optInt("combo") == 3) 100f else 65f
-                "recovery" -> 40f
-                else -> if (stance == "bulwark") -28f else 10f
-            }
-        c.save()
-        c.translate(13f, -20f)
-        c.rotate(angle)
-        u.rect(
-            c,
-            -2f,
-            -24f - (item(0)?.optInt("catalog") ?: 0) % 3 * 2,
-            4f,
-            26f + (item(0)?.optInt("catalog") ?: 0) % 3 * 2,
-            tint(item(0)),
-            1f,
-        )
-        u.rect(c, -7f, -2f, 14f, 3f, u.gold, 1f)
-        c.restore()
-        if (stance == "bulwark") u.polygon(c, -16f, -20f, 10f, 6, u.mint, 30f, 2f)
-        if (state == "hurt") u.circle(c, 0f, -23f, 21f, u.alpha(u.red, 110))
+        if (state == "hurt")
+            art.anchored(
+                c,
+                name,
+                index,
+                x,
+                y + bob,
+                height,
+                flip,
+                100,
+                LightingColorFilter(Color.WHITE, 0x00702010),
+            )
         if (state == "strike") {
-            u.p.style = android.graphics.Paint.Style.STROKE
-            u.p.strokeWidth = if (player.optInt("combo") == 3) 5f else 2f
             u.p.color = u.gold
-            c.drawArc(-31f, -51f, 31f, 11f, -90f, 150f, false, u.p)
-            u.p.style = android.graphics.Paint.Style.FILL
+            u.p.style = Paint.Style.STROKE
+            u.p.strokeWidth = (if (player.optInt("combo") == 3) 5f else 2f) * scale
+            c.drawArc(
+                x - 42 * scale,
+                y - 64 * scale,
+                x + 42 * scale,
+                y + 9 * scale,
+                if (flip) 105f else -85f,
+                150f,
+                false,
+                u.p,
+            )
+            u.p.style = Paint.Style.FILL
         }
-        c.restore()
+        if (player.optString("stance") == "bulwark") {
+            u.p.color = u.alpha(u.mint, 105)
+            u.p.style = Paint.Style.STROKE
+            u.p.strokeWidth = 1.5f * scale
+            c.drawOval(x - 29 * scale, y - 9 * scale, x + 29 * scale, y + 9 * scale, u.p)
+            u.p.style = Paint.Style.FILL
+        }
     }
 }

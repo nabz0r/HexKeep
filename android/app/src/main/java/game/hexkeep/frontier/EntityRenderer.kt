@@ -1,87 +1,106 @@
 package game.hexkeep.frontier
 
 import android.graphics.*
+import game.hexkeep.art.PaintedArt
 import kotlin.math.*
 import org.json.JSONObject
 
-class EntityRenderer(private val u: UiKit) {
-    fun monster(c: Canvas, m: JSONObject, x: Float, y: Float, t: Float, accent: Int) {
-        val kind = m.optInt("kind")
+/** Readable telegraphs around painted, state-driven creature animation. */
+class EntityRenderer(private val u: UiKit, private val art: PaintedArt) {
+    private data class Motion(
+        var x: Int,
+        var y: Int,
+        var back: Boolean = false,
+        var flip: Boolean = false,
+    )
+
+    private val motion = HashMap<Int, Motion>()
+
+    fun clear() = motion.clear()
+
+    fun monster(c: Canvas, m: JSONObject, x: Float, y: Float, t: Float, zone: Int) {
+        val kind = m.optInt("kind").coerceIn(0, 4)
         val hp = m.optInt("hp")
+        val name =
+            if (kind == 4) "boss-${art.biomeNames[zone.coerceIn(0,2)]}" else art.enemyNames[kind]
+        val pos = m.obj("pos")
+        val xx = pos.optInt("x")
+        val yy = pos.optInt("y")
+        val a = motion.getOrPut(m.optInt("id")) { Motion(xx, yy) }
+        if (xx != a.x || yy != a.y) {
+            if (xx != a.x) a.flip = xx < a.x
+            if (yy != a.y) a.back = yy < a.y
+            a.x = xx
+            a.y = yy
+        }
+        val state = m.optString("state")
+        val frame =
+            when (state) {
+                "windup" -> 8
+                "strike" -> if (a.back) 10 else 9
+                "hurt",
+                "dead" -> 11
+                "move" ->
+                    (if (a.back) 4 else 0) +
+                        ((t * (if (kind == 3) 12 else 7) + m.optInt("id")).toInt() % 4)
+                else -> if (a.back) 4 else 0
+            }
+        val height =
+            when (kind) {
+                0 -> 65f
+                1 -> 81f
+                2 -> 96f
+                3 -> 45f
+                else -> 148f
+            }
         if (hp <= 0) {
-            u.polygon(c, x, y, 14f, 6, u.alpha(accent, m.optInt("corpse") * 2), 30f, 1f)
+            val alpha = (m.optInt("corpse") * 3).coerceIn(0, 130)
+            if (alpha > 0) {
+                c.save()
+                c.rotate(68f, x, y)
+                art.anchored(c, name, 11, x, y, height * .8f, a.flip, alpha)
+                c.restore()
+            }
             return
         }
-        val radius = if (kind == 4) 31f else if (kind == 2) 22f else if (kind == 3) 11f else 16f
-        val state = m.optString("state")
-        val stance = m.optString("stance")
-        u.circle(c, x, y + 5, radius * .9f, 0x60000000)
-        val bob =
-            if (state == "move") sin(t * (if (kind == 3) 14 else 8) + m.optInt("id")) * 2
-            else sin(t * 2 + m.optInt("id")) * .7f
+        val r = if (kind == 4) 45f else if (kind == 2) 28f else 22f
+        u.p.color = 0x78000000
+        c.drawOval(x - r, y - 5, x + r, y + 8, u.p)
         if (state == "windup") {
-            u.circle(c, x, y, radius + 13, u.alpha(u.red, 45))
-            u.circle(c, x, y, radius + 13, u.red, 1.5f)
-            u.text(c, "!", x, y - radius - 19, 17f, u.red, true, u.bold)
+            u.p.color = u.alpha(u.red, 65)
+            c.drawOval(x - r - 15, y - r * .45f - 10, x + r + 15, y + r * .45f + 10, u.p)
+            u.p.style = Paint.Style.STROKE
+            u.p.strokeWidth = 2f
+            u.p.color = u.red
+            c.drawOval(x - r - 15, y - r * .45f - 10, x + r + 15, y + r * .45f + 10, u.p)
+            u.p.style = Paint.Style.FILL
+            u.text(c, "!", x, y - height - 10, 20f, u.red, true, u.bold)
         }
-        c.save()
-        c.translate(x, y - 12 + bob)
-        when (kind) {
-            0 -> {
-                u.polygon(c, 0f, 0f, 19f, 3, accent, if (state == "strike") 30f else -90f)
-                u.line(c, -12f, 0f, -24f, 9f, u.gold, 3f)
-                u.line(c, 12f, 0f, 24f, 9f, u.gold, 3f)
-            }
-            1 -> {
-                u.polygon(c, 0f, 0f, 18f, 4, accent, if (state == "windup") -65f else -90f)
-                u.polygon(c, 0f, 0f, 10f, 4, u.ink)
-                u.circle(c, 0f, -1f, 4f, u.gold)
-                u.polygon(c, 0f, -25f, 6f, 3, u.alpha(accent, 170))
-            }
-            2 -> {
-                u.polygon(c, 0f, 0f, 24f, 6, 0xff627e83.toInt(), 30f)
-                u.polygon(c, 0f, 0f, 17f, 6, u.ink, 30f)
-                u.rect(c, -5f, -10f, 10f, 20f, accent, 3f)
-                if (stance == "bulwark") u.polygon(c, 0f, 0f, 28f, 6, u.mint, 30f, 2f)
-            }
-            3 -> {
-                for (i in 0..2) u.polygon(
-                    c,
-                    (i - 1) * 9f,
-                    if (i == 1) -6f else 3f,
-                    8f,
-                    3,
-                    accent,
-                    t * 40 + i * 120,
-                )
-            }
-            else -> {
-                u.polygon(c, 0f, 0f, 34f, 6, 0xff364b60.toInt(), 30f)
-                u.polygon(c, 0f, 0f, 26f, 6, accent, 30f, 3f)
-                for (i in 0..4) {
-                    val a = (-155 + i * 32) * Math.PI / 180
-                    val xx = cos(a).toFloat() * 30
-                    val yy = sin(a).toFloat() * 30
-                    u.polygon(c, xx, yy - 12, 12f, 3, u.gold, -90f + i * 10)
-                }
-                u.polygon(c, 0f, 0f, 12f, 4, u.gold)
-                u.polygon(c, 0f, 0f, 6f, 4, u.ink)
-                if (m.optInt("phase") > 0) u.circle(c, 0f, 0f, 40f, u.alpha(u.red, 100), 2f)
-            }
-        }
-        c.restore()
+        art.anchored(
+            c,
+            name,
+            frame,
+            x,
+            y + if (state == "move") sin(t * 12) * 1.2f else 0f,
+            height,
+            a.flip,
+            if (m.optBoolean("active")) 255 else 155,
+            if (state == "hurt") LightingColorFilter(Color.WHITE, 0x00602010) else null,
+        )
+        if (m.optString("stance") == "bulwark")
+            u.circle(c, x, y - height * .48f, height * .44f, u.alpha(u.mint, 80), 1f)
         if (hp < m.optInt("max_hp") || kind == 4) {
-            u.rect(c, x - radius, y - radius - 28, 2 * radius, 3f, u.ink, 2f)
+            u.rect(c, x - r, y - height - 6, 2 * r, 4f, u.ink, 1f)
             u.rect(
                 c,
-                x - radius,
-                y - radius - 28,
-                2 * radius * hp / m.optInt("max_hp").coerceAtLeast(1),
-                3f,
+                x - r,
+                y - height - 6,
+                2 * r * hp / m.optInt("max_hp").coerceAtLeast(1),
+                4f,
                 u.red,
-                2f,
+                1f,
             )
         }
-        if (!m.optBoolean("active")) u.text(c, "3 BALISES", x, y + 42, 10f, u.muted, true)
+        if (!m.optBoolean("active")) u.text(c, "3 BALISES", x, y + 23, 10f, u.gold, true)
     }
 }

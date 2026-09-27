@@ -2,122 +2,41 @@ package game.hexkeep.frontier
 
 import android.graphics.*
 import android.os.SystemClock
+import game.hexkeep.art.PaintedArt
 import kotlin.math.*
 import org.json.JSONObject
 
-/**
- * One cached procedural terrain bitmap (6 MiB), bounded particles, no per-frame bitmap allocation.
- */
-class FrontierRenderer(private val u: UiKit, private val layers: EquipmentLayers) {
-    private val entities = EntityRenderer(u)
+/** Painted world, depth-sorted scenery and state-driven actors. */
+class FrontierRenderer(
+    private val u: UiKit,
+    private val layers: EquipmentLayers,
+    private val art: PaintedArt,
+) {
+    private val entities = EntityRenderer(u, art)
+    private val scenery = SceneryRenderer(art, u)
     private val feel = CombatFeel()
     val director = CutsceneDirector(u)
-    private var terrain: Bitmap? = null
     private var zoneId = -1
     private var camX = 0f
     private var camY = 0f
-    private val tile = 32f
+    private val tile = 48f
 
     fun close() {
-        terrain?.recycle()
-        terrain = null
-        zoneId = -1
-    }
-
-    private fun terrain(zone: JSONObject): Bitmap {
-        if (zoneId == zone.optInt("id") && terrain != null) return terrain!!
-        terrain?.recycle()
-        zoneId = zone.optInt("id")
-        camX = zone.array("spawn").optInt(0) + .5f
-        camY = zone.array("spawn").optInt(1) + .5f
-        val bmp = Bitmap.createBitmap(48 * 32, 32 * 32, Bitmap.Config.ARGB_8888)
-        val c = Canvas(bmp)
-        val colors = zone.array("colors")
-        val base = u.color(colors.optString(0))
-        val surface = u.color(colors.optString(1))
-        val accent = u.color(colors.optString(2))
-        c.drawColor(base)
-        for (y in 0..31) for (x in 0..47) {
-            val seed = (x * 73856093) xor (y * 19349663) xor (zoneId * 83492791)
-            val xx = x * tile
-            val yy = y * tile
-            u.rect(c, xx, yy, tile, tile, u.alpha(surface, 22 + (seed and 31)), 0f)
-            if ((seed and 7) == 0) u.circle(c, xx + 9, yy + 13, 2f, u.alpha(accent, 50))
-            if (zoneId == 0 && (seed and 15) < 4) {
-                u.line(c, xx + 5, yy + 20, xx + 19, yy + 20, u.alpha(accent, 25))
-                u.line(c, xx + 11, yy + 24, xx + 26, yy + 24, u.alpha(accent, 18))
-            }
-            if (zoneId == 1) {
-                u.line(c, xx + 3, yy + 24, xx + 28, yy + 20, u.alpha(u.gold, 20))
-            }
-            if (zoneId == 2 && (seed and 3) == 0) {
-                u.polygon(c, xx + 17, yy + 15, 3f, 4, u.alpha(u.white, 70))
-            }
-        }
-        // Pale trails between the spawn and the three shrines add navigational structure.
-        val points =
-            listOf(zone.array("spawn")) +
-                zone.array("beacons").let { a -> (0 until a.length()).map { a.getJSONArray(it) } } +
-                listOf(zone.array("boss"))
-        for (i in 1 until points.size) {
-            val a = points[i - 1]
-            val b = points[i]
-            val path = Path()
-            val ax = (a.optInt(0) + .5f) * tile
-            val ay = (a.optInt(1) + .5f) * tile
-            val bx = (b.optInt(0) + .5f) * tile
-            val by = (b.optInt(1) + .5f) * tile
-            path.moveTo(ax, ay)
-            path.cubicTo((ax + bx) / 2, ay, (ax + bx) / 2, by, bx, by)
-            u.p.color = u.alpha(accent, 15)
-            u.p.strokeWidth = 34f
-            u.p.style = Paint.Style.STROKE
-            c.drawPath(path, u.p)
-            u.p.color = u.alpha(u.gold, 20)
-            u.p.strokeWidth = 2f
-            c.drawPath(path, u.p)
-            u.p.style = Paint.Style.FILL
-        }
-        val obs = zone.array("obstacles")
-        for (i in 0 until obs.length()) {
-            val r = obs.getJSONArray(i)
-            val x = r.getInt(0) * tile
-            val y = r.getInt(1) * tile
-            val w = r.getInt(2) * tile
-            val h = r.getInt(3) * tile
-            u.rect(c, x + 8, y + 13, w, h, 0x60000000, 18f)
-            u.rect(c, x, y, w, h, surface, 16f, u.alpha(accent, 80))
-            for (yy in 0 until r.getInt(3)) for (xx in 0 until r.getInt(2)) {
-                val px = x + xx * tile + 16
-                val py = y + yy * tile + 16
-                when (zoneId) {
-                    0 -> {
-                        u.polygon(c, px, py, 24f, 6, u.alpha(base, 190), 30f)
-                        u.polygon(c, px - 3, py - 5, 19f, 5, u.alpha(accent, 55), -90f)
-                        u.line(c, px, py + 8, px + 3, py + 18, u.gold, 2f)
-                    }
-                    1 -> {
-                        u.polygon(c, px, py, 20f, 4, u.alpha(accent, 100), -65f)
-                        u.polygon(c, px - 3, py - 4, 13f, 3, u.alpha(u.white, 65), -65f)
-                    }
-                    else -> {
-                        u.polygon(c, px, py, 22f, 3, u.alpha(accent, 130))
-                        u.polygon(c, px, py - 7, 13f, 3, u.alpha(u.white, 150))
-                    }
-                }
-            }
-        }
-        for (y in 0..31) for (x in 0..47) if (x == 0 || x == 47 || y == 0 || y == 31)
-            u.rect(c, x * tile, y * tile, tile, tile, 0xff070f1a.toInt(), 0f)
-        terrain = bmp
-        return bmp
+        scenery.close()
+        entities.clear()
     }
 
     fun draw(c: Canvas, w: Float, data: JSONObject, reduced: Boolean, cinematic: Boolean = false) {
         val f = data.obj("frontier")
         val run = f.optJSONObject("run") ?: return
         val zone = f.array("zones").optJSONObject(run.optInt("zone")) ?: return
-        val bmp = terrain(zone)
+        if (zoneId != zone.optInt("id")) {
+            zoneId = zone.optInt("id")
+            camX = zone.array("spawn").optInt(0) + .5f
+            camY = zone.array("spawn").optInt(1) + .5f
+            entities.clear()
+        }
+        val props = scenery.prepare(zone, tile)
         val player = run.obj("player")
         val pos = player.obj("pos")
         val colors = zone.array("colors")
@@ -147,7 +66,7 @@ class FrontierRenderer(private val u: UiKit, private val layers: EquipmentLayers
         u.p.shader = null
         u.p.color = Color.WHITE
         u.p.alpha = 255
-        c.drawBitmap(bmp, 0f, 0f, u.p)
+        scenery.floor(c, zoneId, tile)
         // Objective silhouettes remain legible in every palette; shape and labels supplement
         // colour.
         val beacons = zone.array("beacons")
@@ -157,12 +76,19 @@ class FrontierRenderer(private val u: UiKit, private val layers: EquipmentLayers
             val y = (point.getInt(1) + .5f) * tile
             val lit = run.array("beacons").optBoolean(i)
             u.circle(c, x, y, 28f, u.alpha(if (lit) u.gold else accent, 45))
-            u.polygon(c, x, y, 24f, 6, accent, 30f, 1f)
-            u.rect(c, x - 7, y - 37, 14f, 38f, 0xff718587.toInt(), 2f)
-            u.polygon(c, x, y - 42, 10f, 4, if (lit) u.gold else u.muted)
+            art.anchored(c, "props-${art.biomeNames[zoneId]}", if (lit) 9 else 8, x, y, 92f)
             if (lit) {
-                u.circle(c, x, y - 42, 18f, u.alpha(u.gold, 40))
-                u.line(c, x, y - 54, x, y - 84, u.alpha(u.gold, 110), 2f)
+                u.p.shader =
+                    RadialGradient(
+                        x,
+                        y - 58,
+                        40f,
+                        intArrayOf(0x65ffd38b, 0x00ffd38b),
+                        null,
+                        Shader.TileMode.CLAMP,
+                    )
+                c.drawCircle(x, y - 58, 40f, u.p)
+                u.p.shader = null
             }
             u.text(
                 c,
@@ -180,15 +106,20 @@ class FrontierRenderer(private val u: UiKit, private val layers: EquipmentLayers
             val x = (point.getInt(0) + .5f) * tile
             val y = (point.getInt(1) + .5f) * tile
             u.circle(c, x, y, 18f, u.alpha(u.gold, 30))
-            u.polygon(c, x, y - 8 + if (reduced) 0f else sin(t * 2 + i) * 3, 9f, 4, u.gold)
-            u.polygon(c, x, y - 8, 4f, 4, u.ink)
+            art.anchored(
+                c,
+                "props-${art.biomeNames[zoneId]}",
+                11,
+                x,
+                y + if (reduced) 0f else sin(t * 2 + i) * 3,
+                40f,
+            )
         }
         val rescue = zone.array("rescue")
         if (!run.optBoolean("rescued")) {
             val x = (rescue.optInt(0) + .5f) * tile
             val y = (rescue.optInt(1) + .5f) * tile
-            u.polygon(c, x, y - 9, 15f, 3, u.mint)
-            u.circle(c, x, y - 29, 6f, u.white)
+            art.anchored(c, "npcs", zoneId + 3, x, y, 82f)
             u.text(c, "VOYAGEUR", x, y + 22, 9f, u.mint, true)
         }
         val explored = run.array("explored")
@@ -196,9 +127,6 @@ class FrontierRenderer(private val u: UiKit, private val layers: EquipmentLayers
         val maxX = ((centerX + halfW) + 1).toInt().coerceAtMost(47)
         val minY = ((centerY - halfH) - 1).toInt().coerceAtLeast(0)
         val maxY = ((centerY + halfH) + 1).toInt().coerceAtMost(31)
-        if (!cinematic)
-            for (y in minY..maxY) for (x in minX..maxX) if (!explored.optBoolean(y * 48 + x))
-                u.rect(c, x * tile, y * tile, tile + .5f, tile + .5f, 0xa5081724.toInt(), 0f)
         fun visible(p: JSONObject) =
             cinematic || explored.optBoolean((p.optInt("y") / 256) * 48 + p.optInt("x") / 256)
         val monsters =
@@ -206,22 +134,40 @@ class FrontierRenderer(private val u: UiKit, private val layers: EquipmentLayers
                 .objects()
                 .filter { visible(it.obj("pos")) }
                 .sortedBy { it.obj("pos").optInt("y") }
+        val visibleProps =
+            props.filter {
+                it.x / tile in (minX - 3).toFloat()..(maxX + 3).toFloat() &&
+                    it.y / tile in (minY - 1).toFloat()..(maxY + 4).toFloat()
+            }
+        var pi = 0
+        fun sceneryUntil(y: Float) {
+            while (pi < visibleProps.size && visibleProps[pi].y <= y) {
+                scenery.prop(c, visibleProps[pi++], zoneId, tx * tile, ty * tile)
+            }
+        }
         var heroDrawn = false
         for (m in monsters) {
             val p = m.obj("pos")
             val x = p.optInt("x") / 256f * tile
             val y = p.optInt("y") / 256f * tile
-            if (!heroDrawn && p.optInt("y") > pos.optInt("y")) {
+            if (!heroDrawn && y > ty * tile) {
+                sceneryUntil(ty * tile)
                 layers.hero(c, tx * tile, ty * tile, 1f, player, data.obj("journey"), t)
                 heroDrawn = true
             }
+            sceneryUntil(y)
             if (
-                x / tile in (minX - 2).toFloat()..(maxX + 2).toFloat() &&
-                    y / tile in (minY - 2).toFloat()..(maxY + 2).toFloat()
+                x / tile in (minX - 3).toFloat()..(maxX + 3).toFloat() &&
+                    y / tile in (minY - 1).toFloat()..(maxY + 4).toFloat()
             )
-                entities.monster(c, m, x, y, t, if (m.optInt("kind") == 3) u.red else accent)
+                entities.monster(c, m, x, y, t, zoneId)
         }
-        if (!heroDrawn) layers.hero(c, tx * tile, ty * tile, 1f, player, data.obj("journey"), t)
+        if (!heroDrawn) {
+            sceneryUntil(ty * tile)
+            layers.hero(c, tx * tile, ty * tile, 1f, player, data.obj("journey"), t)
+        }
+        sceneryUntil(Float.MAX_VALUE)
+        if (!cinematic) scenery.fog(c, run, tile)
         for (b in run.array("projectiles").objects()) {
             val p = b.obj("pos")
             val x = p.optInt("x") / 256f * tile
@@ -258,6 +204,7 @@ class FrontierRenderer(private val u: UiKit, private val layers: EquipmentLayers
                 )
         }
         c.restore()
+        scenery.atmosphere(c, w, zoneId, t, reduced)
         if (cinematic && scene != null) director.overlay(c, w, scene, reduced)
     }
 
@@ -307,11 +254,22 @@ class FrontierRenderer(private val u: UiKit, private val layers: EquipmentLayers
             u.muted,
             maxWidth = 270f,
         )
-        minimap(c, w - 216, 85f, 184f, 122f, zone, run)
         val boss =
             run.array("monsters").objects().firstOrNull {
                 it.optInt("kind") == 4 && it.optBoolean("active") && it.optInt("hp") > 0
             }
+        val bossNear =
+            boss?.obj("pos")?.let { p ->
+                val pp = player.obj("pos")
+                hypot(
+                    (p.optInt("x") - pp.optInt("x")).toFloat(),
+                    (p.optInt("y") - pp.optInt("y")).toFloat(),
+                ) < 8 * 256
+            } ?: false
+        if (bossNear) {
+            art.fit(c, "abilities", 7, RectF(w - 79, 86f, w - 35, 130f))
+            u.hits.add(UiKit.Hit("f:atlas", RectF(w - 85, 80f, w - 29, 136f)))
+        } else minimap(c, w - 216, 85f, 184f, 122f, zone, run)
         if (boss != null) {
             val bw = min(340f, w - 690)
             val x = (w - bw) / 2
@@ -381,16 +339,29 @@ class FrontierRenderer(private val u: UiKit, private val layers: EquipmentLayers
     ) {
         u.circle(c, x, y, r, 0xe5193341.toInt())
         u.circle(c, x, y, r, if (cd == 0) u.gold else u.muted, 1.5f)
-        u.text(
+        art.fit(
             c,
-            if (cd == 0) symbol else String.format(java.util.Locale.US, "%.1f", cd / 30f),
-            x,
-            y + 9,
-            26f,
-            if (cd == 0) u.gold else u.muted,
-            true,
-            u.serif,
+            "abilities",
+            when (id) {
+                "attack" -> 0
+                "dash" -> 1
+                else -> 2
+            },
+            RectF(x - r + 6, y - r + 6, x + r - 6, y + r - 6),
+            if (cd == 0) 255 else 80,
         )
+        if (cd > 0)
+            u.text(
+                c,
+                String.format(java.util.Locale.US, "%.1f", cd / 30f),
+                x,
+                y + 8,
+                24f,
+                u.white,
+                true,
+                u.bold,
+            )
+        else if (id == "attack") u.text(c, symbol, x + r - 8, y + r - 3, 15f, u.gold, true, u.bold)
         u.text(c, label, x, y + r + 17, 10f, u.white, true)
         u.hits.add(UiKit.Hit(id, RectF(x - r - 4, y - r - 4, x + r + 4, y + r + 4)))
     }
@@ -405,11 +376,12 @@ class FrontierRenderer(private val u: UiKit, private val layers: EquipmentLayers
         run: JSONObject,
     ) {
         u.rect(c, x - 6, y - 6, w + 12, h + 12, 0xe4091926.toInt(), 10f, u.alpha(u.gold, 70))
+        art.frame(c, "floor-${art.biomeNames[z.optInt("id")]}", 0, RectF(x, y, x + w, y + h), 170)
         val explored = run.array("explored")
         val sx = w / 48
         val sy = h / 32
-        for (yy in 0..31) for (xx in 0..47) if (explored.optBoolean(yy * 48 + xx))
-            u.rect(c, x + xx * sx, y + yy * sy, sx + .2f, sy + .2f, 0xff38535d.toInt(), 0f)
+        for (yy in 0..31) for (xx in 0..47) if (!explored.optBoolean(yy * 48 + xx))
+            u.rect(c, x + xx * sx, y + yy * sy, sx + .2f, sy + .2f, 0xdc0d1829.toInt(), 0f)
         val obs = z.array("obstacles")
         for (i in 0 until obs.length()) {
             val o = obs.getJSONArray(i)

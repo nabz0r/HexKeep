@@ -1,5 +1,7 @@
-HEXKEEP — Les Lanternes du Refuge · 0.6
+HEXKEEP — Le Serment des Lanternes · 0.8
 Création originale du projet nabz0r/HexKeep.
+
+Direction artistique 0.8 : illustrations et sprites originaux générés avec OpenAI ImageGen, intégration et animation Android Canvas. Prompts et provenance : docs/art/v08-prompts.json dans le dépôt.
 
 Conception, programmation, textes et direction artistique développés avec assistance IA. Illustrations originales créées avec Imagegen, dont le refuge de la 0.6. Musique synthétisée localement par hk-apu. Aucun service de génération n’est contacté par le jeu.
 

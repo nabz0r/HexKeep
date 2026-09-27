@@ -3,7 +3,7 @@ package game.hexkeep.frontier
 import android.graphics.Canvas
 import org.json.JSONObject
 
-class QuestJournalScreen(private val u: UiKit) {
+class QuestJournalScreen(private val u: UiKit, private val art: game.hexkeep.art.PaintedArt) {
     var zone = 0
     var selected = ""
     var lore = false
@@ -81,6 +81,8 @@ class QuestJournalScreen(private val u: UiKit) {
         }
         val x = left + 16
         val width = w - x - 32
+        u.rect(c, x - 12, 166f, width + 24, 277f, 0xf0111923.toInt(), 8f, u.alpha(u.gold, 65))
+        art.fit(c, "npcs", zone, android.graphics.RectF(w - 114, 167f, w - 34, 243f))
         val q = list.firstOrNull { it.optString("id") == selected } ?: return
         u.text(
             c,
@@ -100,7 +102,7 @@ class QuestJournalScreen(private val u: UiKit) {
             28f,
             u.white,
             font = u.serif,
-            maxWidth = width,
+            maxWidth = width - 95,
         )
         u.wrap(
             c,

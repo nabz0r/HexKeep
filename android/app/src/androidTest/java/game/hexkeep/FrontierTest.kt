@@ -157,7 +157,7 @@ class FrontierTest {
 
     private fun shot(name: String) {
         SystemClock.sleep(180)
-        File(test.targetContext.getExternalFilesDir(null), "v07-$name.png").outputStream().use {
+        File(test.targetContext.getExternalFilesDir(null), "v08-$name.png").outputStream().use {
             test.uiAutomation.takeScreenshot().compress(Bitmap.CompressFormat.PNG, 100, it)
         }
     }
@@ -375,7 +375,7 @@ class FrontierTest {
             val seconds = (SystemClock.uptimeMillis() - started) / 1000.0
             val fps = (after.getLong("frames") - before.getLong("frames")) / seconds
             assertTrue("Canvas failed to render during combat", fps > 0)
-            File(test.targetContext.getExternalFilesDir(null), "v07-touch-performance.json")
+            File(test.targetContext.getExternalFilesDir(null), "v08-touch-performance.json")
                 .writeText(
                     JSONObject()
                         .put("fps", fps)

@@ -52,7 +52,7 @@ class InventoryScreen(private val u: UiKit, private val layers: EquipmentLayers)
         u.button(c, "codex", "Codex", w - 318, 24f, 134f)
         u.rect(c, 32f, 103f, 176f, 412f, u.panel, 14f, u.alpha(u.gold, 45))
         u.text(c, "TON VEILLEUR", 120f, 131f, 11f, u.gold, true, u.bold)
-        layers.hero(c, 120f, 233f, 1.8f, data.obj("frontier").obj("run").obj("player"), j, t)
+        layers.hero(c, 120f, 244f, 1.25f, data.obj("frontier").obj("run").obj("player"), j, t)
         val order = intArrayOf(3, 1, 0, 4, 5, 2)
         order.forEachIndexed { i, slot ->
             val x = 43f + (i % 2) * 80
@@ -61,7 +61,8 @@ class InventoryScreen(private val u: UiKit, private val layers: EquipmentLayers)
             val r = RectF(x, y, x + 74, y + 63)
             slots[slot] = r
             u.rect(c, r, 0xff101f2d.toInt(), 8f, u.alpha(layers.tint(item), 100))
-            layers.icon(c, slot, x + 37, y + 24, 16f, layers.tint(item))
+            if (item != null) layers.itemIcon(c, item, x + 37, y + 23, 22f)
+            else layers.icon(c, slot, x + 37, y + 23, 20f, u.muted)
             u.text(c, slotNames[slot], x + 37, y + 53, 10f, u.muted, true)
             u.hits.add(UiKit.Hit("slot:$slot", r))
         }
@@ -101,7 +102,7 @@ class InventoryScreen(private val u: UiKit, private val layers: EquipmentLayers)
             if (item != null) {
                 val id = item.optLong("id")
                 cells[id] = r
-                layers.icon(c, item.optInt("slot"), x + cw / 2, y + 29, 18f, layers.tint(item))
+                layers.itemIcon(c, item, x + cw / 2, y + 29, 26f)
                 u.rect(c, x + 8, y + 56, cw - 16, 2f, layers.tint(item), 1f)
                 if ((0 until eq.length()).any { eq.optLong(it) == id }) {
                     u.circle(c, x + cw - 10, y + 10, 5f, u.gold)
@@ -218,14 +219,7 @@ class InventoryScreen(private val u: UiKit, private val layers: EquipmentLayers)
             val dragged = items.firstOrNull { it.optLong("id") == pressed }
             if (dragged != null) {
                 u.rect(c, pointer.x - 32, pointer.y - 35, 64f, 64f, 0xee294651.toInt(), 10f, u.gold)
-                layers.icon(
-                    c,
-                    dragged.optInt("slot"),
-                    pointer.x,
-                    pointer.y - 3,
-                    24f,
-                    layers.tint(dragged),
-                )
+                layers.itemIcon(c, dragged, pointer.x, pointer.y - 3, 28f)
                 slots[dragged.optInt("slot")]?.let {
                     u.rect(c, it, u.alpha(u.gold, 35), 8f, u.gold)
                 }

@@ -1,4 +1,4 @@
-# Google Play — dossier de lancement 0.7
+# Google Play — dossier de lancement 0.8
 
 État au 27 septembre 2026 : **candidat technique pour les tests**, pas une application publiée ni une approbation de Google. Le paquet `game.hexkeep` est une édition solo hors ligne. L’ambition MMO géolocalisée reste dans la DEV `game.hexkeep.dev`, avec son verrou de confiance production intact.
 
@@ -9,6 +9,8 @@ La variante `prod` de la 0.5 ouvrait un écran de production verrouillée ; aucu
 La 0.6 ajoute une variante `play`, un AAB reproductible, un accès direct au solo, une sauvegarde du combat, des sources Android séparées pour le réseau et la facturation, une politique propre à cette édition et les ressources du dossier `store/`. Le téléphone n’a besoin d’aucune permission sensible. Les réglages, la confidentialité, les crédits et toutes les licences tierces sont lisibles hors ligne.
 
 La 0.7 ajoute la campagne des Confins, six emplacements d’équipement, le sac tactile et les cinématiques persistantes. Le périmètre de collecte de données et les permissions restent identiques. Voir le [rapport de livraison 0.7](delivery-v07.md).
+
+La 0.8 remplace les graphismes procéduraux par des sprites et décors peints, avec un cache partagé et des tests visuels. Voir le [rapport 0.8](delivery-v08.md).
 
 ## Derniers jalons avant mise en ligne
 
@@ -28,7 +30,7 @@ Les émulateurs et simulations ne prouvent pas les performances de téléphones 
 
 ## Exigences vérifiées dans les sources officielles
 
-- Depuis le 31 août 2026, une nouvelle application téléphone doit cibler **Android 16 / API 36**. La 0.7 cible 36. [Google Play](https://support.google.com/googleplay/android-developer/answer/11926878?hl=en).
+- Depuis le 31 août 2026, une nouvelle application téléphone doit cibler **Android 16 / API 36**. La 0.8 cible 36. [Google Play](https://support.google.com/googleplay/android-developer/answer/11926878?hl=en).
 - Le code natif destiné à Android 15+ doit supporter les pages mémoire **16 Ko**. Le contrôle `scripts/verify-play.py` inspecte les segments ELF 64 bits, l’alignement de l’APK, les permissions et le manifeste du bundle. Un essai sur système 16 Ko reste distinct de cette inspection. [Android Developers](https://android-developers.googleblog.com/2025/05/prepare-play-apps-for-devices-with-16kb-page-size.html).
 - Une politique accessible dans le jeu et par URL, ainsi qu’une déclaration Data safety exacte, sont nécessaires même sans collecte. [Politique User Data](https://support.google.com/googleplay/android-developer/answer/10144311?hl=en).
 - Le test fermé de 12 personnes pendant 14 jours dépend du type et de la date de création du compte ; il ne s’applique pas indistinctement à tous les comptes. [Exigences de test](https://support.google.com/googleplay/android-developer/answer/14151465?hl=en).
@@ -44,8 +46,8 @@ Avec JDK 17, Android build-tools 36 et [bundletool](https://developer.android.co
 
 ```sh
 python3 scripts/verify-play.py \
-  --apk artifacts/HEXKEEP-v0.7-PLAY-preview.apk \
-  --aab artifacts/HEXKEEP-v0.7-PLAY.aab \
+  --apk artifacts/HEXKEEP-v0.8-PLAY-preview.apk \
+  --aab artifacts/HEXKEEP-v0.8-PLAY.aab \
   --bundletool /chemin/bundletool.jar
 ```
 
@@ -53,6 +55,6 @@ Ajouter `--require-signed` uniquement au bundle signé pour l’envoi. L’outil
 
 ## Après le lancement solo
 
-Une traduction anglaise complète et relue, des menus accessibles aux lecteurs d’écran, la personnalisation des commandes et un transfert chiffré de progression sont les prochains investissements de confort. L’interface de la 0.7 reste française et son Canvas ne fournit pas encore une navigation TalkBack complète.
+Une traduction anglaise complète et relue, des menus accessibles aux lecteurs d’écran, la personnalisation des commandes et un transfert chiffré de progression sont les prochains investissements de confort. L’interface de la 0.8 reste française et son Canvas ne fournit pas encore une navigation TalkBack complète.
 
 Pour publier le MMO géolocalisé : hébergement et exploitation réseau pérennes, chaîne d’autorité/attestation, sûreté des lieux réels, consentements et politique adaptés, lutte contre la triche, signalement/modération, essais de charge et coût d’exploitation. Un réseau de dix pairs de développement ne valide pas ces exigences. Il faut qualifier ce produit séparément ; ne pas réactiver simplement les menus DEV dans l’édition Play.

@@ -1,0 +1,506 @@
+{
+  "application_id": "game.hexkeep",
+  "target_sdk": 36,
+  "version_code": 8,
+  "permissions": [
+    "android.permission.VIBRATE"
+  ],
+  "aab_signed": false,
+  "play_console_approval": "not performed",
+  "artifacts": {
+    "artifacts/HEXKEEP-v0.8-PLAY-preview.apk": {
+      "sha256": "4462f6846f6683973be8af3914cd6486548e338ec9ed7ee79ced021f6e5d57f9",
+      "bytes": 92002648,
+      "native": [
+        {
+          "path": "lib/arm64-v8a/libhk_ffi.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "lib/arm64-v8a/libif_watch-7fdb5681f04f9050.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "lib/arm64-v8a/libjnidispatch.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "lib/armeabi-v7a/libhk_ffi.so",
+          "bits": 32,
+          "load_alignment": [
+            4096,
+            4096,
+            4096,
+            4096
+          ]
+        },
+        {
+          "path": "lib/armeabi-v7a/libif_watch-7a3abb36b0c0f951.so",
+          "bits": 32,
+          "load_alignment": [
+            4096,
+            4096,
+            4096
+          ]
+        },
+        {
+          "path": "lib/armeabi-v7a/libjnidispatch.so",
+          "bits": 32,
+          "load_alignment": [
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "lib/x86_64/libhk_ffi.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "lib/x86_64/libif_watch-bf3a5eba77815ec5.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "lib/x86_64/libjnidispatch.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384
+          ]
+        }
+      ],
+      "art": [
+        {
+          "path": "assets/art/v08/abilities.png",
+          "width": 1774,
+          "height": 887,
+          "sha256": "4acff2f4d725c47f144705d0a14bc86f7a44a70de8649079427ea7d8ac95e3ad"
+        },
+        {
+          "path": "assets/art/v08/boss-desert.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "0c3e9f34c25f743dffbd549530ea2aa624110627a6e6ff7013381c77c58ee044"
+        },
+        {
+          "path": "assets/art/v08/boss-forest.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "1565a0b3a19aa2060f2ee89989b6856f601e9f21934d83fe4f9838c943e2c0bc"
+        },
+        {
+          "path": "assets/art/v08/boss-frost.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "06af84cdc2339ef4260e0d0ebde534d0a6d998e58e00d815040a9ead4d6c82ad"
+        },
+        {
+          "path": "assets/art/v08/enemy-bastion.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "0d1f123ce08f6e2d37ae589aaae91a129d12a9585210347b710ef42588d87ce0"
+        },
+        {
+          "path": "assets/art/v08/enemy-needle.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "aac4f84e8be0918312113f575a14fb4e989bf60a302997fafb34b732389f3d92"
+        },
+        {
+          "path": "assets/art/v08/enemy-ravager.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "2dfc5f0ceee63412dca5c34e7e7d86608c5bb56d946b679c6f1129621682a28b"
+        },
+        {
+          "path": "assets/art/v08/enemy-swarm.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "cf273681dc14c663649d93fa9c893bfe976d6bbbe06e4136b8c00e86663a9d20"
+        },
+        {
+          "path": "assets/art/v08/floor-desert.png",
+          "width": 1536,
+          "height": 1024,
+          "sha256": "51ee7c71bacddbfb5e48813d11a9ccb1db8c9848ac532d4704a2b106d2d89ac6"
+        },
+        {
+          "path": "assets/art/v08/floor-forest.png",
+          "width": 1536,
+          "height": 1024,
+          "sha256": "cb41cab69bf487e6beca17f6cfbd30eb601a5f104389c7a911d372c88ea2ee1e"
+        },
+        {
+          "path": "assets/art/v08/floor-frost.png",
+          "width": 1536,
+          "height": 1024,
+          "sha256": "216edf863d94088a09e7ec98ed82d971e91b43779ad8b19d80f2d71463c863ed"
+        },
+        {
+          "path": "assets/art/v08/hero-aurelon.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "0ad5f9b6639ecba934737969b6d2267b6860b7d0108963ea52f4d6f0f3c536d8"
+        },
+        {
+          "path": "assets/art/v08/hero-skarn.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "743804b57e8c3b0f356c2a06afea85a7a6c4157e45444fffb1d70da64166bf98"
+        },
+        {
+          "path": "assets/art/v08/hero-vylde.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "f0b89a1a30fb0723b41661914b0ff4af6c51b8d64f8e1f5901c5caafdc3856d4"
+        },
+        {
+          "path": "assets/art/v08/items-amulets.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "bbf01a10b6400a69f8eb61f44786ee3c896dbb54131525f232a75cdf40b2798f"
+        },
+        {
+          "path": "assets/art/v08/items-boots.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "24c7c53e1141332a33e1443627fa618dcb7a4a3c01b34c0ee2c21a5adb53847e"
+        },
+        {
+          "path": "assets/art/v08/items-chests.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "3647c0d6a978c79a80283240c58b0257ae26e3cbb3e05e25a44df4f3b267c345"
+        },
+        {
+          "path": "assets/art/v08/items-gloves.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "8c38ac5d08f1c8c599ead299b0950c35783d62cc6ff7667f85406c8c44dacef4"
+        },
+        {
+          "path": "assets/art/v08/items-helms.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "73ea299a5b65defc67e978274b77ae285d8dd8c240bdf74ff7588e4f281856d4"
+        },
+        {
+          "path": "assets/art/v08/items-weapons.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "286bbfeba6bff23cc84285c3ec6a577ded8ee6c73560cf38bd90f704ae09ad00"
+        },
+        {
+          "path": "assets/art/v08/npcs.png",
+          "width": 1247,
+          "height": 1261,
+          "sha256": "e99ea7214b966d2c59f9c09d83f0c2e705dca648b152e86cd81d83b59ebdf904"
+        },
+        {
+          "path": "assets/art/v08/props-desert.png",
+          "width": 1448,
+          "height": 1086,
+          "sha256": "bd2dde37db666c8d5268ed572397cfada8bf3d94a461938a8cd35bc60c005448"
+        },
+        {
+          "path": "assets/art/v08/props-forest.png",
+          "width": 1448,
+          "height": 1086,
+          "sha256": "3901444ffe13ea80310383b6f933d26eb85a895c30917fa8d99464e7d9a8357b"
+        },
+        {
+          "path": "assets/art/v08/props-frost.png",
+          "width": 1448,
+          "height": 1086,
+          "sha256": "de8f97cc104d9a79b3713f97e0ee1c31f24b4dc032852e9fde241eec5fc4e68f"
+        },
+        {
+          "path": "assets/art/v08/refuge.png",
+          "width": 1672,
+          "height": 941,
+          "sha256": "95223ce30b0a1dc93ee126c5498660344a79199ef329221be220668c509af176"
+        },
+        {
+          "path": "assets/art/v08/world-atlas.png",
+          "width": 1536,
+          "height": 1024,
+          "sha256": "6dae60c5251b30ab712e1eb9322e349ac39110df10abcb68c38f95bd13b16dfe"
+        }
+      ]
+    },
+    "artifacts/HEXKEEP-v0.8-PLAY.aab": {
+      "sha256": "cc63c436337c1741ecdf229c28af04344594a53465c32e9137f08ba664a93a95",
+      "bytes": 89652295,
+      "native": [
+        {
+          "path": "base/lib/arm64-v8a/libhk_ffi.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "base/lib/arm64-v8a/libif_watch-7fdb5681f04f9050.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "base/lib/arm64-v8a/libjnidispatch.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "base/lib/armeabi-v7a/libhk_ffi.so",
+          "bits": 32,
+          "load_alignment": [
+            4096,
+            4096,
+            4096,
+            4096
+          ]
+        },
+        {
+          "path": "base/lib/armeabi-v7a/libif_watch-7a3abb36b0c0f951.so",
+          "bits": 32,
+          "load_alignment": [
+            4096,
+            4096,
+            4096
+          ]
+        },
+        {
+          "path": "base/lib/armeabi-v7a/libjnidispatch.so",
+          "bits": 32,
+          "load_alignment": [
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "base/lib/x86_64/libhk_ffi.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "base/lib/x86_64/libif_watch-bf3a5eba77815ec5.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "base/lib/x86_64/libjnidispatch.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384
+          ]
+        }
+      ],
+      "art": [
+        {
+          "path": "base/assets/art/v08/abilities.png",
+          "width": 1774,
+          "height": 887,
+          "sha256": "4acff2f4d725c47f144705d0a14bc86f7a44a70de8649079427ea7d8ac95e3ad"
+        },
+        {
+          "path": "base/assets/art/v08/boss-desert.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "0c3e9f34c25f743dffbd549530ea2aa624110627a6e6ff7013381c77c58ee044"
+        },
+        {
+          "path": "base/assets/art/v08/boss-forest.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "1565a0b3a19aa2060f2ee89989b6856f601e9f21934d83fe4f9838c943e2c0bc"
+        },
+        {
+          "path": "base/assets/art/v08/boss-frost.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "06af84cdc2339ef4260e0d0ebde534d0a6d998e58e00d815040a9ead4d6c82ad"
+        },
+        {
+          "path": "base/assets/art/v08/enemy-bastion.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "0d1f123ce08f6e2d37ae589aaae91a129d12a9585210347b710ef42588d87ce0"
+        },
+        {
+          "path": "base/assets/art/v08/enemy-needle.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "aac4f84e8be0918312113f575a14fb4e989bf60a302997fafb34b732389f3d92"
+        },
+        {
+          "path": "base/assets/art/v08/enemy-ravager.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "2dfc5f0ceee63412dca5c34e7e7d86608c5bb56d946b679c6f1129621682a28b"
+        },
+        {
+          "path": "base/assets/art/v08/enemy-swarm.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "cf273681dc14c663649d93fa9c893bfe976d6bbbe06e4136b8c00e86663a9d20"
+        },
+        {
+          "path": "base/assets/art/v08/floor-desert.png",
+          "width": 1536,
+          "height": 1024,
+          "sha256": "51ee7c71bacddbfb5e48813d11a9ccb1db8c9848ac532d4704a2b106d2d89ac6"
+        },
+        {
+          "path": "base/assets/art/v08/floor-forest.png",
+          "width": 1536,
+          "height": 1024,
+          "sha256": "cb41cab69bf487e6beca17f6cfbd30eb601a5f104389c7a911d372c88ea2ee1e"
+        },
+        {
+          "path": "base/assets/art/v08/floor-frost.png",
+          "width": 1536,
+          "height": 1024,
+          "sha256": "216edf863d94088a09e7ec98ed82d971e91b43779ad8b19d80f2d71463c863ed"
+        },
+        {
+          "path": "base/assets/art/v08/hero-aurelon.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "0ad5f9b6639ecba934737969b6d2267b6860b7d0108963ea52f4d6f0f3c536d8"
+        },
+        {
+          "path": "base/assets/art/v08/hero-skarn.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "743804b57e8c3b0f356c2a06afea85a7a6c4157e45444fffb1d70da64166bf98"
+        },
+        {
+          "path": "base/assets/art/v08/hero-vylde.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "f0b89a1a30fb0723b41661914b0ff4af6c51b8d64f8e1f5901c5caafdc3856d4"
+        },
+        {
+          "path": "base/assets/art/v08/items-amulets.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "bbf01a10b6400a69f8eb61f44786ee3c896dbb54131525f232a75cdf40b2798f"
+        },
+        {
+          "path": "base/assets/art/v08/items-boots.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "24c7c53e1141332a33e1443627fa618dcb7a4a3c01b34c0ee2c21a5adb53847e"
+        },
+        {
+          "path": "base/assets/art/v08/items-chests.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "3647c0d6a978c79a80283240c58b0257ae26e3cbb3e05e25a44df4f3b267c345"
+        },
+        {
+          "path": "base/assets/art/v08/items-gloves.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "8c38ac5d08f1c8c599ead299b0950c35783d62cc6ff7667f85406c8c44dacef4"
+        },
+        {
+          "path": "base/assets/art/v08/items-helms.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "73ea299a5b65defc67e978274b77ae285d8dd8c240bdf74ff7588e4f281856d4"
+        },
+        {
+          "path": "base/assets/art/v08/items-weapons.png",
+          "width": 1254,
+          "height": 1254,
+          "sha256": "286bbfeba6bff23cc84285c3ec6a577ded8ee6c73560cf38bd90f704ae09ad00"
+        },
+        {
+          "path": "base/assets/art/v08/npcs.png",
+          "width": 1247,
+          "height": 1261,
+          "sha256": "e99ea7214b966d2c59f9c09d83f0c2e705dca648b152e86cd81d83b59ebdf904"
+        },
+        {
+          "path": "base/assets/art/v08/props-desert.png",
+          "width": 1448,
+          "height": 1086,
+          "sha256": "bd2dde37db666c8d5268ed572397cfada8bf3d94a461938a8cd35bc60c005448"
+        },
+        {
+          "path": "base/assets/art/v08/props-forest.png",
+          "width": 1448,
+          "height": 1086,
+          "sha256": "3901444ffe13ea80310383b6f933d26eb85a895c30917fa8d99464e7d9a8357b"
+        },
+        {
+          "path": "base/assets/art/v08/props-frost.png",
+          "width": 1448,
+          "height": 1086,
+          "sha256": "de8f97cc104d9a79b3713f97e0ee1c31f24b4dc032852e9fde241eec5fc4e68f"
+        },
+        {
+          "path": "base/assets/art/v08/refuge.png",
+          "width": 1672,
+          "height": 941,
+          "sha256": "95223ce30b0a1dc93ee126c5498660344a79199ef329221be220668c509af176"
+        },
+        {
+          "path": "base/assets/art/v08/world-atlas.png",
+          "width": 1536,
+          "height": 1024,
+          "sha256": "6dae60c5251b30ab712e1eb9322e349ac39110df10abcb68c38f95bd13b16dfe"
+        }
+      ]
+    }
+  }
+}

@@ -3,10 +3,10 @@ package game.hexkeep.frontier
 import android.graphics.Canvas
 import org.json.JSONObject
 
-class ChronicleScreen(private val u: UiKit) {
+class ChronicleScreen(private val u: UiKit, private val art: game.hexkeep.art.PaintedArt) {
     var page = 0
     var bestiary = false
-    private val entities = EntityRenderer(u)
+    private val entities = EntityRenderer(u, art)
 
     fun draw(c: Canvas, w: Float, data: JSONObject) {
         val f = data.obj("frontier")
@@ -29,11 +29,12 @@ class ChronicleScreen(private val u: UiKit) {
         val monsters = f.array("monsters").objects()
         val count = if (bestiary) monsters.size else chapters.size
         page = page.coerceIn(0, (count - 1).coerceAtLeast(0))
+        u.rect(c, 32f, 163f, w - 64, 273f, 0xef111923.toInt(), 8f, u.alpha(u.gold, 60))
         if (bestiary && monsters.isNotEmpty()) {
             val m = monsters[page]
             c.save()
-            c.translate(w * .25f, 305f)
-            c.scale(3f, 3f)
+            c.translate(w * .25f, 416f)
+            c.scale(if (page == 4) 1.65f else 2.5f, if (page == 4) 1.65f else 2.5f)
             entities.monster(
                 c,
                 JSONObject()
@@ -46,7 +47,7 @@ class ChronicleScreen(private val u: UiKit) {
                 0f,
                 0f,
                 0f,
-                u.mint,
+                0,
             )
             c.restore()
             val x = w * .46f

@@ -6,9 +6,9 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /** Shared typography and 48+ logical-pixel touch targets across the Confins screens. */
-class UiKit {
+class UiKit(private val art: game.hexkeep.art.PaintedArt) {
     val ink = Color.rgb(9, 18, 29)
-    val panel = Color.rgb(17, 32, 44)
+    val panel = Color.rgb(19, 26, 34)
     val gold = Color.rgb(231, 195, 131)
     val white = Color.rgb(240, 237, 224)
     val muted = Color.rgb(161, 180, 187)
@@ -45,11 +45,29 @@ class UiKit {
         p.color = color
         c.drawRoundRect(r, radius, radius, p)
         if (stroke != 0) {
+            p.shader =
+                LinearGradient(
+                    r.left,
+                    r.top,
+                    r.left,
+                    r.bottom,
+                    intArrayOf(alpha(white, 12), 0x00000000, 0x33000000),
+                    null,
+                    Shader.TileMode.CLAMP,
+                )
+            c.drawRoundRect(r, radius, radius, p)
+            p.shader = null
             p.style = Paint.Style.STROKE
             p.strokeWidth = 1f
             p.color = stroke
             c.drawRoundRect(r, radius, radius, p)
             p.style = Paint.Style.FILL
+            if (r.width() > 80 && r.height() > 45) {
+                val a = alpha(stroke, 130)
+                for (xx in listOf(r.left + 5, r.right - 5)) for (yy in
+                    listOf(r.top + 5, r.bottom - 5)) circle(c, xx, yy, 1.3f, a)
+                line(c, r.left + 12, r.top + 3, r.right - 12, r.top + 3, alpha(stroke, 70))
+            }
         }
     }
 
@@ -98,7 +116,9 @@ class UiKit {
         p.textSize = size
         p.textSize = min(size, size * maxWidth / p.measureText(s).coerceAtLeast(1f))
         p.textAlign = if (center) Paint.Align.CENTER else Paint.Align.LEFT
+        if (color != ink) p.setShadowLayer(1.5f, 0f, 1f, 0xa0000000.toInt())
         c.drawText(s, x, y, p)
+        p.clearShadowLayer()
         p.textAlign = Paint.Align.LEFT
     }
 
@@ -150,7 +170,20 @@ class UiKit {
         val fill =
             if (!enabled) alpha(panel, 160)
             else if (primary) gold else if (focused == id) 0xff314b59.toInt() else panel
-        rect(c, x, y, w, h, fill, 10f, if (primary) 0 else alpha(gold, if (enabled) 75 else 25))
+        rect(c, x, y, w, h, fill, 5f, alpha(gold, if (enabled) 160 else 35))
+        p.shader =
+            LinearGradient(
+                x,
+                y,
+                x,
+                y + h,
+                intArrayOf(alpha(white, if (primary) 48 else 15), 0x00000000, 0x33000000),
+                null,
+                Shader.TileMode.CLAMP,
+            )
+        c.drawRoundRect(RectF(x + 2, y + 2, x + w - 2, y + h - 2), 4f, 4f, p)
+        p.shader = null
+        line(c, x + 12, y + 4, x + w - 12, y + 4, alpha(if (primary) white else gold, 90))
         text(
             c,
             label,
@@ -192,24 +225,31 @@ class UiKit {
     }
 
     fun backdrop(c: Canvas, w: Float, t: Float, motion: Boolean) {
-        c.drawColor(ink)
+        art.cover(c, "refuge", RectF(0f, 0f, w, 540f))
         p.shader =
             LinearGradient(
                 0f,
                 0f,
                 w,
-                540f,
-                intArrayOf(0xff172f3a.toInt(), ink, 0xff19202f.toInt()),
-                null,
+                0f,
+                intArrayOf(0xf008101a.toInt(), 0xb50b1620.toInt(), 0x400b1320),
+                floatArrayOf(0f, .47f, 1f),
                 Shader.TileMode.CLAMP,
             )
         c.drawRect(0f, 0f, w, 540f, p)
         p.shader = null
-        for (i in 0..14) {
-            val x = (i * 173f + 31) % w
-            val y = 60f + (i * 79) % 420
-            polygon(c, x, y, 45f + (i % 4) * 15, 6, alpha(mint, 9), 30f, 1f)
-        }
+        p.shader =
+            LinearGradient(
+                0f,
+                320f,
+                0f,
+                540f,
+                intArrayOf(0x00091420, 0xe5091420.toInt()),
+                null,
+                Shader.TileMode.CLAMP,
+            )
+        c.drawRect(0f, 320f, w, 540f, p)
+        p.shader = null
         if (motion)
             for (i in 0..19) {
                 circle(

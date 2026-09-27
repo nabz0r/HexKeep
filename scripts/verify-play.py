@@ -49,6 +49,25 @@ def inspect_native(path):
     return libraries
 
 
+def inspect_art(path):
+    with zipfile.ZipFile(path) as archive:
+        names = [n for n in archive.namelist() if '/art/v08/' in n and n.endswith('.png')]
+        assert len(names) == 26, f'Expected 26 painted v0.8 assets in {path}'
+        result = []
+        for name in sorted(names):
+            data = archive.read(name)
+            assert data[:8] == b'\x89PNG\r\n\x1a\n', name
+            width, height = struct.unpack_from('>II', data, 16)
+            stem = Path(name).stem
+            opaque = stem.startswith('floor-') or stem in ('refuge', 'world-atlas')
+            assert width >= 1000 and height >= 800, name
+            if not opaque:
+                assert data[25] == 6, f'Sprite without RGBA: {name}'
+            result.append({'path': name, 'width': width, 'height': height, 'sha256': hashlib.sha256(data).hexdigest()})
+        assert not any(n.endswith('/art/v05/aurelon.png') for n in archive.namelist()), 'Superseded sprites should not ship'
+        return result
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--apk', type=Path, required=True)
@@ -59,7 +78,7 @@ def main():
     sdk = Path(os.environ['ANDROID_HOME']) / 'build-tools' / '36.0.0'
     badging = run(sdk/'aapt', 'dump', 'badging', args.apk)
     assert "package: name='game.hexkeep'" in badging
-    assert "versionCode='7'" in badging and "targetSdkVersion:'36'" in badging
+    assert "versionCode='8'" in badging and "targetSdkVersion:'36'" in badging
     permissions = re.findall(r"uses-permission: name='([^']+)'", badging)
     assert permissions == ['android.permission.VIBRATE'], permissions
     run(sdk/'apksigner', 'verify', '--verbose', args.apk)
@@ -76,10 +95,10 @@ def main():
         certificate = run('keytool', '-printcert', '-jarfile', args.aab)
         assert 'Android Debug' not in certificate, 'Debug key is not an upload key'
         assert 'jar verified.' in run('jarsigner', '-verify', args.aab)
-    result = {'application_id': 'game.hexkeep', 'target_sdk': 36, 'version_code': 7,
+    result = {'application_id': 'game.hexkeep', 'target_sdk': 36, 'version_code': 8,
               'permissions': permissions, 'aab_signed': signed, 'play_console_approval': 'not performed',
               'artifacts': {str(p): {'sha256': hashlib.sha256(p.read_bytes()).hexdigest(),
-                            'bytes': p.stat().st_size, 'native': inspect_native(p)} for p in [args.apk, args.aab]}}
+                            'bytes': p.stat().st_size, 'native': inspect_native(p), 'art': inspect_art(p)} for p in [args.apk, args.aab]}}
     print(json.dumps(result, indent=2))
 
 

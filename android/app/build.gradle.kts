@@ -6,8 +6,8 @@ android {
         applicationId = "game.hexkeep"
         minSdk = 26
         targetSdk = 36
-        versionCode = 7
-        versionName = "0.7.0-confins"
+        versionCode = 8
+        versionName = "0.8.0-lanternes"
         ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64") }
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -34,6 +34,7 @@ android {
             if (upload.all { !it.isNullOrBlank() }) signingConfig = signingConfigs.getByName("upload")
         }
     }
+    sourceSets.getByName("main").assets.setSrcDirs(listOf(layout.buildDirectory.dir("generated/gameAssets")))
     sourceSets.getByName("main").assets.srcDir(layout.buildDirectory.dir("generated/licensesAssets"))
     sourceSets.getByName("dev").java.srcDir("src/network/java")
     sourceSets.getByName("prod").java.srcDir("src/network/java")
@@ -53,3 +54,14 @@ val bundleLicenses by tasks.registering(Copy::class) {
     includeEmptyDirs = false
 }
 tasks.named("preBuild") { dependsOn(bundleLicenses) }
+
+// Keep the historical source paintings in Git without shipping superseded sprite sheets.
+val stageGameAssets by tasks.registering(Sync::class) {
+    from("src/main/assets") {
+        exclude("art/v05/aurelon.png", "art/v05/skarn.png", "art/v05/vylde.png",
+            "art/v05/wolf.png", "art/v05/wraith.png", "art/v05/golem.png", "art/v05/pilleur.png",
+            "art/characters.png", "art/keep.png", "art/v06/refuge.png", "art/courtyard.png")
+    }
+    into(layout.buildDirectory.dir("generated/gameAssets"))
+}
+tasks.named("preBuild") { dependsOn(stageGameAssets) }

@@ -1,5 +1,15 @@
 # Historique des versions
 
+## 0.8.0 — Le Serment des Lanternes · 27 septembre 2026
+
+- Refonte artistique peinte : trois héros, quatre familles de monstres et trois boss uniques, avec 120 poses d’animation au total. Les anciennes aventures utilisent aussi les nouvelles planches.
+- 72 illustrations d’équipement, six catégories, cadres de rareté, comparaison et six couches de matière visibles sur le héros.
+- Trois sols et 36 décors peints : Sylve, Dunes, Couronne. Ruines, végétation, balises, campements et reliques ; profondeur, transparence des obstacles devant le joueur, brume douce et cadrage rapproché.
+- Nouveau refuge illustré, atlas sur parchemin, voyageurs peints, huit médaillons d’aptitudes et interface sombre à bordures dorées.
+- Cache d’images partagé et borné, chargement paresseux, retrait des anciennes planches inutilisées du paquet Android. Les sources historiques restent dans le dépôt.
+- Tests graphiques de toutes les planches et régions, animations, six couches et trois formats de canevas, en complément des parcours tactiles de campagne et des anciennes aventures.
+- Version Android 8 ; règles de jeu, progression, sauvegardes et édition Play solo hors ligne conservées. Voir [la livraison](docs/delivery-v08.md) et [l’architecture](docs/architecture-v08.md).
+
 ## 0.7.0 — Les Échos des Confins · 27 septembre 2026
 
 - Campagne originale en trois régions de 48 × 32 cases : forêt inondée, désert cristallin et toundra céleste. Atlas interactif, voyages, progression et déverrouillage des territoires.

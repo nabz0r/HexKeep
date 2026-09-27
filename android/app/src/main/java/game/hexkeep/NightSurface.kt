@@ -30,9 +30,8 @@ class NightSurface(
     private val serif=Typeface.create("serif",Typeface.NORMAL)
     private val sans=Typeface.create("sans-serif",Typeface.NORMAL)
     private val bold=Typeface.create("sans-serif-medium",Typeface.NORMAL)
-    private val art=BitmapFactory.decodeStream(activity.assets.open("art/v06/refuge.png"))
-    private val floor=BitmapFactory.decodeStream(activity.assets.open("art/courtyard.png"))
-    private val atlas=BitmapFactory.decodeStream(activity.assets.open("art/characters.png"))
+    private val art get()=paintedArt.sheet("refuge").bitmap
+    private val floor get()=paintedArt.sheet("floor-forest").bitmap
     private val ruins=BitmapFactory.decodeStream(activity.assets.open("art/ruins.png"))
     private val ruinRects=(0..2).map { column ->
         val width=ruins.width/3;val height=ruins.height;val pixels=IntArray(width*height);ruins.getPixels(pixels,0,width,column*width,0,width,height)
@@ -41,7 +40,8 @@ class NightSurface(
         Rect(column*width+left.coerceAtMost(width-1),top.coerceAtMost(height-1),column*width+right+1,bottom+1)
     }
     private val impactUntil=HashMap<Int,Long>()
-    private val actorAnimator=ActorAnimator(activity.assets)
+    private val paintedArt=game.hexkeep.art.PaintedArt(activity.assets)
+    private val actorAnimator=ActorAnimator(paintedArt)
     private val worker=Executors.newSingleThreadScheduledExecutor { r -> Thread(r,"HEXKEEP simulation") }
     private val destroyed=AtomicBoolean(false)
     @Volatile private var active=true
@@ -54,7 +54,7 @@ class NightSurface(
     @Volatile private var attackHeld=false
     private val attackRequest=AtomicBoolean(false)
     private var attackPointer=-1
-    private val frontierUi=FrontierUi(
+    private val frontierUi=FrontierUi(paintedArt,
         { name -> if(name=="legacy-home"){legacyHome=true;worldMap=false;clearInput()}else if(name=="f:stance"||name=="f:heal"||name=="f:interact")engine.uiAction(name)else command(name) },
         { x,y -> input=input.copy(mx=x,my=y) },
         { held -> attackHeld=held;if(held)attackRequest.set(true) },
@@ -108,7 +108,6 @@ class NightSurface(
         autoAim=prefs.getBoolean("autoAim",false)
         reduceMotion=prefs.getBoolean("reduceMotion",false)
         contentDescription="HEXKEEP — Les Lanternes du Refuge"
-        worker.execute{actorAnimator.warmUp()}
         worker.scheduleAtFixedRate({
             if(active&&!destroyed.get()) try {
                 val v=input
@@ -128,7 +127,7 @@ class NightSurface(
     fun suspendForInterruption(){clearInput();if(snapshot.optInt("screen") in listOf(6,52,53))command("pause")}
     fun onPause(){active=false;clearInput();if(snapshot.optInt("screen") in listOf(6,52,53)&&!snapshot.optBoolean("online"))engine.uiAction("pause")}
     fun onResume(){active=true;invalidate()}
-    fun close(){destroyed.set(true);active=false;worker.shutdownNow();clearInput();frontierUi.close()}
+    fun close(){destroyed.set(true);active=false;worker.shutdownNow();clearInput();frontierUi.close();paintedArt.close()}
     fun back(){clearInput();when{snapshot.optInt("screen") in listOf(52,53)->command("f:pause");snapshot.optInt("screen")==54->command("f:resume");snapshot.optInt("screen")==55->command("f:leave");snapshot.optInt("screen")==56->command("f:journal");snapshot.optInt("screen")==51->command("f:atlas");snapshot.optInt("screen")==50->command("f:home");helpOpen->{helpOpen=false};snapshot.optInt("screen")==10->{command(settingsReturn)};snapshot.optInt("screen") in listOf(40,42)->command("inventory_back");snapshot.optInt("screen")==41->command("home");intro>=0->{intro=-1;heroChoice=false};heroChoice->{heroChoice=false;if(firstChoice)intro=2 else engine.uiAction("home")};worldMap->{worldMap=false};legacyHome&&snapshot.optInt("screen")==7->{legacyHome=false};snapshot.optInt("screen")==6->engine.uiAction("pause");snapshot.optInt("screen")==14->engine.uiAction("resume");snapshot.optInt("screen")==12->engine.uiAction("finish");snapshot.optInt("screen") in listOf(0,7)->activity.finish();else->engine.back()}}
 
     fun metrics():String{
@@ -212,23 +211,26 @@ class NightSurface(
 
     private fun embers(c:Canvas){if(reduceMotion)return;val t=SystemClock.uptimeMillis()/1000f;for(i in 0..27){val x=((i*173.3f+sin(t*.2+i)*24)%vw).toFloat();val y=540f-((t*(7+i%7)+i*51)%540);paint.color=Color.argb(65+(i%4)*25,235,175,86);c.drawCircle(x,y,if(i%5==0)1.6f else .8f,paint)}}
     private fun ornament(c:Canvas,x:Float,y:Float){line(c,x,y,x+45,y,gold);val p=Path();p.moveTo(x+56,y-5);p.lineTo(x+61,y);p.lineTo(x+56,y+5);p.lineTo(x+51,y);p.close();paint.color=gold;c.drawPath(p,paint);line(c,x+67,y,x+112,y,gold)}
-    private fun title(c:Canvas){background(c,0f);text(c,"LES ÉCHOS DES CONFINS",64f,91f,14f,gold,bold);ornament(c,64f,112f);text(c,"HEXKEEP",58f,208f,76f,ivory,serif);paragraph(c,"Là où personne ne veille, le monde s’éteint.",66f,252f,450f,22f,ivory,30f);paragraph(c,"Porte la lumière. Réveille les forteresses. Laisse une trace dans la nuit.",66f,308f,370f,18f,muted,26f)
+    private fun title(c:Canvas){background(c,0f);text(c,"LE SERMENT DES LANTERNES",64f,91f,14f,gold,bold);ornament(c,64f,112f);text(c,"HEXKEEP",58f,208f,76f,ivory,serif);paragraph(c,"Là où personne ne veille, le monde s’éteint.",66f,252f,450f,22f,ivory,30f);paragraph(c,"Porte la lumière. Réveille les forteresses. Laisse une trace dans la nuit.",66f,308f,370f,18f,muted,26f)
         button(c,"begin",if(snapshot.optBoolean("resumable"))"Reprendre mon aventure  ›"else if(snapshot.optBoolean("intro_seen"))"Reprendre la veille  ›"else"Entrer dans la nuit  ›",64f,382f,310f,58f,true){if(snapshot.optBoolean("intro_seen")||snapshot.optBoolean("resumable"))command("continue")else beginIntro()}
         button(c,"settings","Réglages",394f,382f,144f,58f){command("settings")}
-        text(c,"CHAPITRE I  /  LA DERNIÈRE LANTERNE",66f,480f,12f,muted,bold);text(c,"0.7 • ${if(BuildConfig.OFFLINE_EDITION)"AVENTURE HORS LIGNE"else"ÉDITION DEV"}",vw-44,506f,11f,muted,sans,Paint.Align.RIGHT)
+        text(c,"CHAPITRE I  /  LA DERNIÈRE LANTERNE",66f,480f,12f,muted,bold);text(c,"0.8 • ${if(BuildConfig.OFFLINE_EDITION)"AVENTURE HORS LIGNE"else"ÉDITION DEV"}",vw-44,506f,11f,muted,sans,Paint.Align.RIGHT)
     }
     private fun beginIntro(){intro=0;introStarted=SystemClock.uptimeMillis();heroChoice=false;worldMap=false;clearInput()}
     private fun introduction(c:Canvas){background(c,.16f);val elapsed=(SystemClock.uptimeMillis()-introStarted)/1000f;val fade=if(reduceMotion)1f else (elapsed/1.2f).coerceIn(0f,1f);val titles=arrayOf("Le monde oublie.","Une lumière demeure.","À toi de veiller.");val body=arrayOf("Les routes ont disparu sous la brume. Les noms se sont effacés des pierres. Une à une, les forteresses ont cessé de répondre.","Au cœur des ruines, une lanterne brûle encore. Elle n’attend ni roi, ni armée. Seulement quelqu’un pour la porter.","Rallume les trois balises. Apprends les mouvements des ombres. Puis affronte le gardien de la dernière porte.");text(c,"PROLOGUE   /   0${intro+1}",68f,123f,13f,gold,bold);text(c,titles[intro],64f,216f,46f,Color.argb((255*fade).toInt(),238,234,220),serif);paragraph(c,body[intro],68f,275f,min(530f,vw*.55f),22f,ivory,34f);for(i in 0..2)line(c,68f+i*51,420f,101f+i*51,420f,if(i<=intro)gold else 0xff3e5054.toInt(),3f)
         button(c,"intro-next",if(intro==2)"Choisir mon veilleur  ›"else"Continuer  ›",vw-316,410f,248f,58f,true){if(intro<2){intro++;introStarted=SystemClock.uptimeMillis()}else{intro=-1;heroChoice=true;firstChoice=true}}
         button(c,"intro-skip","Passer",vw-164,38f,112f,44f){intro=-1;heroChoice=true;firstChoice=true}
     }
-    private fun portrait(c:Canvas,index:Int,x:Float,y:Float,w:Float,h:Float,alpha:Int=255,flip:Boolean=false){val cell=atlas.width/3;val row=atlas.height/2;val src=Rect(index%3*cell,index/3*row,(index%3+1)*cell,(index/3+1)*row);paint.shader=null;paint.alpha=alpha;paint.color=Color.WHITE;c.save();if(flip)c.scale(-1f,1f,x+w/2,y+h/2);c.drawBitmap(atlas,src,RectF(x,y,x+w,y+h),paint);c.restore();paint.alpha=255}
+    private fun portrait(c:Canvas,index:Int,x:Float,y:Float,w:Float,h:Float,alpha:Int=255,flip:Boolean=false){
+        val name=if(index<3)paintedArt.heroNames[index.coerceIn(0,2)]else paintedArt.enemyNames[(index-3).coerceIn(0,3)]
+        c.save();if(flip)c.scale(-1f,1f,x+w/2,y+h/2);paintedArt.fit(c,name,0,RectF(x,y,x+w,y+h),alpha);c.restore()
+    }
     private fun heroes(c:Canvas){background(c,.57f);text(c,"CHOISIS TA LUMIÈRE",48f,52f,13f,gold,bold);text(c,"Trois serments. Une même nuit.",46f,98f,32f,ivory,serif);val gap=18f;val cw=(vw-96-gap*2)/3;val names=arrayOf("Aurelon","Skarn","Vylde");val details=arrayOf("L’aube • équilibre et précision","Le givre • endurance et impact","La sève • mobilité et entraide");val chosen=snapshot.optInt("realm");for(i in 0..2){val x=48+i*(cw+gap);panel(c,x,126f,cw,274f,if(i==chosen)0xde253a40.toInt()else 0xb50e212c.toInt(),if(i==chosen)gold else 0x40567479);portrait(c,i,x+cw/2-104,125f,208f,208f);text(c,names[i],x+cw/2,352f,28f,if(i==chosen)gold else ivory,serif,Paint.Align.CENTER);fitText(c,details[i],x+cw/2,381f,14f,muted,cw-26,Paint.Align.CENTER);buttons.add(Button("hero$i",RectF(x,126f,x+cw,400f)){engine.hero(i.toUByte(),snapshot.optInt("role").toUByte())})}
         val roles=arrayOf("Foudre · impulsion","Rempart · rempart de pierre","Lien · soin de proximité");val role=snapshot.optInt("role");button(c,"role-cycle",roles[role],48f,421f,min(390f,vw*.43f),52f){engine.hero(chosen.toUByte(),((role+1)%3).toUByte())};button(c,"hero-ready",if(firstChoice)"Allumer ma lanterne  ›"else"Reprendre la veille  ›",vw-368,421f,320f,52f,true){heroChoice=false;if(firstChoice){firstChoice=false;command("prologue")}else command("home")};fitText(c,if(BuildConfig.OFFLINE_EDITION)"Trois origines, trois rôles. Tu peux changer ton serment au refuge. Progression sauvegardée sur cet appareil."else"Les 24 mots restaurent ton identité, pas le butin local. Conserve cet appareil et sa sauvegarde.",48f,507f,14f,muted,vw-96)
     }
     private fun home(c:Canvas){
         background(c,.27f);val j=snapshot.optJSONObject("journey")?:JSONObject()
-        text(c,"HEXKEEP",47f,65f,30f,ivory,serif);text(c,"LES ÉCHOS DES CONFINS  /  0.7",49f,90f,11f,gold,bold)
+        text(c,"HEXKEEP",47f,65f,30f,ivory,serif);text(c,"LE SERMENT DES LANTERNES  /  0.8",49f,90f,11f,gold,bold)
         button(c,"confins-atlas","Atlas des Confins",348f,36f,190f,45f){command("f:atlas")}
         button(c,"gear","Réglages",vw-191,36f,143f,45f){command("settings")}
         fitText(c,"${snapshot.optString("name")}  •  Niveau ${j.optInt("level",1)}",49f,160f,16f,teal,440f)

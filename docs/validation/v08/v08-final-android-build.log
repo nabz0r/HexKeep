@@ -1,0 +1,306 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+> Task :app:bundleLicenses UP-TO-DATE
+> Task :app:stageGameAssets UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDevDebugBuild UP-TO-DATE
+> Task :app:mergeDevDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:generateDevDebugBuildConfig UP-TO-DATE
+> Task :app:checkDevDebugAarMetadata UP-TO-DATE
+> Task :app:generateDevDebugResValues UP-TO-DATE
+> Task :app:mapDevDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDevDebugResources UP-TO-DATE
+> Task :app:mergeDevDebugResources UP-TO-DATE
+> Task :app:packageDevDebugResources UP-TO-DATE
+> Task :app:parseDevDebugLocalResources UP-TO-DATE
+> Task :app:createDevDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDevDebug UP-TO-DATE
+> Task :app:processDevDebugMainManifest UP-TO-DATE
+> Task :app:processDevDebugManifest UP-TO-DATE
+> Task :app:processDevDebugManifestForPackage UP-TO-DATE
+> Task :app:processDevDebugResources UP-TO-DATE
+> Task :app:javaPreCompileDevDebug UP-TO-DATE
+> Task :app:mergeDevDebugShaders UP-TO-DATE
+> Task :app:compileDevDebugShaders NO-SOURCE
+> Task :app:generateDevDebugAssets UP-TO-DATE
+> Task :app:mergeDevDebugAssets UP-TO-DATE
+> Task :app:compressDevDebugAssets UP-TO-DATE
+> Task :app:desugarDevDebugFileDependencies UP-TO-DATE
+> Task :app:checkDevDebugDuplicateClasses UP-TO-DATE
+> Task :app:mergeExtDexDevDebug UP-TO-DATE
+> Task :app:mergeLibDexDevDebug UP-TO-DATE
+> Task :app:mergeDevDebugJniLibFolders UP-TO-DATE
+> Task :app:mergeDevDebugNativeLibs UP-TO-DATE
+> Task :app:stripDevDebugDebugSymbols UP-TO-DATE
+> Task :app:validateSigningDevDebug UP-TO-DATE
+> Task :app:writeDevDebugAppMetadata UP-TO-DATE
+> Task :app:writeDevDebugSigningConfigVersions UP-TO-DATE
+> Task :app:preDevReleaseBuild UP-TO-DATE
+> Task :app:mergeDevReleaseJniLibFolders UP-TO-DATE
+> Task :app:mergeDevReleaseNativeLibs UP-TO-DATE
+> Task :app:stripDevReleaseDebugSymbols UP-TO-DATE
+> Task :app:extractDevReleaseNativeSymbolTables UP-TO-DATE
+> Task :app:mergeDevReleaseNativeDebugMetadata NO-SOURCE
+> Task :app:mergeDevReleaseArtProfile UP-TO-DATE
+> Task :app:desugarDevReleaseFileDependencies UP-TO-DATE
+> Task :app:buildKotlinToolingMetadata UP-TO-DATE
+> Task :app:generateDevReleaseBuildConfig UP-TO-DATE
+> Task :app:checkDevReleaseAarMetadata UP-TO-DATE
+> Task :app:generateDevReleaseResValues UP-TO-DATE
+> Task :app:mapDevReleaseSourceSetPaths UP-TO-DATE
+> Task :app:generateDevReleaseResources UP-TO-DATE
+> Task :app:mergeDevReleaseResources UP-TO-DATE
+> Task :app:packageDevReleaseResources UP-TO-DATE
+> Task :app:parseDevReleaseLocalResources UP-TO-DATE
+> Task :app:createDevReleaseCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDevRelease UP-TO-DATE
+> Task :app:processDevReleaseMainManifest UP-TO-DATE
+> Task :app:processDevReleaseManifest UP-TO-DATE
+> Task :app:processDevReleaseManifestForPackage UP-TO-DATE
+> Task :app:processDevReleaseResources UP-TO-DATE
+> Task :app:javaPreCompileDevRelease UP-TO-DATE
+> Task :app:checkDevReleaseDuplicateClasses UP-TO-DATE
+> Task :app:mergeDevReleaseStartupProfile UP-TO-DATE
+> Task :app:mergeExtDexDevRelease UP-TO-DATE
+> Task :app:mergeDevReleaseShaders UP-TO-DATE
+> Task :app:compileDevReleaseShaders NO-SOURCE
+> Task :app:generateDevReleaseAssets UP-TO-DATE
+> Task :app:mergeDevReleaseAssets UP-TO-DATE
+> Task :app:compressDevReleaseAssets UP-TO-DATE
+> Task :app:extractDevReleaseVersionControlInfo UP-TO-DATE
+> Task :app:extractProguardFiles UP-TO-DATE
+> Task :app:optimizeDevReleaseResources UP-TO-DATE
+> Task :app:collectDevReleaseDependencies UP-TO-DATE
+> Task :app:sdkDevReleaseDependencyData UP-TO-DATE
+> Task :app:validateSigningDevRelease UP-TO-DATE
+> Task :app:writeDevReleaseAppMetadata UP-TO-DATE
+> Task :app:writeDevReleaseSigningConfigVersions UP-TO-DATE
+> Task :app:preProdReleaseBuild UP-TO-DATE
+> Task :app:mergeProdReleaseJniLibFolders UP-TO-DATE
+> Task :app:mergeProdReleaseNativeLibs UP-TO-DATE
+> Task :app:stripProdReleaseDebugSymbols UP-TO-DATE
+> Task :app:extractProdReleaseNativeSymbolTables UP-TO-DATE
+> Task :app:mergeProdReleaseNativeDebugMetadata NO-SOURCE
+> Task :app:checkProdReleaseDuplicateClasses UP-TO-DATE
+> Task :app:generateProdReleaseBuildConfig UP-TO-DATE
+> Task :app:checkProdReleaseAarMetadata UP-TO-DATE
+> Task :app:generateProdReleaseResValues UP-TO-DATE
+> Task :app:mapProdReleaseSourceSetPaths UP-TO-DATE
+> Task :app:generateProdReleaseResources UP-TO-DATE
+> Task :app:mergeProdReleaseResources UP-TO-DATE
+> Task :app:packageProdReleaseResources UP-TO-DATE
+> Task :app:parseProdReleaseLocalResources UP-TO-DATE
+> Task :app:createProdReleaseCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksProdRelease UP-TO-DATE
+> Task :app:processProdReleaseMainManifest UP-TO-DATE
+> Task :app:processProdReleaseManifest UP-TO-DATE
+> Task :app:processProdReleaseManifestForPackage UP-TO-DATE
+> Task :app:processProdReleaseResources UP-TO-DATE
+> Task :app:javaPreCompileProdRelease UP-TO-DATE
+> Task :app:desugarProdReleaseFileDependencies UP-TO-DATE
+> Task :app:mergeProdReleaseStartupProfile UP-TO-DATE
+> Task :app:mergeExtDexProdRelease UP-TO-DATE
+> Task :app:mergeProdReleaseArtProfile UP-TO-DATE
+> Task :app:mergeProdReleaseShaders UP-TO-DATE
+> Task :app:compileProdReleaseShaders NO-SOURCE
+> Task :app:generateProdReleaseAssets UP-TO-DATE
+> Task :app:mergeProdReleaseAssets UP-TO-DATE
+> Task :app:compressProdReleaseAssets UP-TO-DATE
+> Task :app:extractProdReleaseVersionControlInfo UP-TO-DATE
+> Task :app:optimizeProdReleaseResources UP-TO-DATE
+> Task :app:collectProdReleaseDependencies UP-TO-DATE
+> Task :app:sdkProdReleaseDependencyData UP-TO-DATE
+> Task :app:writeProdReleaseAppMetadata UP-TO-DATE
+> Task :app:writeProdReleaseSigningConfigVersions UP-TO-DATE
+> Task :app:prePlayDebugBuild UP-TO-DATE
+> Task :app:mergePlayDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generatePlayDebugBuildConfig UP-TO-DATE
+> Task :app:checkPlayDebugAarMetadata UP-TO-DATE
+> Task :app:generatePlayDebugResValues UP-TO-DATE
+> Task :app:mapPlayDebugSourceSetPaths UP-TO-DATE
+> Task :app:generatePlayDebugResources UP-TO-DATE
+> Task :app:mergePlayDebugResources UP-TO-DATE
+> Task :app:packagePlayDebugResources UP-TO-DATE
+> Task :app:parsePlayDebugLocalResources UP-TO-DATE
+> Task :app:createPlayDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksPlayDebug UP-TO-DATE
+> Task :app:processPlayDebugMainManifest UP-TO-DATE
+> Task :app:processPlayDebugManifest UP-TO-DATE
+> Task :app:processPlayDebugManifestForPackage UP-TO-DATE
+> Task :app:processPlayDebugResources UP-TO-DATE
+> Task :app:javaPreCompilePlayDebug UP-TO-DATE
+> Task :app:mergePlayDebugShaders UP-TO-DATE
+> Task :app:compilePlayDebugShaders NO-SOURCE
+> Task :app:generatePlayDebugAssets UP-TO-DATE
+> Task :app:mergePlayDebugAssets UP-TO-DATE
+> Task :app:compressPlayDebugAssets UP-TO-DATE
+> Task :app:checkPlayDebugDuplicateClasses UP-TO-DATE
+> Task :app:desugarPlayDebugFileDependencies UP-TO-DATE
+> Task :app:mergeExtDexPlayDebug UP-TO-DATE
+> Task :app:mergeLibDexPlayDebug UP-TO-DATE
+> Task :app:mergePlayDebugJniLibFolders UP-TO-DATE
+> Task :app:mergePlayDebugNativeLibs UP-TO-DATE
+> Task :app:stripPlayDebugDebugSymbols UP-TO-DATE
+> Task :app:validateSigningPlayDebug UP-TO-DATE
+> Task :app:writePlayDebugAppMetadata UP-TO-DATE
+> Task :app:writePlayDebugSigningConfigVersions UP-TO-DATE
+> Task :app:prePlayDebugAndroidTestBuild SKIPPED
+> Task :app:processPlayDebugAndroidTestManifest UP-TO-DATE
+> Task :app:generatePlayDebugAndroidTestBuildConfig UP-TO-DATE
+> Task :app:checkPlayDebugAndroidTestAarMetadata UP-TO-DATE
+> Task :app:generatePlayDebugAndroidTestResValues UP-TO-DATE
+> Task :app:mapPlayDebugAndroidTestSourceSetPaths UP-TO-DATE
+> Task :app:generatePlayDebugAndroidTestResources UP-TO-DATE
+> Task :app:mergePlayDebugAndroidTestResources UP-TO-DATE
+> Task :app:processPlayDebugAndroidTestResources UP-TO-DATE
+> Task :app:javaPreCompilePlayDebugAndroidTest UP-TO-DATE
+> Task :app:mergePlayDebugAndroidTestShaders UP-TO-DATE
+> Task :app:compilePlayDebugAndroidTestShaders NO-SOURCE
+> Task :app:generatePlayDebugAndroidTestAssets UP-TO-DATE
+> Task :app:mergePlayDebugAndroidTestAssets UP-TO-DATE
+> Task :app:compressPlayDebugAndroidTestAssets UP-TO-DATE
+> Task :app:checkPlayDebugAndroidTestDuplicateClasses UP-TO-DATE
+> Task :app:desugarPlayDebugAndroidTestFileDependencies UP-TO-DATE
+> Task :app:mergeExtDexPlayDebugAndroidTest UP-TO-DATE
+> Task :app:mergeLibDexPlayDebugAndroidTest UP-TO-DATE
+> Task :app:mergePlayDebugAndroidTestJniLibFolders UP-TO-DATE
+> Task :app:mergePlayDebugAndroidTestNativeLibs NO-SOURCE
+> Task :app:stripPlayDebugAndroidTestDebugSymbols NO-SOURCE
+> Task :app:validateSigningPlayDebugAndroidTest UP-TO-DATE
+> Task :app:writePlayDebugAndroidTestSigningConfigVersions UP-TO-DATE
+> Task :app:prePlayReleaseBuild UP-TO-DATE
+> Task :app:generatePlayReleaseResValues UP-TO-DATE
+> Task :app:mapPlayReleaseSourceSetPaths UP-TO-DATE
+> Task :app:generatePlayReleaseResources UP-TO-DATE
+> Task :app:mergePlayReleaseResources UP-TO-DATE
+> Task :app:createPlayReleaseCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksPlayRelease UP-TO-DATE
+> Task :app:processPlayReleaseMainManifest UP-TO-DATE
+> Task :app:processPlayReleaseManifest UP-TO-DATE
+> Task :app:processApplicationManifestPlayReleaseForBundle UP-TO-DATE
+> Task :app:checkPlayReleaseAarMetadata UP-TO-DATE
+> Task :app:packagePlayReleaseResources UP-TO-DATE
+> Task :app:parsePlayReleaseLocalResources UP-TO-DATE
+> Task :app:processPlayReleaseManifestForPackage UP-TO-DATE
+> Task :app:processPlayReleaseResources UP-TO-DATE
+> Task :app:bundlePlayReleaseResources UP-TO-DATE
+> Task :app:extractPlayReleaseVersionControlInfo UP-TO-DATE
+> Task :app:checkPlayReleaseDuplicateClasses UP-TO-DATE
+> Task :app:generatePlayReleaseBuildConfig UP-TO-DATE
+> Task :app:javaPreCompilePlayRelease UP-TO-DATE
+> Task :app:desugarPlayReleaseFileDependencies UP-TO-DATE
+> Task :app:mergePlayReleaseStartupProfile UP-TO-DATE
+> Task :app:mergeExtDexPlayRelease UP-TO-DATE
+> Task :app:mergePlayReleaseShaders UP-TO-DATE
+> Task :app:compilePlayReleaseShaders NO-SOURCE
+> Task :app:generatePlayReleaseAssets UP-TO-DATE
+> Task :app:mergePlayReleaseAssets UP-TO-DATE
+> Task :app:mergePlayReleaseJniLibFolders UP-TO-DATE
+> Task :app:mergePlayReleaseNativeLibs UP-TO-DATE
+> Task :app:stripPlayReleaseDebugSymbols UP-TO-DATE
+> Task :app:writePlayReleaseAppMetadata UP-TO-DATE
+> Task :app:mergePlayReleaseArtProfile UP-TO-DATE
+> Task :app:collectPlayReleaseDependencies UP-TO-DATE
+> Task :app:configurePlayReleaseDependencies UP-TO-DATE
+> Task :app:extractPlayReleaseNativeSymbolTables UP-TO-DATE
+> Task :app:parsePlayReleaseIntegrityConfig UP-TO-DATE
+> Task :app:prePlayReleaseUnitTestBuild UP-TO-DATE
+> Task :app:compilePlayReleaseKotlin
+> Task :app:compileDevReleaseKotlin
+> Task :app:compileDevDebugKotlin
+> Task :app:compileProdReleaseKotlin
+> Task :app:compilePlayDebugKotlin
+> Task :app:compileDevDebugJavaWithJavac UP-TO-DATE
+> Task :app:dexBuilderDevDebug
+> Task :app:mergeDevDebugGlobalSynthetics UP-TO-DATE
+> Task :app:processDevDebugJavaRes UP-TO-DATE
+> Task :app:mergeDevDebugJavaResource UP-TO-DATE
+> Task :app:compileDevReleaseJavaWithJavac UP-TO-DATE
+> Task :app:mergeProjectDexDevDebug
+> Task :app:dexBuilderDevRelease
+> Task :app:mergeDevReleaseGlobalSynthetics UP-TO-DATE
+> Task :app:generateDevReleaseLintVitalReportModel
+> Task :app:processDevReleaseJavaRes UP-TO-DATE
+> Task :app:mergeDevReleaseJavaResource UP-TO-DATE
+> Task :app:compileProdReleaseJavaWithJavac UP-TO-DATE
+> Task :app:dexBuilderProdRelease
+> Task :app:mergeProdReleaseGlobalSynthetics UP-TO-DATE
+> Task :app:generateProdReleaseLintVitalReportModel
+> Task :app:processProdReleaseJavaRes UP-TO-DATE
+> Task :app:mergeProdReleaseJavaResource UP-TO-DATE
+> Task :app:compilePlayDebugJavaWithJavac UP-TO-DATE
+> Task :app:dexBuilderPlayDebug
+> Task :app:mergePlayDebugGlobalSynthetics UP-TO-DATE
+> Task :app:processPlayDebugJavaRes UP-TO-DATE
+> Task :app:mergePlayDebugJavaResource UP-TO-DATE
+> Task :app:bundlePlayDebugClassesToCompileJar
+> Task :app:mergeProjectDexPlayDebug
+> Task :app:compilePlayReleaseJavaWithJavac UP-TO-DATE
+> Task :app:dexBuilderPlayRelease
+> Task :app:compilePlayDebugAndroidTestKotlin
+> Task :app:packageDevDebug
+> Task :app:createDevDebugApkListingFileRedirect UP-TO-DATE
+> Task :app:assembleDevDebug
+> Task :app:compilePlayDebugAndroidTestJavaWithJavac UP-TO-DATE
+> Task :app:dexBuilderPlayDebugAndroidTest UP-TO-DATE
+> Task :app:mergePlayDebugAndroidTestGlobalSynthetics UP-TO-DATE
+> Task :app:processPlayDebugAndroidTestJavaRes UP-TO-DATE
+> Task :app:mergePlayDebugAndroidTestJavaResource UP-TO-DATE
+> Task :app:mergeProjectDexPlayDebugAndroidTest UP-TO-DATE
+> Task :app:packagePlayDebugAndroidTest UP-TO-DATE
+> Task :app:createPlayDebugAndroidTestApkListingFileRedirect UP-TO-DATE
+> Task :app:assemblePlayDebugAndroidTest UP-TO-DATE
+> Task :app:mergePlayReleaseGlobalSynthetics UP-TO-DATE
+> Task :app:processPlayReleaseJavaRes UP-TO-DATE
+> Task :app:mergePlayReleaseJavaResource UP-TO-DATE
+> Task :app:generatePlayReleaseLintVitalReportModel
+> Task :app:generatePlayReleaseLintReportModel
+> Task :app:bundlePlayReleaseClassesToCompileJar
+> Task :app:mergeDexPlayRelease
+> Task :app:mergeDexProdRelease
+> Task :app:mergeDexDevRelease
+> Task :app:packagePlayDebug
+> Task :app:compileDevReleaseArtProfile
+> Task :app:compileProdReleaseArtProfile
+> Task :app:createPlayDebugApkListingFileRedirect UP-TO-DATE
+> Task :app:assemblePlayDebug
+> Task :app:buildPlayReleasePreBundle
+> Task :app:compilePlayReleaseArtProfile
+> Task :app:generatePlayReleaseUnitTestLintModel
+> Task :app:lintAnalyzePlayReleaseUnitTest
+> Task :app:lintVitalAnalyzeProdRelease
+> Task :app:lintVitalAnalyzeDevRelease
+> Task :app:lintVitalAnalyzePlayRelease
+> Task :app:lintVitalReportDevRelease UP-TO-DATE
+> Task :app:lintVitalDevRelease
+> Task :app:lintVitalReportProdRelease UP-TO-DATE
+> Task :app:lintVitalProdRelease
+> Task :app:lintVitalReportPlayRelease SKIPPED
+> Task :app:lintVitalPlayRelease SKIPPED
+> Task :app:packagePlayReleaseBundle
+> Task :app:packageProdRelease
+> Task :app:createProdReleaseApkListingFileRedirect UP-TO-DATE
+> Task :app:assembleProdRelease
+> Task :app:packageDevRelease
+> Task :app:createDevReleaseApkListingFileRedirect UP-TO-DATE
+> Task :app:assembleDevRelease
+> Task :app:lintAnalyzePlayRelease
+> Task :app:lintReportPlayRelease UP-TO-DATE
+> Task :app:lintPlayRelease
+> Task :app:signPlayReleaseBundle
+> Task :app:producePlayReleaseBundleIdeListingFile
+> Task :app:createPlayReleaseBundleListingFileRedirect UP-TO-DATE
+> Task :app:bundlePlayRelease
+
+[Incubating] Problems report is available at: file:///Users/n/.codex/.chatgpt-projects/g-p-6ab83bd4da808191b19fbaa70f9dda7e/hexkeep/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 21s
+257 actionable tasks: 42 executed, 215 up-to-date
