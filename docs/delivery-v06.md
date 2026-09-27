@@ -20,12 +20,13 @@ Nouveau refuge peint, couverture de boutique, icônes adaptative/monochrome, aid
 | Android 15, téléphone 2340×1080 | Trois tests de publication et deux parcours tactiles réussis : aventure complète, butin, équipement, animation, curiosités, sauvegarde et reprise |
 | Android 15, format 1280×960 | Trois tests de publication réussis ; aide et réglages inspectés visuellement |
 | Android 16, AAB installé en APK fractionnés | **Six tests réussis ensemble** en 125,65 s : sauvegarde, permissions, aventure, animations, curiosités, prologue et mise en arrière-plan |
+| Android 16, pages mémoire 16 Ko | **Six tests réussis** en 123,11 s sur un émulateur dédié ; `getconf PAGE_SIZE` retourne **16384** ; APK fractionnés issus de l’AAB |
 | Migration DEV 0.5 → 0.6 | Installation par-dessus réussie ; identité publique, nom, XP, identifiants et statistiques d’objets, équipement et poussières conservés |
 | Android Lint | Aucune erreur bloquante sur Play release ; avertissements restants sur les API historiques de rendu et les mises à jour de dépendances |
 | Paquet | API cible 36, versionCode 6, trois architectures ; signature de l’APK et alignement ZIP vérifiés, neuf bibliothèques natives inspectées, segments ELF 64 bits ≥ 16 Ko |
 | Boutique | Description courte 80 caractères ; couverture JPEG 1024×500, icône 512×512 et cinq captures réelles ; fiche en français |
 
-Mesure de l’aventure tactile sur téléphone Android 15 émulé : **42,89 images/s pendant 20,87 s**, rendu SwiftShader. Ce résultat n’est pas une promesse de performance sur appareil commercial. Les émulateurs utilisés ont des pages mémoire de 4 Ko ; l’inspection d’alignement n’est pas un essai matériel 16 Ko.
+Mesure de l’aventure tactile sur téléphone Android 15 émulé : **42,89 images/s pendant 20,87 s**, rendu SwiftShader. Ce résultat n’est pas une promesse de performance sur appareil commercial. Les essais couvrent des émulateurs à pages mémoire de 4 Ko et de 16 Ko. Aucun téléphone physique n’a été qualifié dans cette livraison.
 
 Les rapports reproductibles sont dans [validation/v06](validation/v06/). Le protocole CI construit le bundle, inspecte les bibliothèques et lance les tests sur un émulateur API 36. L’AAB est aussi installé localement via bundletool, puis les parcours sont exécutés dans ses APK fractionnés.
 
