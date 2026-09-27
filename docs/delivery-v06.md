@@ -27,7 +27,7 @@ Nouveau refuge peint, couverture de boutique, icônes adaptative/monochrome, aid
 | Paquet | API cible 36, versionCode 6, trois architectures ; signature de l’APK et alignement ZIP vérifiés, neuf bibliothèques natives inspectées, segments ELF 64 bits ≥ 16 Ko |
 | Boutique | Description courte 80 caractères ; couverture JPEG 1024×500, icône 512×512 et cinq captures réelles ; fiche en français |
 
-Mesure de l’aventure tactile sur téléphone Android 15 émulé : **42,89 images/s pendant 20,87 s**, rendu SwiftShader. Ce résultat n’est pas une promesse de performance sur appareil commercial. Les essais couvrent des émulateurs à pages mémoire de 4 Ko et de 16 Ko. Aucun téléphone physique n’a été qualifié dans cette livraison.
+Mesure de l’aventure tactile sur téléphone Android 15 émulé : **42,89 images/s pendant 20,87 s**, rendu SwiftShader. Un hôte GitHub partagé a mesuré **19,42 images/s** en 1080p : le logiciel de rendu et la charge de l’hôte influencent fortement cette mesure. La CI conserve le relevé, mais ne certifie pas un seuil de fluidité sur ce matériel virtuel. Les essais directs conservent un seuil minimal de 20 images/s ; les téléphones physiques restent à qualifier. Ces résultats ne sont pas une promesse de performance sur appareil commercial. Les essais couvrent des émulateurs à pages mémoire de 4 Ko et de 16 Ko. Aucun téléphone physique n’a été qualifié dans cette livraison.
 
 Les rapports reproductibles sont dans [validation/v06](validation/v06/). Le protocole CI construit le bundle, inspecte les bibliothèques et lance les tests sur un émulateur API 36. L’AAB est aussi installé localement via bundletool, puis les parcours sont exécutés dans ses APK fractionnés.
 
@@ -35,6 +35,7 @@ Les rapports reproductibles sont dans [validation/v06](validation/v06/). Le prot
 
 - La protection des écrans sensibles provoquait des mises à jour de fenêtre à chaque instant de simulation. Elle n’est désormais modifiée que si la sensibilité change ; la pause se redessine moins fréquemment.
 - L’assemblage pouvait conserver d’anciennes bibliothèques dans le répertoire de sortie. La construction utilise maintenant un répertoire neuf avant remplacement ; le vérificateur refuse un moteur ne contenant pas les nouvelles fonctions.
+- Chaque parcours de CI utilise son propre processus de test et prépare son état initial ; un geste interrompu ou une ancienne aventure ne doit pas contaminer le parcours suivant.
 - Le banc tactile utilise une source explicitement déclarée tactile, attend le retour du focus après Accueil Android et prépare l’état initial avant le prologue. Ces points ont été vérifiés sur Android 8 et corrigent les gestes ignorés par les images Android standard de la CI.
 - Le banc tactile ne comptait pas les encoches. Il utilise maintenant les coordonnées réelles de la zone de jeu, y compris la position de la vue dans la fenêtre. Android 16 rejetait aussi une seconde libération d’un geste déjà terminé : le pilote de test suit explicitement ce geste.
 - Le test de cycle de vie attendait que le rendu soit inactif, laissant parfois un combat se terminer avant sa mise en arrière-plan. Il utilise désormais le bouton Accueil Android puis le retour à la tâche existante, et vérifie que les ticks restent figés.
