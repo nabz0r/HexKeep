@@ -8,7 +8,7 @@ impl Game {
             serde_json::json!({"id":format!("{id:x}"),"q":q,"r":r,"clear":c.is_some_and(|v|v.clear),"bastion":c.and_then(|v|v.bastion).map(|v|v.index()),"discovered":self.save.journey.discovered.contains(&id),"region":adventure::region_name(id),"poi":adventure::region(id),"current":id==self.save.world.current,"selected":id==self.selected})
         }).collect();
         serde_json::json!({"screen":self.screen,"width":self.width,"ticks":self.ticks,"created":self.save.created,
-            "intro_seen":self.save.introduction_seen,"tutorial":self.tutorial,"lesson":self.lesson,
+            "offline":self.offline,"resumable":self.battle.is_some() && self.online.is_none(),"intro_seen":self.save.introduction_seen,"tutorial":self.tutorial,"lesson":self.lesson,
             "realm":self.save.realm.index(),"role":self.save.role.index(),"name":self.save.name,
             "realm_name":self.save.realm.name(),"role_name":self.save.role.name(),"music":self.save.settings.music,
             "accessible":self.save.settings.accessible,"effects":self.save.sound_effects,"haptics":self.save.settings.haptics,
@@ -20,10 +20,13 @@ impl Game {
             "banner":self.save.world.banner,"selected_current":self.selected==self.save.world.current,"gps":self.save.world.gps,
             "peers":self.peer_count,"latency":self.latency,"cells":cells,"emblem":self.save.expansion.campaign.draft,
             "message":if self.ticks<self.message_until{&self.message}else{""},"ui":ui,
-            "party":self.peers.values().map(|p|serde_json::json!({"name":p.player.name,"realm":p.player.realm.name()})).collect::<Vec<_>>(),"searching":self.node.is_some(),"addresses":self.addresses,"blocked":self.storage_error||!self.is_dev}).to_string()
+            "party":self.peers.values().map(|p|serde_json::json!({"name":p.player.name,"realm":p.player.realm.name()})).collect::<Vec<_>>(),"searching":self.node.is_some(),"addresses":self.addresses,"blocked":self.storage_error||!(self.is_dev||self.offline)}).to_string()
     }
     pub fn ui_action(&mut self, action: &str) {
-        if self.storage_error || !self.is_dev {
+        if self.storage_error || !(self.is_dev || self.offline) {
+            return;
+        }
+        if self.offline && !Self::offline_action_allowed(action) {
             return;
         }
         if self.journey_action(action) {
@@ -32,7 +35,19 @@ impl Game {
         self.key_input = Input::default();
         self.touches.clear();
         match action {
-            "continue" => self.screen = if self.save.created { 7 } else { 0 },
+            "continue" => {
+                self.screen = if let Some(b) = &self.battle {
+                    if b.finished || self.expedition.as_ref().is_some_and(|r| r.victory) {
+                        12
+                    } else {
+                        14
+                    }
+                } else if self.save.created {
+                    7
+                } else {
+                    0
+                }
+            }
             "prologue" => {
                 if self.battle.is_some() {
                     self.end_battle();
@@ -87,7 +102,11 @@ impl Game {
                     self.native_action = 15;
                     self.save.world.enter(self.selected, self.now);
                     self.dirty = true;
-                    self.toast("Déplacement de développement.");
+                    self.toast(if self.offline {
+                        "Un nouveau chemin s’ouvre."
+                    } else {
+                        "Déplacement de développement."
+                    });
                 }
             }
             "found" => {

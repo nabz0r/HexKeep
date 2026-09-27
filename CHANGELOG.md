@@ -1,4 +1,14 @@
-# Versions d’HEXKEEP
+# Historique des versions
+
+## 0.6.0 — Les Lanternes du Refuge · 27 septembre 2026
+
+- Édition Play solo hors ligne jouable, AAB, signature d’envoi configurable et contrôles des artefacts. Le réseau de production reste verrouillé ; la DEV conserve ses fonctions.
+- Sauvegarde et reprise volontaire des aventures après fermeture, sans nouvelle attribution du même bilan. Protection d’un fichier illisible et nouvelle tentative après échec d’écriture.
+- Refuge peint original, visuel Google Play, icône adaptative et monochrome ; accueil recentré sur les aventures et la collection.
+- Pause, aide, réglages en aventure, confirmation avant abandon, contraste et réduction des animations d’ambiance, respect des zones sûres d’écran.
+- Focus audio, interruption sur retrait des écouteurs et retour Android 16. Protection de fenêtre modifiée seulement lors d’un changement réel.
+- Édition Play sans autorisation Internet/GPS/Bluetooth, sans SDK Billing et sans service de veille. Confidentialité et licences consultables hors ligne.
+- Dossier de lancement, fiche française, captures et banc de tests API 36. Publication Google Play non effectuée ; conditions restantes dans `docs/play-release.md`.
 
 ## 0.5.0 — L’Éveil des Veilleurs
 

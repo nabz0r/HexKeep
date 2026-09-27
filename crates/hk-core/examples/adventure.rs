@@ -3,6 +3,7 @@ use hk_core::Game;
 use hk_proto::*;
 fn main() {
     let mut wins = 0;
+    let offline = std::env::args().any(|a| a == "--offline");
     let tiers = if std::env::args().any(|a| a == "--all-tiers") {
         3
     } else {
@@ -12,7 +13,11 @@ fn main() {
         for realm in 0..3 {
             for role in 0..3 {
                 for kind in 0..5 {
-                    let mut g = Game::new("", true);
+                    let mut g = if offline {
+                        Game::new_offline("")
+                    } else {
+                        Game::new("", true)
+                    };
                     g.save.created = true;
                     g.save.journey.victories = tier * 6;
                     g.save.journey.difficulty = tier as u8;
@@ -132,7 +137,11 @@ fn main() {
                     let n = g.save.journey.items.len();
                     assert!(n >= 6);
                     let saved = g.snapshot();
-                    let restored = Game::new(&saved, true);
+                    let restored = if offline {
+                        Game::new_offline(&saved)
+                    } else {
+                        Game::new(&saved, true)
+                    };
                     assert_eq!(restored.save.journey.items.len(), n);
                 }
             }

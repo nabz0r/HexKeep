@@ -1,6 +1,6 @@
 //! PvE encounter direction and discoveries, deliberately outside the shared combat protocol.
 use super::*;
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Site {
     pub id: u8,
     pub pos: Vec2,
@@ -8,7 +8,7 @@ pub struct Site {
     pub name: String,
     pub opened: bool,
 }
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Enemy {
     pub id: u8,
     pub kind: u8,
@@ -16,7 +16,7 @@ pub struct Enemy {
     pub elite: bool,
     pub defeated: bool,
 }
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Hazard {
     pub pos: Vec2,
     pub radius: i32,

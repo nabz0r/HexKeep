@@ -1,8 +1,10 @@
+#![recursion_limit = "256"]
 mod adventure;
 mod discoveries;
 mod expansion;
 mod network;
 mod presentation;
+mod release;
 use hk_ledger::{Kind, Ledger};
 use hk_ppu::*;
 use hk_proto::*;
@@ -49,6 +51,8 @@ pub struct Save {
     pub sound_effects: bool,
     #[serde(default)]
     pub journey: adventure::Journey,
+    #[serde(default)]
+    pub checkpoint: Option<release::Checkpoint>,
 }
 fn default_sound() -> bool {
     true
@@ -73,10 +77,11 @@ impl Default for Save {
             introduction_seen: false,
             sound_effects: true,
             journey: Default::default(),
+            checkpoint: None,
         }
     }
 }
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Expedition {
     pub charges: [u16; 3],
     pub wave: u8,
@@ -121,6 +126,7 @@ pub struct Game {
     pub sound: u8,
     pub storage_error: bool,
     pub is_dev: bool,
+    pub offline: bool,
     quiz: u8,
     keyboard: String,
     keyboard_mode: u8,
@@ -164,7 +170,8 @@ impl Game {
             .unwrap_or_default();
         let selected = save.world.current;
         let session = hk_crypto::identity::Session::development(&save.secret, hk_net::unix_time());
-        Self {
+        let checkpoint = save.checkpoint.take();
+        let mut game = Self {
             save,
             session,
             expansion: expansion::Expansion {
@@ -189,6 +196,7 @@ impl Game {
             sound: 0,
             storage_error: error || tampered,
             is_dev,
+            offline: false,
             quiz: 0,
             keyboard: String::new(),
             keyboard_mode: 0,
@@ -205,10 +213,16 @@ impl Game {
             peer_count: 0,
             latency: 0,
             last_proof,
+        };
+        if let Some(checkpoint) = checkpoint {
+            game.restore_checkpoint(checkpoint);
         }
+        game
     }
     pub fn snapshot(&self) -> String {
-        serde_json::to_string(&self.save).unwrap()
+        let mut save = self.save.clone();
+        save.checkpoint = self.checkpoint();
+        serde_json::to_string(&save).unwrap()
     }
     pub fn sensitive(&self) -> bool {
         matches!(self.screen, 4 | 5 | 13) || self.screen == 11 && self.keyboard_mode == 1
@@ -236,6 +250,9 @@ impl Game {
         self.dirty = true;
     }
     pub fn start_battle(&mut self, mode: u8) {
+        if self.storage_error || (!self.is_dev && !(self.offline && matches!(mode, 0 | 8))) {
+            return;
+        }
         self.key_input = Input::default();
         self.inventory_return = 7;
         self.expansion.court = None;
@@ -393,10 +410,15 @@ impl Game {
     pub fn tick(&mut self, now: u64) {
         self.ticks += 1;
         self.now = now;
-        self.poll_network();
-        self.expansion_tick();
-        if self.storage_error || !self.is_dev {
+        if self.storage_error || !(self.is_dev || self.offline) {
             return;
+        }
+        if !self.offline {
+            self.poll_network();
+            self.expansion_tick();
+        }
+        if self.battle.is_some() && self.online.is_none() && self.ticks % 60 == 0 {
+            self.dirty = true;
         }
         if self.save.created && self.ticks % 30 == 0 {
             if self.save.journey.discovered.insert(self.save.world.current) {
@@ -690,6 +712,7 @@ impl Game {
         if self.storage_error {
             return;
         }
+        // Offline menus use typed UI actions; legacy screens expose DEV services.
         if !self.is_dev {
             return;
         }
@@ -957,7 +980,7 @@ impl Game {
         self.save.secret[10 + self.quiz as usize] as usize % 3
     }
     pub fn gps(&mut self, lat: i32, lng: i32, mock: bool) {
-        if !self.is_dev && mock {
+        if self.offline || (!self.is_dev && mock) {
             return;
         }
         if let Some(cell) = cell_at(lat, lng) {
@@ -984,7 +1007,7 @@ impl Game {
             Canvas::new(w, 240)
         };
         c.clear(INK);
-        if !self.is_dev {
+        if !(self.is_dev || self.offline) {
             c.center(44, "HEXKEEP", GOLD, 4);
             c.center(111, "PRODUCTION VERROUILLÉE", WHITE, 1);
             c.center(136, "Genèse et attestation officielles requises.", MUTED, 1);

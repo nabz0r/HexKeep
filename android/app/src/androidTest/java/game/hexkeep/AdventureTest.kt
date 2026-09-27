@@ -15,13 +15,13 @@ import kotlin.math.*
 /** A full expedition using injected fingers. No warps, forced damage or generated rewards. */
 class AdventureTest {
  private val test=InstrumentationRegistry.getInstrumentation()
- private var scale=2f;private var top=0f;private var vw=1170f
+ private var left=0f;private var scale=2f;private var top=0f;private var vw=1170f
  private var down=0L
  private lateinit var activity:MainActivity
  private lateinit var engine:game.hexkeep.core.Engine
  private fun event(action:Int,points:List<Pair<Float,Float>>){
   val props=points.indices.map{MotionEvent.PointerProperties().apply{id=it;toolType=MotionEvent.TOOL_TYPE_FINGER}}.toTypedArray()
-  val coords=points.map{MotionEvent.PointerCoords().apply{x=it.first*scale;y=it.second*scale+top;pressure=1f;size=1f}}.toTypedArray()
+  val coords=points.map{MotionEvent.PointerCoords().apply{x=left+it.first*scale;y=it.second*scale+top;pressure=1f;size=1f}}.toTypedArray()
   test.uiAutomation.injectInputEvent(MotionEvent.obtain(down,SystemClock.uptimeMillis(),action,points.size,props,coords,0,0,1f,1f,0,0,android.view.InputDevice.SOURCE_TOUCHSCREEN,0),false)
  }
  private fun tap(x:Float,y:Float){down=SystemClock.uptimeMillis();event(MotionEvent.ACTION_DOWN,listOf(x to y));SystemClock.sleep(70);event(MotionEvent.ACTION_UP,listOf(x to y));SystemClock.sleep(300)}
@@ -46,7 +46,7 @@ class AdventureTest {
  @Test fun completeLootEquipAndRestore(){
   var identity="";var count=0
   ActivityScenario.launch<MainActivity>(Intent(test.targetContext,MainActivity::class.java)).use{scenario->
-   SystemClock.sleep(1000);scenario.onActivity{activity=it;engine=it.engine;scale=min(it.window.decorView.height/540f,it.window.decorView.width/960f);top=(it.window.decorView.height-540*scale)/2;vw=it.window.decorView.width/scale;it.engine.uiAction("home");it.engine.hero(0u,0u);identity=it.engine.identityPublic().contentToString()}
+   SystemClock.sleep(1000);scenario.onActivity{activity=it;engine=it.engine;val viewport=JSONObject(it.renderMetrics()).getJSONObject("viewport");scale=viewport.getDouble("scale").toFloat();left=viewport.getDouble("left").toFloat();top=viewport.getDouble("top").toFloat();vw=viewport.getDouble("width").toFloat();it.engine.uiAction("home");it.engine.hero(0u,0u);identity=it.engine.identityPublic().contentToString()}
    SystemClock.sleep(250);tap(200f,398f);assertEquals(41,state().getInt("screen"));shot("journal")
    val cw=(vw-128)/3;tap(48+2*(cw+16)+cw/2,407f);SystemClock.sleep(450);assertEquals(6,state().getInt("screen"))
    val metricBefore=JSONObject(activity.renderMetrics());val combatStarted=SystemClock.uptimeMillis()

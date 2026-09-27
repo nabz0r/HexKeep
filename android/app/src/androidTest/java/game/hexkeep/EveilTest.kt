@@ -15,14 +15,17 @@ import kotlin.math.*
 /** v0.5 acceptance: actual touches, no relocation, damage injection or generated rewards. */
 class EveilTest {
  private val test=InstrumentationRegistry.getInstrumentation()
- private var scale=2f;private var top=0f;private var vw=1170f
+ private var left=0f;private var scale=2f;private var top=0f;private var vw=1170f
  private var down=0L
+ private var gestureDown=false
  private var lastPoints=listOf(100f to 435f)
  private lateinit var activity:MainActivity
  private lateinit var engine:game.hexkeep.core.Engine
  private fun event(action:Int,points:List<Pair<Float,Float>>){
+  if(action==MotionEvent.ACTION_DOWN)gestureDown=true
+  if(action==MotionEvent.ACTION_UP||action==MotionEvent.ACTION_CANCEL)gestureDown=false
   val props=points.indices.map{MotionEvent.PointerProperties().apply{id=it;toolType=MotionEvent.TOOL_TYPE_FINGER}}.toTypedArray()
-  val coords=points.map{MotionEvent.PointerCoords().apply{x=it.first*scale;y=it.second*scale+top;pressure=1f;size=1f}}.toTypedArray()
+  val coords=points.map{MotionEvent.PointerCoords().apply{x=left+it.first*scale;y=it.second*scale+top;pressure=1f;size=1f}}.toTypedArray()
   assertTrue("Touch event rejected",test.uiAutomation.injectInputEvent(MotionEvent.obtain(down,SystemClock.uptimeMillis(),action,points.size,props,coords,0,0,1f,1f,0,0,android.view.InputDevice.SOURCE_TOUCHSCREEN,0),false));lastPoints=points
  }
  private fun tap(x:Float,y:Float,settle:Long=300){down=SystemClock.uptimeMillis();event(MotionEvent.ACTION_DOWN,listOf(x to y));SystemClock.sleep(70);event(MotionEvent.ACTION_UP,listOf(x to y));SystemClock.sleep(settle)}
@@ -49,11 +52,11 @@ class EveilTest {
   if(attack)event(MotionEvent.ACTION_POINTER_DOWN or (1 shl 8),listOf(100f to 435f,(vw-91) to 326f))
   event(MotionEvent.ACTION_MOVE,if(attack)listOf((100+dx*49) to (435+dy*49),(vw-91) to 326f)else listOf((100+dx*49) to (435+dy*49)))
  }
- private fun stop(){val first=lastPoints.take(1);if(lastPoints.size>1)event(MotionEvent.ACTION_POINTER_UP or (1 shl 8),lastPoints);event(MotionEvent.ACTION_UP,first);SystemClock.sleep(120)}
+ private fun stop(){if(!gestureDown)return;val first=lastPoints.take(1);if(lastPoints.size>1)event(MotionEvent.ACTION_POINTER_UP or (1 shl 8),lastPoints);event(MotionEvent.ACTION_UP,first);SystemClock.sleep(120)}
  private fun metrics()=JSONObject(activity.renderMetrics()).getJSONObject("animation")
  @Test fun animateExploreInspectAndResume(){
   ActivityScenario.launch<MainActivity>(Intent(test.targetContext,MainActivity::class.java)).use{scenario->
-   SystemClock.sleep(1500);scenario.onActivity{activity=it;engine=it.engine;scale=min(it.window.decorView.height/540f,it.window.decorView.width/960f);top=(it.window.decorView.height-540*scale)/2;vw=it.window.decorView.width/scale;engine.uiAction("home");engine.hero(0u,0u)}
+   SystemClock.sleep(1500);scenario.onActivity{activity=it;engine=it.engine;val viewport=JSONObject(it.renderMetrics()).getJSONObject("viewport");scale=viewport.getDouble("scale").toFloat();left=viewport.getDouble("left").toFloat();top=viewport.getDouble("top").toFloat();vw=viewport.getDouble("width").toFloat();engine.uiAction("home");engine.hero(0u,0u)}
    SystemClock.sleep(300);tap(200f,398f);tap(160f,407f);assertEquals(6,state().getInt("screen"))
    for((index,direction) in listOf(1f to 0f,0f to -1f,-1f to 0f,0f to 1f).withIndex()){
     beginMove(direction.first,direction.second);SystemClock.sleep(650);shot("walk-$index");stop()

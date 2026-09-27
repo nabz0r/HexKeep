@@ -35,10 +35,10 @@ class Vault(private val activity: Context) {
     companion object { private val diskLock = Any() }
     private val store = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
     private val file = AtomicFile(File(activity.filesDir,"state.hk"))
-    private val alias="hexkeep-state-v1"
+    private val alias=if(BuildConfig.OFFLINE_EDITION)"hexkeep-offline-state-v1"else"hexkeep-state-v1"
     private fun key(): SecretKey {
         (store.getKey(alias,null) as? SecretKey)?.let { return it }
-        val secure=activity.getSystemService(KeyguardManager::class.java).isDeviceSecure
+        val secure=!BuildConfig.OFFLINE_EDITION && activity.getSystemService(KeyguardManager::class.java).isDeviceSecure
         return KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES,"AndroidKeyStore").apply {
             init(KeyGenParameterSpec.Builder(alias,KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
                 .setBlockModes(KeyProperties.BLOCK_MODE_GCM).setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
@@ -71,12 +71,23 @@ class MainActivity : Activity(), LocationListener {
     private var ble:BleLantern?=null
     private var shop:PlayShop?=null
     private var ready=false
+    @Volatile private var protectedWindow=false
     private var audioRunning=AtomicBoolean(false)
     private var authSignal: CancellationSignal?=null
     private var resumed=false
     private var multicast:WifiManager.MulticastLock?=null
     private val locationManager by lazy {getSystemService(LocationManager::class.java)}
     private var lastLocation:Location?=null
+    @Volatile private var audioVolume=1f
+    private val audioManager by lazy { getSystemService(AudioManager::class.java) }
+    private val focusRequest by lazy { android.media.AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+        .setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_GAME).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build())
+        .setOnAudioFocusChangeListener { focus ->
+            audioVolume=if(focus==AudioManager.AUDIOFOCUS_GAIN)1f else 0f
+            if(focus!=AudioManager.AUDIOFOCUS_GAIN && ready) surface.suspendForInterruption()
+        }.build() }
+    private val noisyReceiver=object:android.content.BroadcastReceiver(){override fun onReceive(context:Context?,intent:Intent?){audioVolume=0f;if(ready)surface.suspendForInterruption()}}
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -84,7 +95,10 @@ class MainActivity : Activity(), LocationListener {
         window.decorView.systemUiVisibility=5894
         volumeControlStream=AudioManager.STREAM_MUSIC
         vault=Vault(this)
-        authenticate {openGame()}
+        if(Build.VERSION.SDK_INT>=33) onBackInvokedDispatcher.registerOnBackInvokedCallback(android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT){if(ready)surface.back()else finish()}
+        if(Build.VERSION.SDK_INT>=33)registerReceiver(noisyReceiver,android.content.IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY),Context.RECEIVER_NOT_EXPORTED)
+        else registerReceiver(noisyReceiver,android.content.IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY))
+        if(BuildConfig.OFFLINE_EDITION)openGame()else authenticate {openGame()}
     }
     private fun authenticate(done:()->Unit) {
         authContinuation=done
@@ -115,21 +129,28 @@ class MainActivity : Activity(), LocationListener {
     private fun openGame() {
         var failed=false
         val snapshot=try{vault.read()}catch(e:Exception){failed=true;Log.e("HEXKEEP","Encrypted save could not be opened",e);""}
-        engine=GameRuntime.engine?.takeIf{it.phare()}?:Engine(snapshot,BuildConfig.DEV_NETWORK).also{if(it.phare())it.stopPhare("Phare interrompu : réactive-le après la réouverture.")}
+        engine=if(BuildConfig.OFFLINE_EDITION)Engine.offline(snapshot)else GameRuntime.engine?.takeIf{it.phare()}?:Engine(snapshot,BuildConfig.DEV_NETWORK).also{if(it.phare())it.stopPhare("Phare interrompu : réactive-le après la réouverture.")}
         GameRuntime.engine=engine
-        try{DeviceIdentity.certify(this,engine)}catch(e:Exception){engine.notice("Keystore indisponible : identité DEV active.")}
+        if(!BuildConfig.OFFLINE_EDITION)try{DeviceIdentity.certify(this,engine)}catch(e:Exception){engine.notice("Keystore indisponible : identité DEV active.")}
         if(failed)engine.setStorageError()
         surface=NightSurface(this,engine,::persist,::action,::feedback,::protect)
         setContentView(surface);ready=true
-        if(resumed){startAudio();resumeGps()}
+        if(resumed){startAudio();if(!BuildConfig.OFFLINE_EDITION)resumeGps()}
     }
-    fun persist() {
-        if(!ready)return
-        try{vault.write(engine.snapshot())}catch(e:Exception){Log.e("HEXKEEP","Save failed",e);engine.notice("Sauvegarde impossible : déverrouille l'appareil.")}
+    fun persist() { synchronized(GameRuntime.saveLock) {
+        if(!ready||!engine.canSave())return
+        try{vault.write(engine.snapshot())}catch(e:Exception){Log.e("HEXKEEP","Save failed",e);engine.retrySave();engine.notice("Sauvegarde impossible : déverrouille l'appareil.")}
+    }
     }
     fun renderMetrics():String=surface.metrics()
-    private fun protect(sensitive:Boolean){runOnUiThread{if(sensitive)window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)else window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)}}
-    private fun action(id:Int){runOnUiThread{when(id){
+    private fun protect(sensitive:Boolean){if(sensitive==protectedWindow)return;protectedWindow=sensitive;runOnUiThread{if(sensitive)window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)else window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)}}
+    private fun action(id:Int){runOnUiThread{
+        if(BuildConfig.OFFLINE_EDITION && id !in listOf(15,16,17,19))return@runOnUiThread
+        when(id){
+        16->showReading("Vie privée",if(BuildConfig.OFFLINE_EDITION)"privacy-play.txt"else"privacy-dev.txt")
+        17->showReading("Crédits & licences","credits.txt")
+        19->{audioVolume=if(audioManager.requestAudioFocus(focusRequest)==AudioManager.AUDIOFOCUS_REQUEST_GRANTED)1f else 0f}
+
         1->requestGps()
         2->authenticate{}
         3->{if(multicast==null){multicast=(applicationContext.getSystemService(Context.WIFI_SERVICE)as WifiManager).createMulticastLock("HEXKEEP peers").apply{setReferenceCounted(false);acquire()}}}
@@ -143,6 +164,13 @@ class MainActivity : Activity(), LocationListener {
         15->{getPreferences(0).edit().putBoolean("gps-enabled",false).apply();locationManager.removeUpdates(this);lastLocation=null}
         14->{val input=android.widget.EditText(this);input.hint="/ip4/.../tcp/.../p2p/...";android.app.AlertDialog.Builder(this).setTitle("Pair ou relais").setView(input).setPositiveButton("Connecter"){_,_->connectAddress(input.text.toString(),false)}.setNeutralButton("Réserver un relais"){_,_->connectAddress(input.text.toString(),true)}.setNegativeButton("Retour",null).show()}
     }}}
+    private fun showReading(title:String,asset:String){
+        val body=android.widget.TextView(this).apply{ text=assets.open(asset).bufferedReader().use{it.readText()};textSize=16f;setTextColor(android.graphics.Color.rgb(238,234,220));setPadding(32,24,32,24);setTextIsSelectable(true) }
+        val scroll=android.widget.ScrollView(this).apply{addView(body);setBackgroundColor(android.graphics.Color.rgb(15,31,41))}
+        val dialog=android.app.AlertDialog.Builder(this).setTitle(title).setView(scroll).setPositiveButton("Fermer",null)
+        if(asset=="credits.txt")dialog.setNeutralButton("Composants tiers"){_,_->val files=assets.list("licenses")?:emptyArray();android.app.AlertDialog.Builder(this).setTitle("Licences des composants").setItems(files){_,which->showReading(files[which],"licenses/"+files[which])}.setNegativeButton("Fermer",null).show()}
+        dialog.show()
+    }
     private fun connectAddress(value:String,relay:Boolean){Thread({try{var address=value.trim();val parts=address.split("/");if(parts.size>3&&parts[1]in listOf("dns","dns4","dns6")){val resolved=java.net.InetAddress.getAllByName(parts[2]).firstOrNull{parts[1]=="dns"||(parts[1]=="dns4"&&it is java.net.Inet4Address)||(parts[1]=="dns6"&&it is java.net.Inet6Address)}?:throw IllegalArgumentException("DNS");address="/${if(resolved is java.net.Inet4Address)"ip4"else"ip6"}/${resolved.hostAddress}/"+parts.drop(3).joinToString("/")};if(relay)engine.reserveRelay(address)else engine.connect(address)}catch(_:Exception){engine.notice("Adresse indisponible. Vérifie le pair ou le relais.")}},"HEXKEEP system DNS").start()}
     private fun requestBle(){val permissions=if(Build.VERSION.SDK_INT>=31)arrayOf(Manifest.permission.BLUETOOTH_SCAN,Manifest.permission.BLUETOOTH_ADVERTISE,Manifest.permission.BLUETOOTH_CONNECT)else arrayOf(Manifest.permission.ACCESS_FINE_LOCATION);if(permissions.any{checkSelfPermission(it)!=PackageManager.PERMISSION_GRANTED}){requestPermissions(permissions,32);return};ble?.stop();ble=BleLantern(this,engine).also{it.start()}}
     private fun feedback(){runOnUiThread{getSystemService(Vibrator::class.java)?.vibrate(VibrationEffect.createOneShot(18,80))}}
@@ -166,6 +194,7 @@ class MainActivity : Activity(), LocationListener {
     @Deprecated("Platform callback") override fun onStatusChanged(provider:String?,status:Int,extras:Bundle?){}
     private fun startAudio(){
         if(!ready||audioRunning.get())return
+        audioVolume=if(audioManager.requestAudioFocus(focusRequest)==AudioManager.AUDIOFOCUS_REQUEST_GRANTED)1f else 0f
         val running=AtomicBoolean(true);audioRunning=running
         Thread({
             android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO)
@@ -173,11 +202,13 @@ class MainActivity : Activity(), LocationListener {
                 .setAudioFormat(AudioFormat.Builder().setSampleRate(44100).setChannelMask(AudioFormat.CHANNEL_OUT_MONO).setEncoding(AudioFormat.ENCODING_PCM_16BIT).build())
                 .setBufferSizeInBytes(maxOf(8820,AudioTrack.getMinBufferSize(44100,AudioFormat.CHANNEL_OUT_MONO,AudioFormat.ENCODING_PCM_16BIT)))
                 .setTransferMode(AudioTrack.MODE_STREAM).build()
-            try{track.play();while(running.get()){val pcm=engine.audio(1470u);track.write(pcm,0,pcm.size)}}catch(e:Exception){Log.w("HEXKEEP","Audio interrupted",e)}finally{track.stop();track.release()}
+            try{track.play();while(running.get()){track.setVolume(audioVolume);val pcm=engine.audio(1470u);track.write(pcm,0,pcm.size)}}catch(e:Exception){Log.w("HEXKEEP","Audio interrupted",e)}finally{track.stop();track.release()}
         },"HEXKEEP audio").start()
     }
-    override fun onPause(){resumed=false;GameRuntime.foreground=false;audioRunning.set(false);if(ready){engine.touch(0,3u,0,0);if(!engine.phare()){engine.pauseNetwork();ble?.stop()};multicast?.let{if(it.isHeld)it.release()};multicast=null;surface.onPause();if(engine.dirty())persist()};locationManager.removeUpdates(this);super.onPause()}
-    override fun onResume(){super.onResume();resumed=true;GameRuntime.foreground=true;window.decorView.systemUiVisibility=5894;if(ready){surface.onResume();startAudio();resumeGps()}}
-    override fun onDestroy(){if(ready)surface.close();shop?.close();ble?.stop();audioRunning.set(false);authSignal?.cancel();super.onDestroy()}
+    override fun onPause(){resumed=false;GameRuntime.foreground=false;audioRunning.set(false);if(ready){engine.touch(0,3u,0,0);if(!engine.phare()){engine.pauseNetwork();ble?.stop()};multicast?.let{if(it.isHeld)it.release()};multicast=null;surface.onPause();persist()};if(!BuildConfig.OFFLINE_EDITION)locationManager.removeUpdates(this);audioManager.abandonAudioFocusRequest(focusRequest);super.onPause()}
+    override fun onResume(){super.onResume();resumed=true;GameRuntime.foreground=true;window.decorView.systemUiVisibility=5894;if(ready){surface.onResume();startAudio();if(!BuildConfig.OFFLINE_EDITION)resumeGps()}}
+    override fun onDestroy(){if(ready)surface.close();shop?.close();ble?.stop();audioRunning.set(false);authSignal?.cancel();unregisterReceiver(noisyReceiver);super.onDestroy()}
+    // API 33+ is handled by the OnBackInvokedDispatcher registered in onCreate.
+    @android.annotation.SuppressLint("GestureBackNavigation")
     @Deprecated("Back compatibility") override fun onBackPressed(){if(ready){surface.back()}else super.onBackPressed()}
 }

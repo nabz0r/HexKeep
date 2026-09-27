@@ -30,6 +30,8 @@ import java.nio.CharBuffer
 import java.nio.charset.CodingErrorAction
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.ConcurrentHashMap
+import android.os.Build
+import androidx.annotation.RequiresApi
 import java.util.concurrent.atomic.AtomicBoolean
 
 // This is a helper for safely working with byte buffers returned from the Rust code.
@@ -794,17 +796,23 @@ internal interface UniffiForeignFutureCompleteVoid : com.sun.jna.Callback {
 
 
 
+
+
+
+
+
+
 // For large crates we prevent `MethodTooLargeException` (see #2340)
-// N.B. the name of the extension is very misleading, since it is 
-// rather `InterfaceTooLargeException`, caused by too many methods 
+// N.B. the name of the extension is very misleading, since it is
+// rather `InterfaceTooLargeException`, caused by too many methods
 // in the interface for large crates.
 //
 // By splitting the otherwise huge interface into two parts
-// * UniffiLib 
+// * UniffiLib
 // * IntegrityCheckingUniffiLib (this)
 // we allow for ~2x as many methods in the UniffiLib interface.
-// 
-// The `ffi_uniffi_contract_version` method and all checksum methods are put 
+//
+// The `ffi_uniffi_contract_version` method and all checksum methods are put
 // into `IntegrityCheckingUniffiLib` and these methods are called only once,
 // when the library is loaded.
 internal interface IntegrityCheckingUniffiLib : Library {
@@ -820,6 +828,8 @@ fun uniffi_hk_ffi_checksum_method_engine_beacon(
 fun uniffi_hk_ffi_checksum_method_engine_ble_observed(
 ): Short
 fun uniffi_hk_ffi_checksum_method_engine_ble_status(
+): Short
+fun uniffi_hk_ffi_checksum_method_engine_can_save(
 ): Short
 fun uniffi_hk_ffi_checksum_method_engine_connect(
 ): Short
@@ -867,6 +877,8 @@ fun uniffi_hk_ffi_checksum_method_engine_proof(
 ): Short
 fun uniffi_hk_ffi_checksum_method_engine_reserve_relay(
 ): Short
+fun uniffi_hk_ffi_checksum_method_engine_retry_save(
+): Short
 fun uniffi_hk_ffi_checksum_method_engine_sensitive(
 ): Short
 fun uniffi_hk_ffi_checksum_method_engine_session_certify(
@@ -889,6 +901,8 @@ fun uniffi_hk_ffi_checksum_method_engine_ui_action(
 ): Short
 fun uniffi_hk_ffi_checksum_constructor_engine_new(
 ): Short
+fun uniffi_hk_ffi_checksum_constructor_engine_offline(
+): Short
 fun ffi_hk_ffi_uniffi_contract_version(
 ): Int
 
@@ -901,8 +915,8 @@ internal interface UniffiLib : Library {
         internal val INSTANCE: UniffiLib by lazy {
             val componentName = "hk_ffi"
             // For large crates we prevent `MethodTooLargeException` (see #2340)
-            // N.B. the name of the extension is very misleading, since it is 
-            // rather `InterfaceTooLargeException`, caused by too many methods 
+            // N.B. the name of the extension is very misleading, since it is
+            // rather `InterfaceTooLargeException`, caused by too many methods
             // in the interface for large crates.
             //
             // By splitting the otherwise huge interface into two parts
@@ -910,7 +924,7 @@ internal interface UniffiLib : Library {
             // * IntegrityCheckingUniffiLib
             // And all checksum methods are put into `IntegrityCheckingUniffiLib`
             // we allow for ~2x as many methods in the UniffiLib interface.
-            // 
+            //
             // Thus we first load the library with `loadIndirect` as `IntegrityCheckingUniffiLib`
             // so that we can (optionally!) call `uniffiCheckApiChecksums`...
             loadIndirect<IntegrityCheckingUniffiLib>(componentName)
@@ -925,12 +939,12 @@ internal interface UniffiLib : Library {
             // to trigger this issue, the performance impact is negligible, running on
             // a macOS M1 machine the `loadIndirect` call takes ~50ms.
             val lib = loadIndirect<UniffiLib>(componentName)
-            // No need to check the contract version and checksums, since 
+            // No need to check the contract version and checksums, since
             // we already did that with `IntegrityCheckingUniffiLib` above.
             // Loading of library with integrity check done.
             lib
         }
-        
+
         // The Cleaner for the whole library
         internal val CLEANER: UniffiCleaner by lazy {
             UniffiCleaner.create()
@@ -938,97 +952,103 @@ internal interface UniffiLib : Library {
     }
 
     // FFI functions
-    fun uniffi_hk_ffi_fn_clone_engine(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+    fun uniffi_hk_ffi_fn_clone_engine(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
 ): Pointer
-fun uniffi_hk_ffi_fn_free_engine(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_free_engine(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
 ): Unit
-fun uniffi_hk_ffi_fn_constructor_engine_new(`snapshot`: RustBuffer.ByValue,`dev`: Byte,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_constructor_engine_new(`snapshot`: RustBuffer.ByValue,`dev`: Byte,uniffi_out_err: UniffiRustCallStatus,
 ): Pointer
-fun uniffi_hk_ffi_fn_method_engine_action(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_constructor_engine_offline(`snapshot`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
+): Pointer
+fun uniffi_hk_ffi_fn_method_engine_action(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
 ): Byte
-fun uniffi_hk_ffi_fn_method_engine_audio(`ptr`: Pointer,`count`: Int,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_audio(`ptr`: Pointer,`count`: Int,uniffi_out_err: UniffiRustCallStatus,
 ): RustBuffer.ByValue
-fun uniffi_hk_ffi_fn_method_engine_back(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_back(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
 ): Unit
-fun uniffi_hk_ffi_fn_method_engine_beacon(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_beacon(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
 ): RustBuffer.ByValue
-fun uniffi_hk_ffi_fn_method_engine_ble_observed(`ptr`: Pointer,`bytes`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_ble_observed(`ptr`: Pointer,`bytes`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
 ): Unit
-fun uniffi_hk_ffi_fn_method_engine_ble_status(`ptr`: Pointer,`message`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_ble_status(`ptr`: Pointer,`message`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
 ): Unit
-fun uniffi_hk_ffi_fn_method_engine_connect(`ptr`: Pointer,`address`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
-): Unit
-fun uniffi_hk_ffi_fn_method_engine_controls(`ptr`: Pointer,`mx`: Short,`my`: Short,`ax`: Short,`ay`: Short,`auto`: Byte,`dash`: Byte,`skill`: Byte,uniffi_out_err: UniffiRustCallStatus, 
-): Unit
-fun uniffi_hk_ffi_fn_method_engine_debug_status(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
-): RustBuffer.ByValue
-fun uniffi_hk_ffi_fn_method_engine_determinism_check(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
-): RustBuffer.ByValue
-fun uniffi_hk_ffi_fn_method_engine_dirty(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_can_save(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
 ): Byte
-fun uniffi_hk_ffi_fn_method_engine_frame(`ptr`: Pointer,`width`: Int,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_connect(`ptr`: Pointer,`address`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
+): Unit
+fun uniffi_hk_ffi_fn_method_engine_controls(`ptr`: Pointer,`mx`: Short,`my`: Short,`ax`: Short,`ay`: Short,`auto`: Byte,`dash`: Byte,`skill`: Byte,uniffi_out_err: UniffiRustCallStatus,
+): Unit
+fun uniffi_hk_ffi_fn_method_engine_debug_status(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
 ): RustBuffer.ByValue
-fun uniffi_hk_ffi_fn_method_engine_haptic(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_determinism_check(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
+): RustBuffer.ByValue
+fun uniffi_hk_ffi_fn_method_engine_dirty(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
 ): Byte
-fun uniffi_hk_ffi_fn_method_engine_hero(`ptr`: Pointer,`realm`: Byte,`role`: Byte,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_frame(`ptr`: Pointer,`width`: Int,uniffi_out_err: UniffiRustCallStatus,
+): RustBuffer.ByValue
+fun uniffi_hk_ffi_fn_method_engine_haptic(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
+): Byte
+fun uniffi_hk_ffi_fn_method_engine_hero(`ptr`: Pointer,`realm`: Byte,`role`: Byte,uniffi_out_err: UniffiRustCallStatus,
 ): Unit
-fun uniffi_hk_ffi_fn_method_engine_identity_challenge(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_identity_challenge(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
 ): RustBuffer.ByValue
-fun uniffi_hk_ffi_fn_method_engine_identity_public(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_identity_public(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
 ): RustBuffer.ByValue
-fun uniffi_hk_ffi_fn_method_engine_import_exchange(`ptr`: Pointer,`data`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_import_exchange(`ptr`: Pointer,`data`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
 ): RustBuffer.ByValue
-fun uniffi_hk_ffi_fn_method_engine_location(`ptr`: Pointer,`lat`: Int,`lng`: Int,`mock`: Byte,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_location(`ptr`: Pointer,`lat`: Int,`lng`: Int,`mock`: Byte,uniffi_out_err: UniffiRustCallStatus,
 ): Unit
-fun uniffi_hk_ffi_fn_method_engine_memory_speed(`ptr`: Pointer,`speed`: Int,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_memory_speed(`ptr`: Pointer,`speed`: Int,uniffi_out_err: UniffiRustCallStatus,
 ): Unit
-fun uniffi_hk_ffi_fn_method_engine_native_text(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_native_text(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
 ): RustBuffer.ByValue
-fun uniffi_hk_ffi_fn_method_engine_network_addresses(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_network_addresses(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
 ): RustBuffer.ByValue
-fun uniffi_hk_ffi_fn_method_engine_network_peers(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_network_peers(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
 ): Int
-fun uniffi_hk_ffi_fn_method_engine_network_report(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_network_report(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
 ): RustBuffer.ByValue
-fun uniffi_hk_ffi_fn_method_engine_notice(`ptr`: Pointer,`message`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_notice(`ptr`: Pointer,`message`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
 ): Unit
-fun uniffi_hk_ffi_fn_method_engine_pause_network(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_pause_network(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
 ): Unit
-fun uniffi_hk_ffi_fn_method_engine_phare(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_phare(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
 ): Byte
-fun uniffi_hk_ffi_fn_method_engine_presentation(`ptr`: Pointer,`width`: Int,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_presentation(`ptr`: Pointer,`width`: Int,uniffi_out_err: UniffiRustCallStatus,
 ): RustBuffer.ByValue
-fun uniffi_hk_ffi_fn_method_engine_proof(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_proof(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
 ): RustBuffer.ByValue
-fun uniffi_hk_ffi_fn_method_engine_reserve_relay(`ptr`: Pointer,`address`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_reserve_relay(`ptr`: Pointer,`address`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
 ): Unit
-fun uniffi_hk_ffi_fn_method_engine_sensitive(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_retry_save(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
+): Unit
+fun uniffi_hk_ffi_fn_method_engine_sensitive(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
 ): Byte
-fun uniffi_hk_ffi_fn_method_engine_session_certify(`ptr`: Pointer,`signature`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_session_certify(`ptr`: Pointer,`signature`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
 ): Byte
-fun uniffi_hk_ffi_fn_method_engine_session_request(`ptr`: Pointer,`public`: RustBuffer.ByValue,`attestation`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_session_request(`ptr`: Pointer,`public`: RustBuffer.ByValue,`attestation`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
 ): RustBuffer.ByValue
-fun uniffi_hk_ffi_fn_method_engine_set_storage_error(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_set_storage_error(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
 ): Unit
-fun uniffi_hk_ffi_fn_method_engine_snapshot(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_snapshot(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
 ): RustBuffer.ByValue
-fun uniffi_hk_ffi_fn_method_engine_stop_phare(`ptr`: Pointer,`message`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_stop_phare(`ptr`: Pointer,`message`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
 ): Unit
-fun uniffi_hk_ffi_fn_method_engine_throne_unlock(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_throne_unlock(`ptr`: Pointer,uniffi_out_err: UniffiRustCallStatus,
 ): Unit
-fun uniffi_hk_ffi_fn_method_engine_tick(`ptr`: Pointer,`time`: Long,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_tick(`ptr`: Pointer,`time`: Long,uniffi_out_err: UniffiRustCallStatus,
 ): Unit
-fun uniffi_hk_ffi_fn_method_engine_touch(`ptr`: Pointer,`id`: Int,`phase`: Byte,`x`: Int,`y`: Int,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_touch(`ptr`: Pointer,`id`: Int,`phase`: Byte,`x`: Int,`y`: Int,uniffi_out_err: UniffiRustCallStatus,
 ): Unit
-fun uniffi_hk_ffi_fn_method_engine_ui_action(`ptr`: Pointer,`action`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+fun uniffi_hk_ffi_fn_method_engine_ui_action(`ptr`: Pointer,`action`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
 ): Unit
-fun ffi_hk_ffi_rustbuffer_alloc(`size`: Long,uniffi_out_err: UniffiRustCallStatus, 
+fun ffi_hk_ffi_rustbuffer_alloc(`size`: Long,uniffi_out_err: UniffiRustCallStatus,
 ): RustBuffer.ByValue
-fun ffi_hk_ffi_rustbuffer_from_bytes(`bytes`: ForeignBytes.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+fun ffi_hk_ffi_rustbuffer_from_bytes(`bytes`: ForeignBytes.ByValue,uniffi_out_err: UniffiRustCallStatus,
 ): RustBuffer.ByValue
-fun ffi_hk_ffi_rustbuffer_free(`buf`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+fun ffi_hk_ffi_rustbuffer_free(`buf`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus,
 ): Unit
-fun ffi_hk_ffi_rustbuffer_reserve(`buf`: RustBuffer.ByValue,`additional`: Long,uniffi_out_err: UniffiRustCallStatus, 
+fun ffi_hk_ffi_rustbuffer_reserve(`buf`: RustBuffer.ByValue,`additional`: Long,uniffi_out_err: UniffiRustCallStatus,
 ): RustBuffer.ByValue
 fun ffi_hk_ffi_rust_future_poll_u8(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
 ): Unit
@@ -1036,7 +1056,7 @@ fun ffi_hk_ffi_rust_future_cancel_u8(`handle`: Long,
 ): Unit
 fun ffi_hk_ffi_rust_future_free_u8(`handle`: Long,
 ): Unit
-fun ffi_hk_ffi_rust_future_complete_u8(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+fun ffi_hk_ffi_rust_future_complete_u8(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
 ): Byte
 fun ffi_hk_ffi_rust_future_poll_i8(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
 ): Unit
@@ -1044,7 +1064,7 @@ fun ffi_hk_ffi_rust_future_cancel_i8(`handle`: Long,
 ): Unit
 fun ffi_hk_ffi_rust_future_free_i8(`handle`: Long,
 ): Unit
-fun ffi_hk_ffi_rust_future_complete_i8(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+fun ffi_hk_ffi_rust_future_complete_i8(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
 ): Byte
 fun ffi_hk_ffi_rust_future_poll_u16(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
 ): Unit
@@ -1052,7 +1072,7 @@ fun ffi_hk_ffi_rust_future_cancel_u16(`handle`: Long,
 ): Unit
 fun ffi_hk_ffi_rust_future_free_u16(`handle`: Long,
 ): Unit
-fun ffi_hk_ffi_rust_future_complete_u16(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+fun ffi_hk_ffi_rust_future_complete_u16(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
 ): Short
 fun ffi_hk_ffi_rust_future_poll_i16(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
 ): Unit
@@ -1060,7 +1080,7 @@ fun ffi_hk_ffi_rust_future_cancel_i16(`handle`: Long,
 ): Unit
 fun ffi_hk_ffi_rust_future_free_i16(`handle`: Long,
 ): Unit
-fun ffi_hk_ffi_rust_future_complete_i16(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+fun ffi_hk_ffi_rust_future_complete_i16(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
 ): Short
 fun ffi_hk_ffi_rust_future_poll_u32(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
 ): Unit
@@ -1068,7 +1088,7 @@ fun ffi_hk_ffi_rust_future_cancel_u32(`handle`: Long,
 ): Unit
 fun ffi_hk_ffi_rust_future_free_u32(`handle`: Long,
 ): Unit
-fun ffi_hk_ffi_rust_future_complete_u32(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+fun ffi_hk_ffi_rust_future_complete_u32(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
 ): Int
 fun ffi_hk_ffi_rust_future_poll_i32(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
 ): Unit
@@ -1076,7 +1096,7 @@ fun ffi_hk_ffi_rust_future_cancel_i32(`handle`: Long,
 ): Unit
 fun ffi_hk_ffi_rust_future_free_i32(`handle`: Long,
 ): Unit
-fun ffi_hk_ffi_rust_future_complete_i32(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+fun ffi_hk_ffi_rust_future_complete_i32(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
 ): Int
 fun ffi_hk_ffi_rust_future_poll_u64(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
 ): Unit
@@ -1084,7 +1104,7 @@ fun ffi_hk_ffi_rust_future_cancel_u64(`handle`: Long,
 ): Unit
 fun ffi_hk_ffi_rust_future_free_u64(`handle`: Long,
 ): Unit
-fun ffi_hk_ffi_rust_future_complete_u64(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+fun ffi_hk_ffi_rust_future_complete_u64(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
 ): Long
 fun ffi_hk_ffi_rust_future_poll_i64(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
 ): Unit
@@ -1092,7 +1112,7 @@ fun ffi_hk_ffi_rust_future_cancel_i64(`handle`: Long,
 ): Unit
 fun ffi_hk_ffi_rust_future_free_i64(`handle`: Long,
 ): Unit
-fun ffi_hk_ffi_rust_future_complete_i64(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+fun ffi_hk_ffi_rust_future_complete_i64(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
 ): Long
 fun ffi_hk_ffi_rust_future_poll_f32(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
 ): Unit
@@ -1100,7 +1120,7 @@ fun ffi_hk_ffi_rust_future_cancel_f32(`handle`: Long,
 ): Unit
 fun ffi_hk_ffi_rust_future_free_f32(`handle`: Long,
 ): Unit
-fun ffi_hk_ffi_rust_future_complete_f32(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+fun ffi_hk_ffi_rust_future_complete_f32(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
 ): Float
 fun ffi_hk_ffi_rust_future_poll_f64(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
 ): Unit
@@ -1108,7 +1128,7 @@ fun ffi_hk_ffi_rust_future_cancel_f64(`handle`: Long,
 ): Unit
 fun ffi_hk_ffi_rust_future_free_f64(`handle`: Long,
 ): Unit
-fun ffi_hk_ffi_rust_future_complete_f64(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+fun ffi_hk_ffi_rust_future_complete_f64(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
 ): Double
 fun ffi_hk_ffi_rust_future_poll_pointer(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
 ): Unit
@@ -1116,7 +1136,7 @@ fun ffi_hk_ffi_rust_future_cancel_pointer(`handle`: Long,
 ): Unit
 fun ffi_hk_ffi_rust_future_free_pointer(`handle`: Long,
 ): Unit
-fun ffi_hk_ffi_rust_future_complete_pointer(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+fun ffi_hk_ffi_rust_future_complete_pointer(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
 ): Pointer
 fun ffi_hk_ffi_rust_future_poll_rust_buffer(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
 ): Unit
@@ -1124,7 +1144,7 @@ fun ffi_hk_ffi_rust_future_cancel_rust_buffer(`handle`: Long,
 ): Unit
 fun ffi_hk_ffi_rust_future_free_rust_buffer(`handle`: Long,
 ): Unit
-fun ffi_hk_ffi_rust_future_complete_rust_buffer(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+fun ffi_hk_ffi_rust_future_complete_rust_buffer(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
 ): RustBuffer.ByValue
 fun ffi_hk_ffi_rust_future_poll_void(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
 ): Unit
@@ -1132,7 +1152,7 @@ fun ffi_hk_ffi_rust_future_cancel_void(`handle`: Long,
 ): Unit
 fun ffi_hk_ffi_rust_future_free_void(`handle`: Long,
 ): Unit
-fun ffi_hk_ffi_rust_future_complete_void(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+fun ffi_hk_ffi_rust_future_complete_void(`handle`: Long,uniffi_out_err: UniffiRustCallStatus,
 ): Unit
 
 }
@@ -1164,6 +1184,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_hk_ffi_checksum_method_engine_ble_status() != 19129.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_hk_ffi_checksum_method_engine_can_save() != 4836.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_hk_ffi_checksum_method_engine_connect() != 29984.toShort()) {
@@ -1235,6 +1258,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_hk_ffi_checksum_method_engine_reserve_relay() != 39188.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if (lib.uniffi_hk_ffi_checksum_method_engine_retry_save() != 23768.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if (lib.uniffi_hk_ffi_checksum_method_engine_sensitive() != 28793.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
@@ -1266,6 +1292,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_hk_ffi_checksum_constructor_engine_new() != 34553.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_hk_ffi_checksum_constructor_engine_offline() != 28965.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
 }
@@ -1340,7 +1369,7 @@ inline fun <T : Disposable?, R> T.use(block: (T) -> R) =
         }
     }
 
-/** 
+/**
  * Used to instantiate an interface without an actual pointer, for fakes in tests, mostly.
  *
  * @suppress
@@ -1385,28 +1414,28 @@ private class UniffiJnaCleanable(
 // using Android or not.
 // There are further runtime checks to chose the correct implementation
 // of the cleaner.
+
+
 private fun UniffiCleaner.Companion.create(): UniffiCleaner =
-    try {
-        // For safety's sake: if the library hasn't been run in android_cleaner = true
-        // mode, but is being run on Android, then we still need to think about
-        // Android API versions.
-        // So we check if java.lang.ref.Cleaner is there, and use that…
-        java.lang.Class.forName("java.lang.ref.Cleaner")
-        JavaLangRefCleaner()
-    } catch (e: ClassNotFoundException) {
-        // … otherwise, fallback to the JNA cleaner.
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        AndroidSystemCleaner()
+    } else {
         UniffiJnaCleaner()
     }
 
-private class JavaLangRefCleaner : UniffiCleaner {
-    val cleaner = java.lang.ref.Cleaner.create()
+// The SystemCleaner, available from API Level 33.
+// Some API Level 33 OSes do not support using it, so we require API Level 34.
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+private class AndroidSystemCleaner : UniffiCleaner {
+    val cleaner = android.system.SystemCleaner.cleaner()
 
     override fun register(value: Any, cleanUpTask: Runnable): UniffiCleaner.Cleanable =
-        JavaLangRefCleanable(cleaner.register(value, cleanUpTask))
+        AndroidSystemCleanable(cleaner.register(value, cleanUpTask))
 }
 
-private class JavaLangRefCleanable(
-    val cleanable: java.lang.ref.Cleaner.Cleanable
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+private class AndroidSystemCleanable(
+    private val cleanable: java.lang.ref.Cleaner.Cleanable,
 ) : UniffiCleaner.Cleanable {
     override fun clean() = cleanable.clean()
 }
@@ -1725,85 +1754,89 @@ public object FfiConverterByteArray: FfiConverterRustBuffer<ByteArray> {
 
 
 public interface EngineInterface {
-    
+
     fun `action`(): kotlin.UByte
-    
+
     fun `audio`(`count`: kotlin.UInt): kotlin.ByteArray
-    
+
     fun `back`()
-    
+
     fun `beacon`(): kotlin.ByteArray
-    
+
     fun `bleObserved`(`bytes`: kotlin.ByteArray)
-    
+
     fun `bleStatus`(`message`: kotlin.String)
-    
+
+    fun `canSave`(): kotlin.Boolean
+
     fun `connect`(`address`: kotlin.String)
-    
+
     fun `controls`(`mx`: kotlin.Short, `my`: kotlin.Short, `ax`: kotlin.Short, `ay`: kotlin.Short, `auto`: kotlin.Boolean, `dash`: kotlin.Boolean, `skill`: kotlin.Boolean)
-    
+
     fun `debugStatus`(): kotlin.String
-    
+
     fun `determinismCheck`(): kotlin.String
-    
+
     fun `dirty`(): kotlin.Boolean
-    
+
     fun `frame`(`width`: kotlin.Int): kotlin.ByteArray
-    
+
     fun `haptic`(): kotlin.UByte
-    
+
     fun `hero`(`realm`: kotlin.UByte, `role`: kotlin.UByte)
-    
+
     fun `identityChallenge`(): kotlin.ByteArray
-    
+
     fun `identityPublic`(): kotlin.ByteArray
-    
+
     fun `importExchange`(`data`: kotlin.String): kotlin.String
-    
+
     fun `location`(`lat`: kotlin.Int, `lng`: kotlin.Int, `mock`: kotlin.Boolean)
-    
+
     fun `memorySpeed`(`speed`: kotlin.UInt)
-    
+
     fun `nativeText`(): kotlin.String
-    
+
     fun `networkAddresses`(): List<kotlin.String>
-    
+
     fun `networkPeers`(): kotlin.UInt
-    
+
     fun `networkReport`(): kotlin.String
-    
+
     fun `notice`(`message`: kotlin.String)
-    
+
     fun `pauseNetwork`()
-    
+
     fun `phare`(): kotlin.Boolean
-    
+
     fun `presentation`(`width`: kotlin.Int): kotlin.String
-    
+
     fun `proof`(): kotlin.String
-    
+
     fun `reserveRelay`(`address`: kotlin.String)
-    
+
+    fun `retrySave`()
+
     fun `sensitive`(): kotlin.Boolean
-    
+
     fun `sessionCertify`(`signature`: kotlin.ByteArray): kotlin.Boolean
-    
+
     fun `sessionRequest`(`public`: kotlin.ByteArray, `attestation`: kotlin.String): kotlin.ByteArray
-    
+
     fun `setStorageError`()
-    
+
     fun `snapshot`(): kotlin.String
-    
+
     fun `stopPhare`(`message`: kotlin.String)
-    
+
     fun `throneUnlock`()
-    
+
     fun `tick`(`time`: kotlin.ULong)
-    
+
     fun `touch`(`id`: kotlin.Int, `phase`: kotlin.UByte, `x`: kotlin.Int, `y`: kotlin.Int)
-    
+
     fun `uiAction`(`action`: kotlin.String)
-    
+
     companion object
 }
 
@@ -1906,7 +1939,7 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
-    
+
 
     override fun `audio`(`count`: kotlin.UInt): kotlin.ByteArray {
             return FfiConverterByteArray.lift(
@@ -1918,18 +1951,18 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
-    
+
 
     override fun `back`()
-        = 
+        =
     callWithPointer {
     uniffiRustCall() { _status ->
     UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_back(
         it, _status)
 }
     }
-    
-    
+
+
 
     override fun `beacon`(): kotlin.ByteArray {
             return FfiConverterByteArray.lift(
@@ -1941,51 +1974,63 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
-    
+
 
     override fun `bleObserved`(`bytes`: kotlin.ByteArray)
-        = 
+        =
     callWithPointer {
     uniffiRustCall() { _status ->
     UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_ble_observed(
         it, FfiConverterByteArray.lower(`bytes`),_status)
 }
     }
-    
-    
+
+
 
     override fun `bleStatus`(`message`: kotlin.String)
-        = 
+        =
     callWithPointer {
     uniffiRustCall() { _status ->
     UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_ble_status(
         it, FfiConverterString.lower(`message`),_status)
 }
     }
-    
-    
+
+
+
+    override fun `canSave`(): kotlin.Boolean {
+            return FfiConverterBoolean.lift(
+    callWithPointer {
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_can_save(
+        it, _status)
+}
+    }
+    )
+    }
+
 
     override fun `connect`(`address`: kotlin.String)
-        = 
+        =
     callWithPointer {
     uniffiRustCall() { _status ->
     UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_connect(
         it, FfiConverterString.lower(`address`),_status)
 }
     }
-    
-    
+
+
 
     override fun `controls`(`mx`: kotlin.Short, `my`: kotlin.Short, `ax`: kotlin.Short, `ay`: kotlin.Short, `auto`: kotlin.Boolean, `dash`: kotlin.Boolean, `skill`: kotlin.Boolean)
-        = 
+        =
     callWithPointer {
     uniffiRustCall() { _status ->
     UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_controls(
         it, FfiConverterShort.lower(`mx`),FfiConverterShort.lower(`my`),FfiConverterShort.lower(`ax`),FfiConverterShort.lower(`ay`),FfiConverterBoolean.lower(`auto`),FfiConverterBoolean.lower(`dash`),FfiConverterBoolean.lower(`skill`),_status)
 }
     }
-    
-    
+
+
 
     override fun `debugStatus`(): kotlin.String {
             return FfiConverterString.lift(
@@ -1997,7 +2042,7 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
-    
+
 
     override fun `determinismCheck`(): kotlin.String {
             return FfiConverterString.lift(
@@ -2009,7 +2054,7 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
-    
+
 
     override fun `dirty`(): kotlin.Boolean {
             return FfiConverterBoolean.lift(
@@ -2021,7 +2066,7 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
-    
+
 
     override fun `frame`(`width`: kotlin.Int): kotlin.ByteArray {
             return FfiConverterByteArray.lift(
@@ -2033,7 +2078,7 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
-    
+
 
     override fun `haptic`(): kotlin.UByte {
             return FfiConverterUByte.lift(
@@ -2045,18 +2090,18 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
-    
+
 
     override fun `hero`(`realm`: kotlin.UByte, `role`: kotlin.UByte)
-        = 
+        =
     callWithPointer {
     uniffiRustCall() { _status ->
     UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_hero(
         it, FfiConverterUByte.lower(`realm`),FfiConverterUByte.lower(`role`),_status)
 }
     }
-    
-    
+
+
 
     override fun `identityChallenge`(): kotlin.ByteArray {
             return FfiConverterByteArray.lift(
@@ -2068,7 +2113,7 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
-    
+
 
     override fun `identityPublic`(): kotlin.ByteArray {
             return FfiConverterByteArray.lift(
@@ -2080,7 +2125,7 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
-    
+
 
     override fun `importExchange`(`data`: kotlin.String): kotlin.String {
             return FfiConverterString.lift(
@@ -2092,29 +2137,29 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
-    
+
 
     override fun `location`(`lat`: kotlin.Int, `lng`: kotlin.Int, `mock`: kotlin.Boolean)
-        = 
+        =
     callWithPointer {
     uniffiRustCall() { _status ->
     UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_location(
         it, FfiConverterInt.lower(`lat`),FfiConverterInt.lower(`lng`),FfiConverterBoolean.lower(`mock`),_status)
 }
     }
-    
-    
+
+
 
     override fun `memorySpeed`(`speed`: kotlin.UInt)
-        = 
+        =
     callWithPointer {
     uniffiRustCall() { _status ->
     UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_memory_speed(
         it, FfiConverterUInt.lower(`speed`),_status)
 }
     }
-    
-    
+
+
 
     override fun `nativeText`(): kotlin.String {
             return FfiConverterString.lift(
@@ -2126,7 +2171,7 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
-    
+
 
     override fun `networkAddresses`(): List<kotlin.String> {
             return FfiConverterSequenceString.lift(
@@ -2138,7 +2183,7 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
-    
+
 
     override fun `networkPeers`(): kotlin.UInt {
             return FfiConverterUInt.lift(
@@ -2150,7 +2195,7 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
-    
+
 
     override fun `networkReport`(): kotlin.String {
             return FfiConverterString.lift(
@@ -2162,29 +2207,29 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
-    
+
 
     override fun `notice`(`message`: kotlin.String)
-        = 
+        =
     callWithPointer {
     uniffiRustCall() { _status ->
     UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_notice(
         it, FfiConverterString.lower(`message`),_status)
 }
     }
-    
-    
+
+
 
     override fun `pauseNetwork`()
-        = 
+        =
     callWithPointer {
     uniffiRustCall() { _status ->
     UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_pause_network(
         it, _status)
 }
     }
-    
-    
+
+
 
     override fun `phare`(): kotlin.Boolean {
             return FfiConverterBoolean.lift(
@@ -2196,7 +2241,7 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
-    
+
 
     override fun `presentation`(`width`: kotlin.Int): kotlin.String {
             return FfiConverterString.lift(
@@ -2208,7 +2253,7 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
-    
+
 
     override fun `proof`(): kotlin.String {
             return FfiConverterString.lift(
@@ -2220,18 +2265,29 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
-    
+
 
     override fun `reserveRelay`(`address`: kotlin.String)
-        = 
+        =
     callWithPointer {
     uniffiRustCall() { _status ->
     UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_reserve_relay(
         it, FfiConverterString.lower(`address`),_status)
 }
     }
-    
-    
+
+
+
+    override fun `retrySave`()
+        =
+    callWithPointer {
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_retry_save(
+        it, _status)
+}
+    }
+
+
 
     override fun `sensitive`(): kotlin.Boolean {
             return FfiConverterBoolean.lift(
@@ -2243,7 +2299,7 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
-    
+
 
     override fun `sessionCertify`(`signature`: kotlin.ByteArray): kotlin.Boolean {
             return FfiConverterBoolean.lift(
@@ -2255,7 +2311,7 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
-    
+
 
     override fun `sessionRequest`(`public`: kotlin.ByteArray, `attestation`: kotlin.String): kotlin.ByteArray {
             return FfiConverterByteArray.lift(
@@ -2267,18 +2323,18 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
-    
+
 
     override fun `setStorageError`()
-        = 
+        =
     callWithPointer {
     uniffiRustCall() { _status ->
     UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_set_storage_error(
         it, _status)
 }
     }
-    
-    
+
+
 
     override fun `snapshot`(): kotlin.String {
             return FfiConverterString.lift(
@@ -2290,69 +2346,80 @@ open class Engine: Disposable, AutoCloseable, EngineInterface
     }
     )
     }
-    
+
 
     override fun `stopPhare`(`message`: kotlin.String)
-        = 
+        =
     callWithPointer {
     uniffiRustCall() { _status ->
     UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_stop_phare(
         it, FfiConverterString.lower(`message`),_status)
 }
     }
-    
-    
+
+
 
     override fun `throneUnlock`()
-        = 
+        =
     callWithPointer {
     uniffiRustCall() { _status ->
     UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_throne_unlock(
         it, _status)
 }
     }
-    
-    
+
+
 
     override fun `tick`(`time`: kotlin.ULong)
-        = 
+        =
     callWithPointer {
     uniffiRustCall() { _status ->
     UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_tick(
         it, FfiConverterULong.lower(`time`),_status)
 }
     }
-    
-    
+
+
 
     override fun `touch`(`id`: kotlin.Int, `phase`: kotlin.UByte, `x`: kotlin.Int, `y`: kotlin.Int)
-        = 
+        =
     callWithPointer {
     uniffiRustCall() { _status ->
     UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_touch(
         it, FfiConverterInt.lower(`id`),FfiConverterUByte.lower(`phase`),FfiConverterInt.lower(`x`),FfiConverterInt.lower(`y`),_status)
 }
     }
-    
-    
+
+
 
     override fun `uiAction`(`action`: kotlin.String)
-        = 
+        =
     callWithPointer {
     uniffiRustCall() { _status ->
     UniffiLib.INSTANCE.uniffi_hk_ffi_fn_method_engine_ui_action(
         it, FfiConverterString.lower(`action`),_status)
 }
     }
-    
-    
 
-    
 
-    
-    
-    companion object
-    
+
+
+
+
+    companion object {
+         fun `offline`(`snapshot`: kotlin.String): Engine {
+            return FfiConverterTypeEngine.lift(
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_hk_ffi_fn_constructor_engine_offline(
+        FfiConverterString.lower(`snapshot`),_status)
+}
+    )
+    }
+
+
+
+    }
+
 }
 
 /**
