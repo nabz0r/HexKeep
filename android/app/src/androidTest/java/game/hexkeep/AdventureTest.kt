@@ -25,6 +25,17 @@ class AdventureTest {
   test.uiAutomation.injectInputEvent(MotionEvent.obtain(down,SystemClock.uptimeMillis(),action,points.size,props,coords,0,0,1f,1f,0,0,android.view.InputDevice.SOURCE_TOUCHSCREEN,0),false)
  }
  private fun tap(x:Float,y:Float){down=SystemClock.uptimeMillis();event(MotionEvent.ACTION_DOWN,listOf(x to y));SystemClock.sleep(70);event(MotionEvent.ACTION_UP,listOf(x to y));SystemClock.sleep(300)}
+ private fun tapId(id:String){
+  repeat(8){
+   var metrics=JSONObject();test.runOnMainSync{metrics=JSONObject(activity.renderMetrics())}
+   val hits=metrics.getJSONObject("frontier").getJSONArray("buttons")
+   val list=(0 until hits.length()).map{hits.getJSONObject(it)}
+   val hit=list.firstOrNull{it.getString("id")==id}
+   if(hit!=null){tap((hit.getDouble("left")+hit.getDouble("right")).toFloat()/2,(hit.getDouble("top")+hit.getDouble("bottom")).toFloat()/2);return}
+   if(id.startsWith("item:")){val next=list.firstOrNull{it.getString("id")=="bag-next"&&it.optBoolean("enabled")};if(next!=null)tap((next.getDouble("left")+next.getDouble("right")).toFloat()/2,(next.getDouble("top")+next.getDouble("bottom")).toFloat()/2)else SystemClock.sleep(100)}else SystemClock.sleep(100)
+  }
+  error("Inventory target absent: $id")
+ }
  private fun shot(name:String){SystemClock.sleep(150);val b=test.uiAutomation.takeScreenshot();File(test.targetContext.getExternalFilesDir(null),"v05-$name.png").outputStream().use{b.compress(Bitmap.CompressFormat.PNG,100,it)}}
  private fun state()=JSONObject(engine.presentation(584))
  private fun route(b:JSONObject,goal:Pair<Float,Float>):Pair<Float,Float>{
@@ -47,7 +58,7 @@ class AdventureTest {
   var identity="";var count=0
   ActivityScenario.launch<MainActivity>(Intent(test.targetContext,MainActivity::class.java)).use{scenario->
    SystemClock.sleep(1000);scenario.onActivity{activity=it;engine=it.engine;val viewport=JSONObject(it.renderMetrics()).getJSONObject("viewport");scale=viewport.getDouble("scale").toFloat();left=viewport.getDouble("left").toFloat();top=viewport.getDouble("top").toFloat();vw=viewport.getDouble("width").toFloat();it.engine.uiAction("continue");it.engine.uiAction("home");it.engine.hero(0u,0u);identity=it.engine.identityPublic().contentToString()}
-   SystemClock.sleep(250);tap(200f,398f);assertEquals(41,state().getInt("screen"));shot("journal")
+   SystemClock.sleep(250);tap(160f,476f);assertEquals(41,state().getInt("screen"));shot("journal")
    val cw=(vw-128)/3;tap(48+2*(cw+16)+cw/2,407f);SystemClock.sleep(450);assertEquals(6,state().getInt("screen"))
    val metricBefore=JSONObject(activity.renderMetrics());val combatStarted=SystemClock.uptimeMillis()
    down=SystemClock.uptimeMillis();event(MotionEvent.ACTION_DOWN,listOf(100f to 435f));SystemClock.sleep(50);event(MotionEvent.ACTION_POINTER_DOWN or (1 shl 8),listOf(100f to 435f,(vw-91) to 326f))
@@ -69,7 +80,7 @@ class AdventureTest {
    tap(vw/2,447f);assertEquals(7,state().getInt("screen"));tap(385f,474f);assertEquals(40,state().getInt("screen"));shot("inventory")
    val j=state().getJSONObject("journey");count=j.getJSONArray("items").length();assertTrue(count>=7)
    // Select a recovered item through its card, then equip it through the actual UI.
-   val all=j.getJSONArray("items");val item=(0 until all.length()).map{all.getJSONObject(it)}.maxWith(compareBy<JSONObject>{it.getInt("rarity")}.thenBy{it.getLong("id")});val lw=vw-397;val card=(lw-15)/2;tap(48+card/2,166f);tap(vw-185,344f);assertEquals(item.getLong("id"),state().getJSONObject("journey").getJSONArray("equipped").getLong(item.getInt("slot")));shot("inventory-equipped")
+   val all=j.getJSONArray("items");val item=(0 until all.length()).map{all.getJSONObject(it)}.maxWith(compareBy<JSONObject>{it.getInt("rarity")}.thenBy{it.getLong("id")});tapId("item:${item.getLong("id")}");tapId("equip:${item.getLong("id")}");assertEquals(item.getLong("id"),state().getJSONObject("journey").getJSONArray("equipped").getLong(item.getInt("slot")));shot("inventory-equipped")
    engine.uiAction("home");SystemClock.sleep(2300)
   }
   ActivityScenario.launch<MainActivity>(Intent(test.targetContext,MainActivity::class.java)).use{scenario->SystemClock.sleep(1000);scenario.onActivity{engine=it.engine;assertEquals(identity,engine.identityPublic().contentToString());assertEquals(count,state().getJSONObject("journey").getJSONArray("items").length())}}

@@ -20,7 +20,7 @@ pub struct Item {
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Journey {
     pub items: Vec<Item>,
-    pub equipped: [u64; 3],
+    pub equipped: Vec<u64>,
     pub next_id: u64,
     pub dust: u32,
     pub discovered: BTreeSet<u64>,
@@ -42,7 +42,7 @@ impl Default for Journey {
     fn default() -> Self {
         let mut s = Self {
             items: vec![],
-            equipped: [0; 3],
+            equipped: vec![0; 6],
             next_id: 1,
             dust: 0,
             discovered: BTreeSet::new(),
@@ -55,7 +55,7 @@ impl Default for Journey {
             bestiary: BTreeMap::new(),
             collection: BTreeSet::new(),
         };
-        for slot in 0..3 {
+        for slot in 0..6 {
             let item = s.make_item(slot as u64, 0);
             s.equipped[slot] = item.id;
             s.collection.insert(item.catalog);
@@ -84,10 +84,28 @@ impl Journey {
             }
             self.collection.insert(item.catalog);
         }
+        self.equipped.resize(6, 0);
+        self.items.retain(|i| i.slot < 6);
+        self.next_id = self.next_id.max(
+            self.items
+                .iter()
+                .map(|i| i.id)
+                .max()
+                .unwrap_or(0)
+                .saturating_add(1),
+        );
+        for slot in 3..6 {
+            if self.equipped[slot] == 0 {
+                let item = self.make_item(slot as u64, 0);
+                self.equipped[slot] = item.id;
+                self.collection.insert(item.catalog);
+                self.items.push(item);
+            }
+        }
         self.difficulty = self.difficulty.min(self.max_difficulty());
     }
     pub fn make_item(&mut self, seed: u64, rarity: u8) -> Item {
-        let slot = (seed % 3) as u8;
+        let slot = (seed % 6) as u8;
         let tier = rarity.min(3);
         let p = tier as i32 + 1;
         let names = [
@@ -133,8 +151,50 @@ impl Journey {
                 "Étoile oubliée",
                 "Clé sans serrure",
             ],
+            [
+                "Heaume des brumes",
+                "Couronne de lichen",
+                "Masque du passeur",
+                "Diadème des dunes",
+                "Capuche des veilleurs",
+                "Cercle de verre",
+                "Heaume de givre",
+                "Visage de l’aurore",
+                "Couronne sans roi",
+                "Masque du silence",
+                "Coiffe des étoiles",
+                "Heaume du retour",
+            ],
+            [
+                "Gants du serment",
+                "Poignes de racine",
+                "Mains de braise",
+                "Gantelets du prisme",
+                "Liens de rosée",
+                "Paumes des chemins",
+                "Gants boréaux",
+                "Griffes du vent",
+                "Poignes de cuivre",
+                "Gants du cartographe",
+                "Mains du refuge",
+                "Liens de l’aube",
+            ],
+            [
+                "Bottes du voyageur",
+                "Pas de mousse",
+                "Grèves de verre",
+                "Sandales des dunes",
+                "Bottes du carillon",
+                "Pas de l’ombre",
+                "Bottes d’aurore",
+                "Grèves des confins",
+                "Pas de Minuit",
+                "Bottes de l’étoile",
+                "Grèves du retour",
+                "Pas du dernier feu",
+            ],
         ];
-        let model = ((seed / 3) % 12) as usize;
+        let model = ((seed / 6) % 12) as usize;
         let name = names[slot as usize][model].to_string();
         let motif = ((seed / 37) % 4) as u8;
         let id = self.next_id;
@@ -146,8 +206,18 @@ impl Journey {
             rarity: tier,
             vitality: (if slot == 1 { p * 12 } else { p * 3 }) + (seed % 4) as i32,
             power: (if slot == 0 { p * 8 } else { p * 2 }) + ((seed >> 4) % 3) as i32,
-            guard: if slot == 1 { p * 8 } else { 0 },
-            haste: if slot == 2 { tier as u16 + 1 } else { 0 },
+            guard: if slot == 1 {
+                p * 8
+            } else if slot == 3 {
+                p * 5
+            } else {
+                0
+            },
+            haste: if slot == 2 || slot == 5 {
+                tier as u16 + 1
+            } else {
+                0
+            },
             motif,
             catalog: slot as u16 * 12 + model as u16,
             lore: [
@@ -162,7 +232,7 @@ impl Journey {
     pub fn stats(&self) -> (i32, i32, i32, u16) {
         let mut v = (0, 0, 0, 0);
         for i in &self.items {
-            if self.equipped[i.slot as usize] == i.id {
+            if self.equipped.get(i.slot as usize) == Some(&i.id) {
                 v.0 += i.vitality;
                 v.1 += i.power;
                 v.2 += i.guard;
@@ -184,7 +254,7 @@ impl Journey {
         v
     }
     pub fn equip(&mut self, id: u64) -> bool {
-        if let Some(i) = self.items.iter().find(|i| i.id == id) {
+        if let Some(i) = self.items.iter().find(|i| i.id == id && i.slot < 6) {
             self.equipped[i.slot as usize] = id;
             true
         } else {
@@ -205,6 +275,9 @@ impl Journey {
     pub fn store(&mut self, item: Item) {
         self.collection.insert(item.catalog);
         self.recent.push(item.clone());
+        if self.recent.len() > 16 {
+            self.recent.remove(0);
+        }
         if self.items.len() < 60 {
             self.items.push(item)
         } else {
@@ -276,7 +349,7 @@ impl Game {
                 j.secrets.len()
             )
         };
-        serde_json::json!({"items":j.items,"equipped":j.equipped,"dust":j.dust,"discovered":j.discovered.len(),"outings":j.outings,"recent":j.recent,"level":1+self.save.expansion.campaign.xp/250,"vitality":base_hp+60+hp,"power":100+power,"armor":100+armor,"haste":haste,"region":region_name(cell),"events":events,"remaining":1800-self.now%1800,"victories":j.victories,"difficulty":j.difficulty,"max_difficulty":j.max_difficulty(),"secrets":j.secrets,"secret_entries":discoveries::secret_entries(j),"collection":j.collection.len(),"bestiary":j.bestiary,"next_goal":next_goal,"in_battle":self.battle.is_some(),"inventory_return":self.inventory_return,"story":(["La gardienne Éline a retrouvé une carte sans routes. Tes pas lui rendent ses chemins.","Les cloches ne sonnent plus pour les rois. Elles répondent aux lanternes des voyageurs.","Sous le verre repose la mémoire des trois serments. Aucun royaume ne peut veiller seul."][region(cell)])})
+        serde_json::json!({"items":j.items,"equipped":j.equipped,"dust":j.dust,"discovered":j.discovered.len(),"outings":j.outings,"recent":j.recent,"level":1+self.save.expansion.campaign.xp/250,"vitality":base_hp+60+hp,"power":100+power,"armor":100+armor,"haste":haste,"region":region_name(cell),"events":events,"remaining":1800-self.now%1800,"victories":j.victories,"difficulty":j.difficulty,"max_difficulty":j.max_difficulty(),"secrets":j.secrets,"secret_entries":discoveries::secret_entries(j),"collection":j.collection.len(),"bestiary":j.bestiary,"next_goal":next_goal,"in_battle":self.battle.is_some()||self.save.frontier.run.is_some(),"inventory_return":self.inventory_return,"story":(["La gardienne Éline a retrouvé une carte sans routes. Tes pas lui rendent ses chemins.","Les cloches ne sonnent plus pour les rois. Elles répondent aux lanternes des voyageurs.","Sous le verre repose la mémoire des trois serments. Aucun royaume ne peut veiller seul."][region(cell)])})
     }
     pub(crate) fn journey_reward(&mut self, b: &Battle, run: &Expedition) {
         let j = &mut self.save.journey;
@@ -441,7 +514,7 @@ impl Game {
             }
             return true;
         }
-        if self.battle.is_some() {
+        if self.battle.is_some() || self.save.frontier.run.is_some() {
             return action == "forge" || action.starts_with("salvage:");
         }
         if let Some(id) = action.strip_prefix("salvage:").and_then(|s| s.parse().ok()) {
@@ -491,7 +564,7 @@ mod tests {
     #[test]
     fn inventory_migration_equipment_salvage() {
         let mut j = Journey::default();
-        assert_eq!(j.items.len(), 3);
+        assert_eq!(j.items.len(), 6);
         assert!(!j.salvage(1));
         let item = j.make_item(0, 3);
         let id = item.id;
@@ -534,10 +607,10 @@ mod tests {
         g.ui_action("inventory_back");
         assert_eq!(g.screen, 6);
         g.ui_action("finish");
-        assert_eq!(g.save.journey.items.len(), 7);
+        assert_eq!(g.save.journey.items.len(), 10);
         let xp = g.save.expansion.campaign.xp;
         g.ui_action("finish");
-        assert_eq!(g.save.journey.items.len(), 7);
+        assert_eq!(g.save.journey.items.len(), 10);
         assert_eq!(g.save.expansion.campaign.xp, xp);
     }
 }
@@ -550,7 +623,7 @@ mod eveil_tests {
         let mut g = Game::new("", true);
         g.save.created = true;
         g.save.journey.completed = vec!["a".into(), "b".into(), "c".into()];
-        let equipped = g.save.journey.equipped;
+        let equipped = g.save.journey.equipped.clone();
         let old = g.save.journey.items[0].clone();
         let mut value: serde_json::Value = serde_json::from_str(&g.snapshot()).unwrap();
         let j = value["journey"].as_object_mut().unwrap();
@@ -575,7 +648,7 @@ mod eveil_tests {
         assert_eq!(j.items[0].power, old.power);
         assert_eq!(j.items[0].id, old.id);
         assert_eq!(j.victories, 3);
-        assert_eq!(j.collection.len(), 3);
+        assert_eq!(j.collection.len(), 6);
         assert!(!j.items[0].lore.is_empty());
     }
     #[test]

@@ -46,9 +46,18 @@ impl Game {
                 | "heal"
                 | "interact"
                 | "forge"
-        ) || ["cell:", "difficulty:", "contract:", "equip:", "salvage:"]
-            .iter()
-            .any(|prefix| action.starts_with(prefix))
+                | "bag_sort"
+        ) || [
+            "cell:",
+            "difficulty:",
+            "contract:",
+            "equip:",
+            "salvage:",
+            "f:",
+            "bag_move:",
+        ]
+        .iter()
+        .any(|prefix| action.starts_with(prefix))
     }
 
     pub(crate) fn checkpoint(&self) -> Option<Checkpoint> {

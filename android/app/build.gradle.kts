@@ -6,8 +6,8 @@ android {
         applicationId = "game.hexkeep"
         minSdk = 26
         targetSdk = 36
-        versionCode = 6
-        versionName = "0.6.0-lanternes"
+        versionCode = 7
+        versionName = "0.7.0-confins"
         ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64") }
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

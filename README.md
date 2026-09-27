@@ -1,37 +1,41 @@
 <div align="center">
 
 # HEXKEEP
-### Les Lanternes du Refuge · v0.6
+### Les Échos des Confins · v0.7
 
 *Là où personne ne veille, le monde s’éteint.*
 
-![HEXKEEP — Les Lanternes du Refuge](store/feature-graphic.jpg)
+![HEXKEEP — Les Échos des Confins](docs/screenshots/v07-refuge.png)
 
 **Un action-RPG de lanternes, de ruines et de mémoires. Une édition solo hors ligne préparée pour les tests Google Play.**
 
 [![Android 8+](https://img.shields.io/badge/Android-8%2B-78c8b9?style=for-the-badge)](docs/installation.md)
-[![Version 0.6](https://img.shields.io/badge/version-0.6-e5bc74?style=for-the-badge)](CHANGELOG.md)
+[![Version 0.7](https://img.shields.io/badge/version-0.7-e5bc74?style=for-the-badge)](CHANGELOG.md)
 [![Vérifications](https://github.com/nabz0r/HexKeep/actions/workflows/ci.yml/badge.svg)](https://github.com/nabz0r/HexKeep/actions/workflows/ci.yml)
 
-**[⬇ Prévisualisation Play · solo](downloads/HEXKEEP-v0.6-PLAY-preview.apk)** · **[⬇ Mise à jour DEV](downloads/HEXKEEP-v0.6-DEV.apk)** · [Dossier Google Play](docs/play-release.md) · [Validation 0.6](docs/delivery-v06.md)
+**[⬇ Prévisualisation Play · solo](downloads/HEXKEEP-v0.7-PLAY-preview.apk)** · **[⬇ Mise à jour DEV](downloads/HEXKEEP-v0.7-DEV.apk)** · [Dossier Google Play](docs/play-release.md) · [Livraison 0.7](docs/delivery-v07.md)
 
 </div>
 
 ---
 
-## Ce que livre la 0.6
+## Ce que livre la 0.7
 
-Le refuge reçoit une nouvelle peinture originale et un visuel de couverture. L’aventure reprend après fermeture : position, ennemis, objectifs, caches, fioles et butin sont conservés, avec une reprise volontaire en pause. L’aide, les réglages de confort, la politique de confidentialité et les licences sont accessibles dans le jeu. Les encoches et le retour système Android récent sont pris en compte.
+**Les Échos des Confins** ouvre une campagne de trois grandes régions : la Sylve des Échos, les Dunes de Verre et la Couronne Boréale. Un atlas relie ces biomes, douze missions guident leur découverte et des cinématiques racontent le voyage d’Éline. Les nouveaux décors, personnages et équipements utilisent des formes procédurales originales.
+
+Le combat de campagne apporte trois postures, trois frappes rapides suivies d’une finissante, des esquives, un éclat de lumière, des impacts suspendus et cinq nouveaux comportements ennemis. Les trois gardiens évoluent en trois phases. Le sac devient une grille avec glisser-déposer, comparaison, tri et six emplacements visibles sur le veilleur. Les cinq aventures précédentes restent accessibles depuis **Les Marches** ; **Refuge & autres modes** conserve les autres fonctions.
+
+[Changelog](CHANGELOG.md) · [Architecture 0.7](docs/architecture-v07.md) · [Guide de campagne](docs/player-guide-v07.md) · [Direction et références](docs/design-v07.md)
 
 | Édition | Usage | Identifiant |
 |---|---|---|
-| **Play · prévisualisation** | Cinq aventures solo, exploration fictive, objets et mémoires. Sans Internet, GPS, publicité, achats intégrés ou compte. APK signée pour test ; signature différente de la future distribution officielle possible | `game.hexkeep` |
+| **Play · prévisualisation** | Campagne des Confins, cinq aventures solo, objets et mémoires. Sans Internet, GPS, publicité, achats intégrés ou compte. APK signée pour test ; signature différente de la future distribution officielle possible | `game.hexkeep` |
 | **DEV · mise à jour** | Même aventure, plus les outils géolocalisés, pairs, forteresses et expériences de royaume de la 0.5 | `game.hexkeep.dev` |
 | **Production réseau** | Verrouillée en attente d’une autorité officielle ; ce n’est pas le lancement solo | Variante `prod`, non distribuée aux joueurs |
 
 **Le jeu n’est pas encore publié sur Google Play.** L’AAB est construit et contrôlé ; la clé d’envoi officielle, la configuration du compte, les déclarations, les tests sur téléphones et l’éventuel test fermé restent nécessaires. Le [dossier de publication](docs/play-release.md) indique chaque étape et ses conditions. L’interface est française. La progression est locale : les deux éditions ne partagent pas leurs données et une désinstallation efface la sauvegarde.
 
-![Le refuge 0.6](store/fr-FR/screenshots/01-refuge.png)
+![Atlas des Confins](docs/screenshots/v07-atlas.png)
 
 ## Une lumière. Trois serments. Des chemins à retrouver.
 
@@ -44,22 +48,22 @@ Les routes ont disparu sous la brume. Au refuge, Éline conserve une carte dont 
 | Sentir chaque geste | Explorer et comprendre | Préparer le prochain départ |
 |:--|:--|:--|
 | **84 poses peintes** : marche, dos, frappe et esquive | **Cinq contrats**, dont une veillée et une chasse aux curiosités | **Sac et statistiques accessibles en combat** |
-| Direction du corps, trajectoires, impacts et chute des ennemis | **Sept familles d’ennemis**, invocations, élites et gardien en furie | **36 modèles d’objets**, quatre raretés et quatre serments |
+| Direction du corps, trajectoires, impacts et chute des ennemis | **Sept familles d’ennemis**, invocations, élites et gardien en furie | **72 modèles d’objets**, quatre raretés et quatre serments |
 | Joystick analogique, visée assistée ou manuelle, glissement aux murs | Cinq coffres, source de soin, autel et chat à découvrir | Deux pièces du même serment donnent un bonus |
 | Aventure solo suspendue pendant la consultation du sac | Consigne permanente, boussole, mini-carte et annonces de danger | **Neuf mémoires**, bestiaire et trois difficultés à débloquer |
 
 <table>
-<tr><td><img src="docs/screenshots/v05-refuge.png" alt="Le refuge" /></td><td><img src="docs/screenshots/v05-journal.png" alt="Le carnet des aventures" /></td></tr>
-<tr><td><img src="docs/screenshots/v05-field-inventory.png" alt="Le sac et les statistiques" /></td><td><img src="docs/screenshots/v05-combat.png" alt="Exploration et combat" /></td></tr>
+<tr><td><img src="docs/screenshots/v07-missions.png" alt="Missions des Confins" /></td><td><img src="docs/screenshots/v07-inventory.png" alt="Sac et six emplacements" /></td></tr>
+<tr><td><img src="docs/screenshots/v07-cinematic.png" alt="Cinématique dans la Sylve" /></td><td><img src="docs/screenshots/v07-touch-battle.png" alt="Combat tactile" /></td></tr>
 </table>
 
-### Jouer en cinq gestes (édition DEV)
+### Jouer en cinq gestes
 
-1. Installe **[HEXKEEP-v0.6-DEV.apk](downloads/HEXKEEP-v0.6-DEV.apk)**. Le paquet principal est signé et contient ARM64, ARMv7 et x86_64. Android 8 minimum.
-2. Entre dans la nuit, choisis ton veilleur et découvre les commandes dans le prologue jouable.
-3. Au refuge, ouvre **Choisir une aventure**. À gauche, déplace-toi ; à droite, vise ; les deux grands boutons déclenchent esquive et pouvoir. Maintenir ATTAQUE vise un ennemi visible ; glisser depuis ce bouton permet de viser soi-même.
-4. Approche des curiosités et touche **Interagir**. Le butin arrive immédiatement dans le sac. En combat, touche **Sac · stats** ou ta barre de vie pour comparer et équiper, puis reprendre la même aventure. La forge et le recyclage t’attendent au refuge.
-5. **Explorer la marche** permet d’activer le GPS ou de voyager en simulation. **Jouer avec des veilleurs** ouvre la recherche locale et les combats entre joueurs.
+1. Installe la [prévisualisation Play](downloads/HEXKEEP-v0.7-PLAY-preview.apk) ou mets à jour la [DEV](downloads/HEXKEEP-v0.7-DEV.apk), sans désinstaller l’ancienne version.
+2. Découvre les gestes dans le prologue, puis ouvre **l’atlas des Confins** au refuge.
+3. Accepte les missions secondaires dans le journal. Voyage vers la Sylve, recueille ses mémoires et secours son voyageur.
+4. Maintiens **Attaquer** pour enchaîner trois frappes rapides et une lourde. Change de posture, esquive les annonces rouges et utilise tes fioles. Rallume les trois balises pour appeler le gardien.
+5. Ouvre le sac pour comparer et glisser les objets vers les six emplacements. Réclame tes missions dans le journal, rentre à l’atlas et découvre la région suivante.
 
 **Mise à jour :** la signature et l’identifiant `game.hexkeep.dev` restent ceux des versions DEV précédentes. Installer par-dessus conserve les données. Ne désinstalle pas pour mettre à jour. Les mots de récupération restent dans **Réglages → Mon Nom & sauvegarde**. Le [guide d’installation](docs/installation.md) explique les cas particuliers.
 
@@ -77,7 +81,7 @@ Prérequis : Rust stable, JDK 17, SDK Android 36, NDK `28.2.13676358`, `cargo-nd
 rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
 cargo install cargo-ndk --locked
 scripts/build.sh
-adb install -r artifacts/HEXKEEP-v0.6-DEV.apk
+adb install -r artifacts/HEXKEEP-v0.7-DEV.apk
 ```
 
 `JAVA_HOME`, `ANDROID_HOME` et `ANDROID_NDK_HOME` peuvent désigner tes installations. Le script construit la DEV debug, la DEV release signée, la production réseau verrouillée, la prévisualisation Play et son AAB. La signature officielle Play est configurable par variables d’environnement ; voir le dossier de publication. **La production unsigned n’est pas l’APK à installer.** Une compilation locale utilise ta propre clé debug ; elle peut donc demander une autre installation que le paquet distribué. La clé de distribution DEV n’est pas publiée.
@@ -93,7 +97,7 @@ Le parcours `adventure` joue les 45 combinaisons royaume × rôle × contrat ave
 
 ### Réseau entre pairs
 
-Dans **Jouer avec des veilleurs**, lance la recherche sur chaque téléphone, dans la même marche et sur le même Wi-Fi. **Connexion directe / relais** accepte une multiadresse libp2p. Utilise la même version sur tous les appareils : les corrections de navigation de la 0.5 conservent le protocole 0.5 dans la 0.6. Les versions DEV 0.5 et 0.6 utilisent les mêmes règles de combat réseau.
+Dans **Jouer avec des veilleurs**, lance la recherche sur chaque téléphone, dans la même marche et sur le même Wi-Fi. **Connexion directe / relais** accepte une multiadresse libp2p. Utilise la même version sur tous les appareils : les corrections de navigation de la 0.5 conservent le protocole 0.5 dans la 0.6. La campagne 0.7 est isolée du combat réseau : le protocole historique reste inchangé. Utilise la même version de l’application pour les essais entre pairs.
 
 ```sh
 cargo build --release -p hexkeep-sim -p hexkeep-relay -p crown

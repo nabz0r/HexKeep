@@ -1,0 +1,776 @@
+{
+  "version": 1,
+  "title": "Les Échos des Confins",
+  "zones": [
+    {
+      "id": 0,
+      "name": "La Sylve des Échos",
+      "biome": "Forêt inondée",
+      "subtitle": "Chaque racine retient un nom.",
+      "colors": [
+        "10282c",
+        "244c47",
+        "71d4a5",
+        "dfc68c"
+      ],
+      "map_x": 0.25,
+      "map_y": 0.65,
+      "spawn": [
+        4,
+        16
+      ],
+      "beacons": [
+        [
+          12,
+          7
+        ],
+        [
+          25,
+          25
+        ],
+        [
+          36,
+          8
+        ]
+      ],
+      "relics": [
+        [
+          8,
+          25
+        ],
+        [
+          19,
+          5
+        ],
+        [
+          31,
+          27
+        ],
+        [
+          40,
+          19
+        ]
+      ],
+      "rescue": [
+        19,
+        19
+      ],
+      "boss": [
+        43,
+        7
+      ],
+      "boss_name": "Le Cerf sans Aube",
+      "speaker": "Éline",
+      "overview": "Sous les canopées noyées, les anciens veilleux emprisonnent les voix des voyageurs. Rends leur lumière aux trois racines avant que le Cerf ne referme les chemins.",
+      "lore": "Éline ne cherche pas un royaume à sauver. Elle cherche le nom de son frère, parti relever les lanternes de la Sylve. Les racines ont appris à imiter les disparus. Leurs murmures ne sont pas des mensonges : ce sont des souvenirs qui refusent de mourir.",
+      "obstacles": [
+        [
+          7,
+          9,
+          3,
+          9
+        ],
+        [
+          14,
+          13,
+          4,
+          3
+        ],
+        [
+          21,
+          8,
+          3,
+          6
+        ],
+        [
+          28,
+          17,
+          3,
+          7
+        ],
+        [
+          35,
+          12,
+          3,
+          4
+        ],
+        [
+          39,
+          23,
+          4,
+          3
+        ],
+        [
+          11,
+          27,
+          5,
+          2
+        ]
+      ],
+      "npcs": "Lio, le cartographe des racines",
+      "width": 48,
+      "height": 32
+    },
+    {
+      "id": 1,
+      "name": "Les Dunes de Verre",
+      "biome": "Désert cristallin",
+      "subtitle": "Le soleil a laissé ses cicatrices.",
+      "colors": [
+        "35232c",
+        "754c43",
+        "f0be7a",
+        "8be3de"
+      ],
+      "map_x": 0.53,
+      "map_y": 0.37,
+      "spawn": [
+        4,
+        25
+      ],
+      "beacons": [
+        [
+          10,
+          7
+        ],
+        [
+          27,
+          22
+        ],
+        [
+          38,
+          9
+        ]
+      ],
+      "relics": [
+        [
+          7,
+          17
+        ],
+        [
+          19,
+          27
+        ],
+        [
+          31,
+          7
+        ],
+        [
+          41,
+          24
+        ]
+      ],
+      "rescue": [
+        22,
+        13
+      ],
+      "boss": [
+        43,
+        6
+      ],
+      "boss_name": "La Matriarche du Prisme",
+      "speaker": "Saher",
+      "overview": "Les caravanes suivaient autrefois un astre qui ne se couchait jamais. Ses éclats alimentent désormais des automates affamés. Recompose le signal des trois prismes.",
+      "lore": "Saher garde la dernière citerne sous le sable devenu verre. Il sait pourquoi les forteresses se sont tues : les veilleurs ont tiré trop de lumière du même cœur. La nuit est une dette, pas une malédiction. Éline reconnaît sur les prismes l’écriture de son frère.",
+      "obstacles": [
+        [
+          8,
+          11,
+          6,
+          3
+        ],
+        [
+          16,
+          5,
+          3,
+          6
+        ],
+        [
+          19,
+          19,
+          5,
+          3
+        ],
+        [
+          29,
+          12,
+          3,
+          6
+        ],
+        [
+          34,
+          25,
+          5,
+          3
+        ],
+        [
+          38,
+          15,
+          4,
+          3
+        ],
+        [
+          11,
+          26,
+          4,
+          3
+        ]
+      ],
+      "npcs": "Saher, le gardien de la citerne",
+      "width": 48,
+      "height": 32
+    },
+    {
+      "id": 2,
+      "name": "La Couronne Boréale",
+      "biome": "Toundra céleste",
+      "subtitle": "Au bout de la nuit, une réponse.",
+      "colors": [
+        "121f3a",
+        "334d70",
+        "a8d8f2",
+        "c3a2ec"
+      ],
+      "map_x": 0.78,
+      "map_y": 0.64,
+      "spawn": [
+        4,
+        16
+      ],
+      "beacons": [
+        [
+          12,
+          25
+        ],
+        [
+          24,
+          6
+        ],
+        [
+          37,
+          22
+        ]
+      ],
+      "relics": [
+        [
+          8,
+          6
+        ],
+        [
+          18,
+          26
+        ],
+        [
+          31,
+          13
+        ],
+        [
+          42,
+          27
+        ]
+      ],
+      "rescue": [
+        22,
+        18
+      ],
+      "boss": [
+        43,
+        6
+      ],
+      "boss_name": "L’Archonte des Derniers Feux",
+      "speaker": "Le Frère de la Lanterne",
+      "overview": "Des aurores dessinent les anciennes routes dans le ciel. Les forteresses ont confié leur dette à un gardien unique. Réveille les balises puis affronte celui qui porte tous les noms.",
+      "lore": "Au sommet de la Couronne, le frère d’Éline n’est plus tout à fait humain. Il est devenu l’Archonte afin de retenir l’effondrement. Le vaincre ne libérera pas la lumière : il faudra apprendre à la partager. Tes lanternes forment la première constellation qui ne dépend d’aucun roi.",
+      "obstacles": [
+        [
+          8,
+          12,
+          3,
+          8
+        ],
+        [
+          14,
+          5,
+          4,
+          4
+        ],
+        [
+          19,
+          12,
+          3,
+          4
+        ],
+        [
+          27,
+          20,
+          4,
+          5
+        ],
+        [
+          30,
+          6,
+          4,
+          4
+        ],
+        [
+          37,
+          12,
+          3,
+          6
+        ],
+        [
+          10,
+          27,
+          7,
+          2
+        ]
+      ],
+      "npcs": "Iria, l’arpenteuse des aurores",
+      "width": 48,
+      "height": 32
+    }
+  ],
+  "quests": [
+    {
+      "id": "main-0",
+      "zone": 0,
+      "main": true,
+      "title": "Les racines rallumées",
+      "description": "Sous les canopées noyées, les anciens veilleux emprisonnent les voix des voyageurs. Rends leur lumière aux trois racines avant que le Cerf ne referme les chemins.",
+      "objective": "beacons_boss",
+      "target": 4,
+      "reward_dust": 60,
+      "reward_xp": 180
+    },
+    {
+      "id": "relic-0",
+      "zone": 0,
+      "main": false,
+      "title": "Les voix retenues",
+      "description": "Retrouve les quatre fragments de mémoire. Chaque fragment révèle un nom que la Sylve avait retenu.",
+      "objective": "relics",
+      "target": 4,
+      "reward_dust": 35,
+      "reward_xp": 90
+    },
+    {
+      "id": "rescue-0",
+      "zone": 0,
+      "main": false,
+      "title": "Un cartographe égaré",
+      "description": "Retrouve Lio, le cartographe des racines et sécurise ses alentours avant de lui parler.",
+      "objective": "rescue",
+      "target": 1,
+      "reward_dust": 25,
+      "reward_xp": 70
+    },
+    {
+      "id": "hunt-0",
+      "zone": 0,
+      "main": false,
+      "title": "Les dents de la forêt",
+      "description": "Élimine les gardiens hostiles. Les victoires comptent dès l’acceptation du contrat, même si tu reviens au refuge.",
+      "objective": "kills",
+      "target": 8,
+      "reward_dust": 30,
+      "reward_xp": 100
+    },
+    {
+      "id": "main-1",
+      "zone": 1,
+      "main": true,
+      "title": "La dette du soleil",
+      "description": "Les caravanes suivaient autrefois un astre qui ne se couchait jamais. Ses éclats alimentent désormais des automates affamés. Recompose le signal des trois prismes.",
+      "objective": "beacons_boss",
+      "target": 4,
+      "reward_dust": 80,
+      "reward_xp": 240
+    },
+    {
+      "id": "relic-1",
+      "zone": 1,
+      "main": false,
+      "title": "Le journal de la citerne",
+      "description": "Rassemble les quatre pages du registre : elles disent à qui appartenait la lumière.",
+      "objective": "relics",
+      "target": 4,
+      "reward_dust": 35,
+      "reward_xp": 90
+    },
+    {
+      "id": "rescue-1",
+      "zone": 1,
+      "main": false,
+      "title": "L’eau sous le verre",
+      "description": "Retrouve Saher, le gardien de la citerne et sécurise ses alentours avant de lui parler.",
+      "objective": "rescue",
+      "target": 1,
+      "reward_dust": 25,
+      "reward_xp": 70
+    },
+    {
+      "id": "hunt-1",
+      "zone": 1,
+      "main": false,
+      "title": "Les sentinelles du prisme",
+      "description": "Élimine les gardiens hostiles. Les victoires comptent dès l’acceptation du contrat, même si tu reviens au refuge.",
+      "objective": "kills",
+      "target": 10,
+      "reward_dust": 30,
+      "reward_xp": 100
+    },
+    {
+      "id": "main-2",
+      "zone": 2,
+      "main": true,
+      "title": "Une constellation libre",
+      "description": "Des aurores dessinent les anciennes routes dans le ciel. Les forteresses ont confié leur dette à un gardien unique. Réveille les balises puis affronte celui qui porte tous les noms.",
+      "objective": "beacons_boss",
+      "target": 4,
+      "reward_dust": 100,
+      "reward_xp": 300
+    },
+    {
+      "id": "relic-2",
+      "zone": 2,
+      "main": false,
+      "title": "Les lettres jamais reçues",
+      "description": "Rassemble quatre lettres gelées afin qu’Éline puisse enfin lire les mots de son frère.",
+      "objective": "relics",
+      "target": 4,
+      "reward_dust": 35,
+      "reward_xp": 90
+    },
+    {
+      "id": "rescue-2",
+      "zone": 2,
+      "main": false,
+      "title": "La dernière arpenteuse",
+      "description": "Retrouve Iria, l’arpenteuse des aurores et sécurise ses alentours avant de lui parler.",
+      "objective": "rescue",
+      "target": 1,
+      "reward_dust": 25,
+      "reward_xp": 70
+    },
+    {
+      "id": "hunt-2",
+      "zone": 2,
+      "main": false,
+      "title": "Le silence des essaims",
+      "description": "Élimine les gardiens hostiles. Les victoires comptent dès l’acceptation du contrat, même si tu reviens au refuge.",
+      "objective": "kills",
+      "target": 12,
+      "reward_dust": 30,
+      "reward_xp": 100
+    }
+  ],
+  "scenes": [
+    {
+      "id": "intro-0",
+      "title": "La Sylve des Échos",
+      "beats": [
+        {
+          "speaker": "Éline",
+          "text": "Chaque racine retient un nom.",
+          "camera": [
+            4,
+            16
+          ],
+          "zoom": 1.15,
+          "duration": 180
+        },
+        {
+          "speaker": "Éline",
+          "text": "Éline ne cherche pas un royaume à sauver. Elle cherche le nom de son frère, parti relever les lanternes de la Sylve. Les racines ont appris à imiter les disparus. Leurs murmures ne sont pas des mensonges : ce sont des souvenirs qui refusent de mourir.",
+          "camera": [
+            12,
+            7
+          ],
+          "zoom": 0.85,
+          "duration": 330
+        },
+        {
+          "speaker": "Éline",
+          "text": "Rallume les trois balises. La route se souvient de ceux qui la parcourent.",
+          "camera": [
+            43,
+            7
+          ],
+          "zoom": 0.85,
+          "duration": 180
+        }
+      ]
+    },
+    {
+      "id": "boss-0",
+      "title": "Le Cerf sans Aube",
+      "beats": [
+        {
+          "speaker": "Le Cerf sans Aube",
+          "text": "Vous appelez cela la nuit. Nous l’appelons le repos des noms.",
+          "camera": [
+            43,
+            7
+          ],
+          "zoom": 1.3,
+          "duration": 180
+        },
+        {
+          "speaker": "Éline",
+          "text": "Observe ses changements de posture. Une garde fermée annonce une frappe lente ; une lumière rouge annonce la charge.",
+          "camera": [
+            43,
+            7
+          ],
+          "zoom": 1.0,
+          "duration": 180
+        }
+      ]
+    },
+    {
+      "id": "outro-0",
+      "title": "Le premier passage",
+      "beats": [
+        {
+          "speaker": "Éline",
+          "text": "La Sylve respire. Les Dunes ont répondu à ton signal. Emporte ces noms : personne ne les effacera plus.",
+          "camera": [
+            25,
+            25
+          ],
+          "zoom": 0.85,
+          "duration": 240
+        }
+      ]
+    },
+    {
+      "id": "intro-1",
+      "title": "Les Dunes de Verre",
+      "beats": [
+        {
+          "speaker": "Saher",
+          "text": "Le soleil a laissé ses cicatrices.",
+          "camera": [
+            4,
+            25
+          ],
+          "zoom": 1.15,
+          "duration": 180
+        },
+        {
+          "speaker": "Saher",
+          "text": "Saher garde la dernière citerne sous le sable devenu verre. Il sait pourquoi les forteresses se sont tues : les veilleurs ont tiré trop de lumière du même cœur. La nuit est une dette, pas une malédiction. Éline reconnaît sur les prismes l’écriture de son frère.",
+          "camera": [
+            10,
+            7
+          ],
+          "zoom": 0.85,
+          "duration": 330
+        },
+        {
+          "speaker": "Saher",
+          "text": "Rallume les trois balises. La route se souvient de ceux qui la parcourent.",
+          "camera": [
+            43,
+            6
+          ],
+          "zoom": 0.85,
+          "duration": 180
+        }
+      ]
+    },
+    {
+      "id": "boss-1",
+      "title": "La Matriarche du Prisme",
+      "beats": [
+        {
+          "speaker": "La Matriarche du Prisme",
+          "text": "Chaque lumière empruntée revient un jour chercher son prix.",
+          "camera": [
+            43,
+            6
+          ],
+          "zoom": 1.3,
+          "duration": 180
+        },
+        {
+          "speaker": "Saher",
+          "text": "Observe ses changements de posture. Une garde fermée annonce une frappe lente ; une lumière rouge annonce la charge.",
+          "camera": [
+            43,
+            6
+          ],
+          "zoom": 1.0,
+          "duration": 180
+        }
+      ]
+    },
+    {
+      "id": "outro-1",
+      "title": "Le prix des lanternes",
+      "beats": [
+        {
+          "speaker": "Éline",
+          "text": "Ces fragments racontent la vérité. Mon frère n’a pas fui la nuit. Il lui a servi de rempart. La Couronne nous attend.",
+          "camera": [
+            27,
+            22
+          ],
+          "zoom": 0.85,
+          "duration": 240
+        }
+      ]
+    },
+    {
+      "id": "intro-2",
+      "title": "La Couronne Boréale",
+      "beats": [
+        {
+          "speaker": "Le Frère de la Lanterne",
+          "text": "Au bout de la nuit, une réponse.",
+          "camera": [
+            4,
+            16
+          ],
+          "zoom": 1.15,
+          "duration": 180
+        },
+        {
+          "speaker": "Le Frère de la Lanterne",
+          "text": "Au sommet de la Couronne, le frère d’Éline n’est plus tout à fait humain. Il est devenu l’Archonte afin de retenir l’effondrement. Le vaincre ne libérera pas la lumière : il faudra apprendre à la partager. Tes lanternes forment la première constellation qui ne dépend d’aucun roi.",
+          "camera": [
+            12,
+            25
+          ],
+          "zoom": 0.85,
+          "duration": 330
+        },
+        {
+          "speaker": "Le Frère de la Lanterne",
+          "text": "Rallume les trois balises. La route se souvient de ceux qui la parcourent.",
+          "camera": [
+            43,
+            6
+          ],
+          "zoom": 0.85,
+          "duration": 180
+        }
+      ]
+    },
+    {
+      "id": "boss-2",
+      "title": "L’Archonte des Derniers Feux",
+      "beats": [
+        {
+          "speaker": "L’Archonte des Derniers Feux",
+          "text": "Je ne gardais pas la porte. Je retenais ce qui se trouvait derrière.",
+          "camera": [
+            43,
+            6
+          ],
+          "zoom": 1.3,
+          "duration": 180
+        },
+        {
+          "speaker": "Le Frère de la Lanterne",
+          "text": "Observe ses changements de posture. Une garde fermée annonce une frappe lente ; une lumière rouge annonce la charge.",
+          "camera": [
+            43,
+            6
+          ],
+          "zoom": 1.0,
+          "duration": 180
+        }
+      ]
+    },
+    {
+      "id": "outro-2",
+      "title": "La lumière partagée",
+      "beats": [
+        {
+          "speaker": "Éline",
+          "text": "Il reste des ombres. Il restera toujours des veilleurs. Mais, cette fois, aucune lanterne ne portera seule la nuit.",
+          "camera": [
+            24,
+            6
+          ],
+          "zoom": 0.85,
+          "duration": 240
+        }
+      ]
+    },
+    {
+      "id": "revelation",
+      "title": "Ce que coûte une lumière",
+      "beats": [
+        {
+          "speaker": "Saher",
+          "text": "Les anciennes forteresses brûlaient les souvenirs pour entretenir leurs soleils. La nuit a rendu aux oubliés ce qu’on leur avait pris.",
+          "camera": [
+            22,
+            13
+          ],
+          "zoom": 1.15,
+          "duration": 300
+        },
+        {
+          "speaker": "Éline",
+          "text": "Alors nous ne rallumerons pas leur empire. Nous construirons des chemins que chacun pourra éclairer.",
+          "camera": [
+            27,
+            22
+          ],
+          "zoom": 0.9,
+          "duration": 240
+        }
+      ]
+    }
+  ],
+  "monsters": [
+    {
+      "id": 0,
+      "name": "Ravageur de ronce",
+      "role": "Mêlée agressive",
+      "tactic": "Une ruée suit son éclat rouge. Esquive sur le côté pendant sa préparation.",
+      "shape": "triangle",
+      "hp": 75,
+      "damage": 15
+    },
+    {
+      "id": 1,
+      "name": "Aiguilleur du prisme",
+      "role": "Tireur mobile",
+      "tactic": "Recule quand tu approches. Coupe sa trajectoire et esquive ses traits.",
+      "shape": "diamond",
+      "hp": 55,
+      "damage": 12
+    },
+    {
+      "id": 2,
+      "name": "Bastion creux",
+      "role": "Tank à garde",
+      "tactic": "Sa posture de rempart réduit les dégâts. Le quatrième coup lourd brise sa garde.",
+      "shape": "hexagon",
+      "hp": 140,
+      "damage": 22
+    },
+    {
+      "id": 3,
+      "name": "Essaim de cendre",
+      "role": "Encerclement",
+      "tactic": "Les éclats cherchent les flancs. Attire-les ensemble puis termine ton combo.",
+      "shape": "swarm",
+      "hp": 32,
+      "damage": 7
+    },
+    {
+      "id": 4,
+      "name": "Archonte",
+      "role": "Boss à trois phases",
+      "tactic": "À deux tiers puis un tiers de vie, sa posture et ses attaques changent. Survis aux salves et aux renforts.",
+      "shape": "crown",
+      "hp": 650,
+      "damage": 22
+    }
+  ]
+}

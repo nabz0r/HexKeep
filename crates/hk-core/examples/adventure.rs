@@ -30,7 +30,7 @@ fn main() {
                     while g.screen == 6 {
                         if inspected != g.save.journey.items.len() {
                             inspected = g.save.journey.items.len();
-                            let best: Vec<_> = (0..3)
+                            let best: Vec<_> = (0..6)
                                 .filter_map(|slot| {
                                     g.save
                                         .journey
@@ -107,14 +107,38 @@ fn main() {
                             mv = hk_sim::navigation::direction(p.pos, escape, &b.obstacles);
                         }
                         let heal = p.hp < p.max_hp / 2;
+                        // Gather the optional caches before ending a hunt. Six-slot
+                        // loadouts can otherwise defeat its guardian before the route ends.
+                        let collecting = run.caches.iter().any(|v| !*v);
+                        let aim = if collecting {
+                            b.fighters
+                                .iter()
+                                .skip(2)
+                                .filter(|f| {
+                                    f.hp > 0
+                                        && hk_sim::navigation::clear_line(
+                                            p.pos,
+                                            f.pos,
+                                            &b.obstacles,
+                                            24,
+                                        )
+                                })
+                                .min_by_key(|f| p.pos.dist2(f.pos))
+                                .map(|f| {
+                                    Vec2::new(f.pos.x - p.pos.x, f.pos.y - p.pos.y).scaled(1024)
+                                })
+                                .unwrap_or_default()
+                        } else {
+                            Vec2::default()
+                        };
                         g.controls(
                             mv.x as i16,
                             mv.y as i16,
-                            0,
-                            0,
-                            true,
+                            aim.x as i16,
+                            aim.y as i16,
+                            !collecting,
                             tick % 100 == 1,
-                            tick % 181 == 1,
+                            !collecting && tick % 181 == 1,
                         );
                         if heal {
                             g.ui_action("heal");

@@ -6,9 +6,9 @@ HK_REPORT_DIR=${1:-artifacts}
 mkdir -p "$HK_REPORT_DIR"
 HK_FAILED=0
 : > "$HK_REPORT_DIR/play-device.txt"
-for HK_CASE in PlayReleaseTest AdventureTest EveilTest 'GameplayTest#soloOfflineLifecycle'; do
+for HK_CASE in PlayReleaseTest AdventureTest EveilTest FrontierTest 'GameplayTest#soloOfflineLifecycle'; do
   HK_EXPECTED=1
-  if [ "$HK_CASE" = PlayReleaseTest ]; then HK_EXPECTED=3; fi
+  if [ "$HK_CASE" = PlayReleaseTest ] || [ "$HK_CASE" = FrontierTest ]; then HK_EXPECTED=3; fi
   HK_CASE_REPORT="$HK_REPORT_DIR/$HK_CASE.txt"
   # FPS is recorded in device-files, but a shared SwiftShader runner cannot
   # certify physical-device performance. Direct local runs retain a 20 FPS floor.

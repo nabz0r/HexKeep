@@ -8,11 +8,11 @@ impl Game {
             serde_json::json!({"id":format!("{id:x}"),"q":q,"r":r,"clear":c.is_some_and(|v|v.clear),"bastion":c.and_then(|v|v.bastion).map(|v|v.index()),"discovered":self.save.journey.discovered.contains(&id),"region":adventure::region_name(id),"poi":adventure::region(id),"current":id==self.save.world.current,"selected":id==self.selected})
         }).collect();
         serde_json::json!({"screen":self.screen,"width":self.width,"ticks":self.ticks,"created":self.save.created,
-            "offline":self.offline,"resumable":self.battle.is_some() && self.online.is_none(),"intro_seen":self.save.introduction_seen,"tutorial":self.tutorial,"lesson":self.lesson,
+            "offline":self.offline,"resumable":(self.battle.is_some() && self.online.is_none()) || self.save.frontier.run.is_some(),"intro_seen":self.save.introduction_seen,"tutorial":self.tutorial,"lesson":self.lesson,
             "realm":self.save.realm.index(),"role":self.save.role.index(),"name":self.save.name,
             "realm_name":self.save.realm.name(),"role_name":self.save.role.name(),"music":self.save.settings.music,
             "accessible":self.save.settings.accessible,"effects":self.save.sound_effects,"haptics":self.save.settings.haptics,
-            "journey":self.journey_view(),"xp":self.save.expansion.campaign.xp,"kills":self.save.kills,"equipped":self.save.expansion.campaign.equipped,
+            "journey":self.journey_view(),"frontier":self.frontier_view(),"xp":self.save.expansion.campaign.xp,"kills":self.save.kills,"equipped":self.save.expansion.campaign.equipped,
             "battle":self.battle,"battle_mode":self.battle_mode,"expedition":self.expedition,
             "guidance":self.battle.as_ref().zip(self.expedition.as_ref()).map(|(b,run)|discoveries::view(b,run)),
             "bestiary":(0..7).map(|i|serde_json::json!({"kind":i,"name":discoveries::NAMES[i],"tactic":discoveries::TACTICS[i],"defeated":self.save.journey.bestiary.get(&(i as u8)).copied().unwrap_or(0)})).collect::<Vec<_>>(),
@@ -27,6 +27,9 @@ impl Game {
             return;
         }
         if self.offline && !Self::offline_action_allowed(action) {
+            return;
+        }
+        if self.frontier_action(action) {
             return;
         }
         if self.journey_action(action) {
@@ -193,6 +196,16 @@ impl Game {
         dash: bool,
         skill: bool,
     ) {
+        if self.screen == 52 {
+            self.frontier_controls(
+                mx,
+                my,
+                auto || ax.abs() > 100 || ay.abs() > 100,
+                dash,
+                skill,
+            );
+            return;
+        }
         if self.screen != 6 {
             self.key_input = Input::default();
             return;
@@ -272,7 +285,7 @@ mod tests {
         assert_eq!(restored.save.kills, 87);
         assert_eq!(restored.save.expansion.campaign.xp, 320);
         assert!(restored.save.sound_effects);
-        assert_eq!(restored.save.journey.items.len(), 3);
+        assert_eq!(restored.save.journey.items.len(), 6);
         assert!(!restored.save.introduction_seen);
     }
     #[test]

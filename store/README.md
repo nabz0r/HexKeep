@@ -1,4 +1,4 @@
-# Ressources Google Play · 0.6
+# Ressources Google Play · 0.7
 
 Candidat français : `fr-FR/title.txt`, description courte et description complète. `feature-graphic.jpg` : 1024×500, sans alpha. `icon.png` : 512×512, rendu du dessin vectoriel livré dans le jeu. `fr-FR/screenshots/` : captures réelles, sans ajout d’interfaces fictives.
 

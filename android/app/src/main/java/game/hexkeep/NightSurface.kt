@@ -6,6 +6,7 @@ import android.os.SystemClock
 import android.view.MotionEvent
 import android.view.View
 import game.hexkeep.core.Engine
+import game.hexkeep.frontier.FrontierUi
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.concurrent.Executors
@@ -53,7 +54,13 @@ class NightSurface(
     @Volatile private var attackHeld=false
     private val attackRequest=AtomicBoolean(false)
     private var attackPointer=-1
-    private var snapshot=JSONObject()
+    private val frontierUi=FrontierUi(
+        { name -> if(name=="legacy-home"){legacyHome=true;worldMap=false;clearInput()}else if(name=="f:stance"||name=="f:heal"||name=="f:interact")engine.uiAction(name)else command(name) },
+        { x,y -> input=input.copy(mx=x,my=y) },
+        { held -> attackHeld=held;if(held)attackRequest.set(true) },
+        { dashRequest.set(true) }, { skillRequest.set(true) }
+    )
+    @Volatile private var snapshot=JSONObject()
     private var previous=JSONObject()
     private var received=0L
     private var tickCount=0
@@ -72,11 +79,10 @@ class NightSurface(
     private var intro=-1
     private var heroChoice=false
     private var worldMap=false
-    private var inventoryPage=0
+    private var legacyHome=false
     private var journalPage=0
     private var codexPage=0
     private var codexSecrets=false
-    private var chosenItem=0L
     private var firstChoice=false
     private var introStarted=0L
     private var screenStarted=0L
@@ -106,7 +112,7 @@ class NightSurface(
         worker.scheduleAtFixedRate({
             if(active&&!destroyed.get()) try {
                 val v=input
-                engine.controls(v.mx,v.my,v.ax,v.ay,autoAim||attackHeld||attackRequest.getAndSet(false),dashRequest.getAndSet(false),skillRequest.getAndSet(false))
+                engine.controls(v.mx,v.my,v.ax,v.ay,(autoAim&&snapshot.optInt("screen")!=52)||attackHeld||attackRequest.getAndSet(false),dashRequest.getAndSet(false),skillRequest.getAndSet(false))
                 engine.tick((System.currentTimeMillis()/1000).toULong())
                 val next=JSONObject(engine.presentation(logicalWidth))
                 val sensitive=engine.sensitive()
@@ -119,22 +125,23 @@ class NightSurface(
             } catch(e:Exception) { android.util.Log.e("HEXKEEP","Presentation update failed",e) }
         },0,33_333_333,TimeUnit.NANOSECONDS)
     }
-    fun suspendForInterruption(){clearInput();if(snapshot.optInt("screen")==6)command("pause")}
-    fun onPause(){active=false;clearInput();if(snapshot.optInt("screen")==6&&!snapshot.optBoolean("online"))engine.uiAction("pause")}
+    fun suspendForInterruption(){clearInput();if(snapshot.optInt("screen") in listOf(6,52,53))command("pause")}
+    fun onPause(){active=false;clearInput();if(snapshot.optInt("screen") in listOf(6,52,53)&&!snapshot.optBoolean("online"))engine.uiAction("pause")}
     fun onResume(){active=true;invalidate()}
-    fun close(){destroyed.set(true);active=false;worker.shutdownNow();clearInput()}
-    fun back(){clearInput();when{helpOpen->{helpOpen=false};snapshot.optInt("screen")==10->{command(settingsReturn)};snapshot.optInt("screen") in listOf(40,42)->command("inventory_back");snapshot.optInt("screen")==41->command("home");intro>=0->{intro=-1;heroChoice=false};heroChoice->{heroChoice=false;if(firstChoice)intro=2 else engine.uiAction("home")};worldMap->{worldMap=false};snapshot.optInt("screen")==6->engine.uiAction("pause");snapshot.optInt("screen")==14->engine.uiAction("resume");snapshot.optInt("screen")==12->engine.uiAction("finish");snapshot.optInt("screen") in listOf(0,7)->activity.finish();else->engine.back()}}
+    fun close(){destroyed.set(true);active=false;worker.shutdownNow();clearInput();frontierUi.close()}
+    fun back(){clearInput();when{snapshot.optInt("screen") in listOf(52,53)->command("f:pause");snapshot.optInt("screen")==54->command("f:resume");snapshot.optInt("screen")==55->command("f:leave");snapshot.optInt("screen")==56->command("f:journal");snapshot.optInt("screen")==51->command("f:atlas");snapshot.optInt("screen")==50->command("f:home");helpOpen->{helpOpen=false};snapshot.optInt("screen")==10->{command(settingsReturn)};snapshot.optInt("screen") in listOf(40,42)->command("inventory_back");snapshot.optInt("screen")==41->command("home");intro>=0->{intro=-1;heroChoice=false};heroChoice->{heroChoice=false;if(firstChoice)intro=2 else engine.uiAction("home")};worldMap->{worldMap=false};legacyHome&&snapshot.optInt("screen")==7->{legacyHome=false};snapshot.optInt("screen")==6->engine.uiAction("pause");snapshot.optInt("screen")==14->engine.uiAction("resume");snapshot.optInt("screen")==12->engine.uiAction("finish");snapshot.optInt("screen") in listOf(0,7)->activity.finish();else->engine.back()}}
 
     fun metrics():String{
         // Input injection uses screen coordinates; older Android versions offset the content view.
         val origin=IntArray(2);getLocationOnScreen(origin)
-        return JSONObject().put("frames",frames).put("seconds",if(metricStart==0L)0.0 else (System.nanoTime()-metricStart)/1e9).put("over_33ms",slowFrames).put("renderer","Android hardware Canvas").put("animation",actorAnimator.metrics()).put("viewport",JSONObject().put("left",viewportLeft+origin[0]).put("top",viewportTop+origin[1]).put("scale",viewportScale).put("width",vw)).toString()
+        return JSONObject().put("frames",frames).put("seconds",if(metricStart==0L)0.0 else (System.nanoTime()-metricStart)/1e9).put("over_33ms",slowFrames).put("renderer","Android hardware Canvas").put("animation",actorAnimator.metrics()).put("frontier",frontierUi.metrics()).put("viewport",JSONObject().put("left",viewportLeft+origin[0]).put("top",viewportTop+origin[1]).put("scale",viewportScale).put("width",vw)).toString()
     }
-    private fun clearInput(){input=StickInput();movePointer=-1;aimPointer=-1;attackPointer=-1;attackHeld=false;attackRequest.set(false);dashRequest.set(false);skillRequest.set(false);focused=null;engine.controls(0,0,0,0,false,false,false);engine.touch(0,3u,0,0)}
+    private fun clearInput(){frontierUi.clear();input=StickInput();movePointer=-1;aimPointer=-1;attackPointer=-1;attackHeld=false;attackRequest.set(false);dashRequest.set(false);skillRequest.set(false);focused=null;engine.controls(0,0,0,0,false,false,false);engine.touch(0,3u,0,0)}
     private fun command(name:String){
         clearInput()
-        if(name=="settings")settingsReturn=if(snapshot.optJSONObject("battle")!=null)"continue"else if(snapshot.optBoolean("created"))"home"else"continue"
-        if(name=="resume")action(19)
+        if(name=="f:atlas"||name=="f:home")legacyHome=false
+        if(name=="settings")settingsReturn=if(snapshot.optJSONObject("battle")!=null||snapshot.optJSONObject("frontier")?.optJSONObject("run")!=null)"continue"else if(snapshot.optBoolean("created"))"home"else"continue"
+        if(name=="resume"||name=="f:resume")action(19)
         engine.uiAction(name)
     }
     override fun onApplyWindowInsets(insets:android.view.WindowInsets):android.view.WindowInsets {
@@ -160,6 +167,7 @@ class NightSurface(
             heroChoice||screen==2||screen==3->heroes(c)
             screen==0->title(c)
             screen==7&&worldMap->map(c)
+            frontierUi.handles(screen)&&!(screen==7&&legacyHome)->frontierUi.draw(c,vw,snapshot,reduceMotion)
             screen==7->home(c)
             screen==6->battle(c)
             screen==14->{battle(c,false);pause(c)}
@@ -167,19 +175,20 @@ class NightSurface(
             screen==10->settings(c)
             screen==20->fortress(c)
             screen==16->party(c)
-            screen==40->inventory(c)
             screen==41->journal(c)
             screen==42->codex(c)
             else->legacy(c)
         }
         val message=snapshot.optString("message")
-        if(message.isNotBlank()&&screen!=6){
-            if(screen==40||screen==42){panel(c,48f,101f,vw-96,22f,0xf0152630.toInt());fitText(c,message,60f,117f,12f,ivory,vw-120)}
+        if(message.isNotBlank()&&screen !in listOf(6,53)){
+            if(screen==40){panel(c,vw/2-290,516f,580f,23f,0xf0152630.toInt());fitText(c,message,vw/2,533f,12f,ivory,556f,Paint.Align.CENTER)}
+            else if(screen==52){panel(c,vw/2-250,165f,500f,36f,0xf0152630.toInt());fitText(c,message,vw/2,188f,13f,ivory,476f,Paint.Align.CENTER)}
+            else if(screen==42){panel(c,48f,101f,vw-96,22f,0xf0152630.toInt());fitText(c,message,60f,117f,12f,ivory,vw-120)}
             else{panel(c,vw/2-260,482f,520f,40f,0xe8152630.toInt());fitText(c,message,vw/2,507f,14f,ivory,490f,Paint.Align.CENTER)}
         }
         if(helpOpen)help(c)
         c.restore()
-        if(active){if(screen==6)postInvalidateOnAnimation()else postInvalidateDelayed(50)}
+        if(active){if(screen in listOf(6,52,53))postInvalidateOnAnimation()else postInvalidateDelayed(50)}
     }
     private fun fill(c:Canvas,color:Int){paint.shader=null;paint.color=color;paint.style=Paint.Style.FILL;c.drawRect(0f,0f,vw,540f,paint)}
     private fun panel(c:Canvas,x:Float,y:Float,w:Float,h:Float,color:Int=0xde10212b.toInt(),stroke:Int=0x305da3ab){paint.shader=null;paint.style=Paint.Style.FILL;paint.color=color;c.drawRoundRect(x,y,x+w,y+h,if(h<30)4f else 12f,if(h<30)4f else 12f,paint);if(stroke!=0){paint.style=Paint.Style.STROKE;paint.strokeWidth=1f;paint.color=stroke;c.drawRoundRect(x,y,x+w,y+h,if(h<30)4f else 12f,if(h<30)4f else 12f,paint);paint.style=Paint.Style.FILL}}
@@ -203,10 +212,10 @@ class NightSurface(
 
     private fun embers(c:Canvas){if(reduceMotion)return;val t=SystemClock.uptimeMillis()/1000f;for(i in 0..27){val x=((i*173.3f+sin(t*.2+i)*24)%vw).toFloat();val y=540f-((t*(7+i%7)+i*51)%540);paint.color=Color.argb(65+(i%4)*25,235,175,86);c.drawCircle(x,y,if(i%5==0)1.6f else .8f,paint)}}
     private fun ornament(c:Canvas,x:Float,y:Float){line(c,x,y,x+45,y,gold);val p=Path();p.moveTo(x+56,y-5);p.lineTo(x+61,y);p.lineTo(x+56,y+5);p.lineTo(x+51,y);p.close();paint.color=gold;c.drawPath(p,paint);line(c,x+67,y,x+112,y,gold)}
-    private fun title(c:Canvas){background(c,0f);text(c,"LES LANTERNES DU REFUGE",64f,91f,14f,gold,bold);ornament(c,64f,112f);text(c,"HEXKEEP",58f,208f,76f,ivory,serif);paragraph(c,"Là où personne ne veille, le monde s’éteint.",66f,252f,450f,22f,ivory,30f);paragraph(c,"Porte la lumière. Réveille les forteresses. Laisse une trace dans la nuit.",66f,308f,370f,18f,muted,26f)
+    private fun title(c:Canvas){background(c,0f);text(c,"LES ÉCHOS DES CONFINS",64f,91f,14f,gold,bold);ornament(c,64f,112f);text(c,"HEXKEEP",58f,208f,76f,ivory,serif);paragraph(c,"Là où personne ne veille, le monde s’éteint.",66f,252f,450f,22f,ivory,30f);paragraph(c,"Porte la lumière. Réveille les forteresses. Laisse une trace dans la nuit.",66f,308f,370f,18f,muted,26f)
         button(c,"begin",if(snapshot.optBoolean("resumable"))"Reprendre mon aventure  ›"else if(snapshot.optBoolean("intro_seen"))"Reprendre la veille  ›"else"Entrer dans la nuit  ›",64f,382f,310f,58f,true){if(snapshot.optBoolean("intro_seen")||snapshot.optBoolean("resumable"))command("continue")else beginIntro()}
         button(c,"settings","Réglages",394f,382f,144f,58f){command("settings")}
-        text(c,"CHAPITRE I  /  LA DERNIÈRE LANTERNE",66f,480f,12f,muted,bold);text(c,"0.6 • ${if(BuildConfig.OFFLINE_EDITION)"AVENTURE HORS LIGNE"else"ÉDITION DEV"}",vw-44,506f,11f,muted,sans,Paint.Align.RIGHT)
+        text(c,"CHAPITRE I  /  LA DERNIÈRE LANTERNE",66f,480f,12f,muted,bold);text(c,"0.7 • ${if(BuildConfig.OFFLINE_EDITION)"AVENTURE HORS LIGNE"else"ÉDITION DEV"}",vw-44,506f,11f,muted,sans,Paint.Align.RIGHT)
     }
     private fun beginIntro(){intro=0;introStarted=SystemClock.uptimeMillis();heroChoice=false;worldMap=false;clearInput()}
     private fun introduction(c:Canvas){background(c,.16f);val elapsed=(SystemClock.uptimeMillis()-introStarted)/1000f;val fade=if(reduceMotion)1f else (elapsed/1.2f).coerceIn(0f,1f);val titles=arrayOf("Le monde oublie.","Une lumière demeure.","À toi de veiller.");val body=arrayOf("Les routes ont disparu sous la brume. Les noms se sont effacés des pierres. Une à une, les forteresses ont cessé de répondre.","Au cœur des ruines, une lanterne brûle encore. Elle n’attend ni roi, ni armée. Seulement quelqu’un pour la porter.","Rallume les trois balises. Apprends les mouvements des ombres. Puis affronte le gardien de la dernière porte.");text(c,"PROLOGUE   /   0${intro+1}",68f,123f,13f,gold,bold);text(c,titles[intro],64f,216f,46f,Color.argb((255*fade).toInt(),238,234,220),serif);paragraph(c,body[intro],68f,275f,min(530f,vw*.55f),22f,ivory,34f);for(i in 0..2)line(c,68f+i*51,420f,101f+i*51,420f,if(i<=intro)gold else 0xff3e5054.toInt(),3f)
@@ -219,7 +228,8 @@ class NightSurface(
     }
     private fun home(c:Canvas){
         background(c,.27f);val j=snapshot.optJSONObject("journey")?:JSONObject()
-        text(c,"HEXKEEP",47f,65f,30f,ivory,serif);text(c,"LES LANTERNES DU REFUGE  /  0.6",49f,90f,11f,gold,bold)
+        text(c,"HEXKEEP",47f,65f,30f,ivory,serif);text(c,"LES ÉCHOS DES CONFINS  /  0.7",49f,90f,11f,gold,bold)
+        button(c,"confins-atlas","Atlas des Confins",348f,36f,190f,45f){command("f:atlas")}
         button(c,"gear","Réglages",vw-191,36f,143f,45f){command("settings")}
         fitText(c,"${snapshot.optString("name")}  •  Niveau ${j.optInt("level",1)}",49f,160f,16f,teal,440f)
         text(c,"Retrouve les chemins.",45f,214f,39f,ivory,serif)
@@ -232,71 +242,8 @@ class NightSurface(
         text(c,"${snapshot.optInt("xp")} éclats  •  ${j.optInt("dust")} poussières",x+24,235f,15f,muted)
         button(c,"hero","Identité & serment",x+20,262f,286f,45f){firstChoice=false;heroChoice=true}
         button(c,"network",if(BuildConfig.OFFLINE_EDITION)"Les gestes du veilleur  ›"else"Jouer avec des veilleurs  ›",x+20,318f,286f,45f){if(BuildConfig.OFFLINE_EDITION)helpOpen=true else command("network")}
-        button(c,"campaign",if(BuildConfig.OFFLINE_EDITION)"${j.optInt("collection")} / 36 objets · ${j.optJSONArray("secrets")?.length()?:0} / 9 mémoires"else"Forteresse & chroniques",x+20,374f,286f,43f){command(if(BuildConfig.OFFLINE_EDITION)"codex"else"campaign")}
+        button(c,"campaign",if(BuildConfig.OFFLINE_EDITION)"${j.optInt("collection")} / 72 objets · ${j.optJSONArray("secrets")?.length()?:0} / 9 mémoires"else"Forteresse & chroniques",x+20,374f,286f,43f){command(if(BuildConfig.OFFLINE_EDITION)"codex"else"campaign")}
         button(c,"codex","Carnet & secrets  ›",x,448f,326f,45f){command("codex")};fitText(c,nextGoal(j),48f,530f,13f,gold,vw-96)
-    }
-    private fun rarity(n:Int)=intArrayOf(muted,teal,0xff8fb4ff.toInt(),0xffd29ffa.toInt())[n.coerceIn(0,3)]
-    private fun itemIcon(c:Canvas,slot:Int,x:Float,y:Float,color:Int){
-        glow(c,x,y,27f,color,35);val p=Path()
-        when(slot){0->{line(c,x-13,y+14,x+13,y-14,color,4f);line(c,x-12,y+4,x-3,y+13,color,3f);circle(c,x+14,y-15,3f,color)}
-            1->{p.moveTo(x,y-19);p.lineTo(x+16,y-11);p.lineTo(x+13,y+8);p.lineTo(x,y+20);p.lineTo(x-13,y+8);p.lineTo(x-16,y-11);p.close();paint.color=color;paint.style=Paint.Style.STROKE;paint.strokeWidth=2f;c.drawPath(p,paint);paint.style=Paint.Style.FILL;line(c,x,y-12,x,y+12,color,2f)}
-            else->{circle(c,x,y,16f,color,2f);line(c,x-7,y+7,x+7,y-7,color,3f);circle(c,x,y,3f,color)}}
-    }
-    private fun inventory(c:Canvas){
-        background(c,.78f)
-        val j=snapshot.optJSONObject("journey")?:JSONObject()
-        val raw=j.optJSONArray("items")?:JSONArray()
-        val items=(0 until raw.length()).map{raw.getJSONObject(it)}.sortedWith(compareByDescending<JSONObject>{it.optInt("rarity")}.thenByDescending{it.optLong("id")})
-        val equipped=j.optJSONArray("equipped")?:JSONArray()
-        val inBattle=j.optBoolean("in_battle");val online=snapshot.optBoolean("online")
-        val locked=online || (inBattle && snapshot.optJSONObject("expedition")==null)
-        header(c,"Le sac du veilleur",if(inBattle)if(online)"Combat en ligne • équipement normalisé"else"Aventure en pause • équipe-toi puis reprends"else"Équipement • statistiques • collections"){command("inventory_back")}
-        button(c,"inventory-codex","Carnet & aide",vw-345,38f,150f,44f){command("codex")}
-        val lw=vw-397;val cw=(lw-15)/2;val pages=max(1,(items.size+5)/6)
-        inventoryPage=inventoryPage.coerceIn(0,pages-1)
-        if(items.none{it.optLong("id")==chosenItem})chosenItem=items.firstOrNull()?.optLong("id")?:0
-        for(k in 0..5){
-            val item=items.getOrNull(inventoryPage*6+k)?:continue
-            val id=item.optLong("id");val slot=item.optInt("slot");val x=48+(k%2)*(cw+15);val y=125+(k/2)*105f
-            val color=rarity(item.optInt("rarity"));val worn=equipped.optLong(slot)==id
-            panel(c,x,y,cw,91f,if(chosenItem==id)0xe52b414e.toInt()else 0xe0132935.toInt(),if(chosenItem==id)gold else color)
-            itemIcon(c,slot,x+33,y+40,color)
-            fitText(c,item.optString("name"),x+65,y+27,17f,ivory,cw-77)
-            text(c,arrayOf("Commun","Inhabituel","Rare","Épique")[item.optInt("rarity").coerceIn(0,3)]+if(worn)" · ÉQUIPÉ"else "",x+65,y+48,11f,color,bold)
-            val stats=when(slot){1->"+${item.optInt("vitality")} vie · +${item.optInt("guard")} armure";2->"+${item.optInt("power")} puissance · +${item.optInt("haste")} cadence";else->"+${item.optInt("power")} puissance · +${item.optInt("vitality")} vie"}
-            fitText(c,stats,x+65,y+70,12f,muted,cw-77)
-            text(c,arrayOf("Aube","Givre","Sève","Étoile")[item.optInt("motif").coerceIn(0,3)],x+65,y+85,9f,gold)
-            buttons.add(Button("item$id",RectF(x,y,x+cw,y+91)){chosenItem=id})
-        }
-        button(c,"prev","‹",48f,456f,51f,46f){inventoryPage=(inventoryPage-1).coerceAtLeast(0)}
-        text(c,"${inventoryPage+1} / $pages · ${items.size} / 60 objets",111f,484f,12f,muted)
-        button(c,"next","›",48+lw-51,456f,51f,46f){inventoryPage=(inventoryPage+1).coerceAtMost(pages-1)}
-        val x=vw-322
-        panel(c,x,124f,274f,382f)
-        text(c,"NIVEAU ${j.optInt("level",1)}",x+20,153f,12f,gold,bold)
-        val p=snapshot.optJSONObject("battle")?.optJSONArray("fighters")?.optJSONObject(snapshot.optInt("local"))
-        val hp=if(inBattle)p?.optInt("hp")?:0 else j.optInt("vitality")
-        val maximum=if(inBattle)p?.optInt("max_hp")?:0 else j.optInt("vitality")
-        text(c,"Vie ${hp.coerceAtLeast(0)} / $maximum",x+20,180f,18f,ivory)
-        val armor=if(inBattle)p?.optInt("armor")?:0 else j.optInt("armor")
-        text(c,"Armure $armor · Puissance ${if(inBattle)p?.optInt("power")?:100 else j.optInt("power")}%",x+20,207f,13f,ivory)
-        text(c,"Cadence +${j.optInt("haste")} · 2 pièces = bonus",x+20,232f,12f,muted)
-        val selected=items.find{it.optLong("id")==chosenItem}
-        if(selected!=null){
-            val slot=selected.optInt("slot");val worn=equipped.optLong(slot)==chosenItem
-            val current=items.find{it.optLong("id")==equipped.optLong(slot)}
-            fitText(c,selected.optString("name"),x+20,276f,17f,rarity(selected.optInt("rarity")),234f)
-            fun delta(key:String):String{val d=selected.optInt(key)-(current?.optInt(key)?:0);return if(d>=0)"+$d"else"$d"}
-            text(c,"Vie ${delta("vitality")} · Puissance ${delta("power")}",x+20,297f,12f,muted)
-            text(c,"Armure ${delta("guard")} · Cadence ${delta("haste")}",x+20,313f,12f,muted)
-            button(c,"equip",if(locked)"Valeurs du Codex"else if(worn)"Équipé"else"Équiper",x+20,322f,234f,42f,!worn&&!locked){if(!locked)command("equip:$chosenItem")}
-            fitText(c,"Serment de "+arrayOf("l’Aube","Givre","Sève","l’Étoile")[selected.optInt("motif").coerceIn(0,3)],x+20,382f,12f,gold,234f)
-            paragraph(c,selected.optString("lore","Retrouvé sur les anciens chemins."),x+20,399f,234f,11f,muted,15f)
-            if(!worn&&!inBattle)button(c,"salvage","Recycler · +${4*(selected.optInt("rarity")+1)} braises",x+20,420f,234f,25f){command("salvage:$chosenItem");chosenItem=0}
-        }
-        if(inBattle)button(c,"return-battle","Reprendre l’aventure  ›",x+20,454f,234f,36f,true){command("inventory_back")}
-        else button(c,"forge","Forger · 30 / ${j.optInt("dust")} braises",x+20,454f,234f,36f){command("forge")}
-        text(c,if(inBattle)"Le butin trouvé est conservé. Changer d’équipement ne restaure pas la vie."else"Deux objets du même serment : +12 vie et +8 puissance. Les combats réseau restent normalisés.",48f,525f,12f,muted)
     }
     private fun journal(c:Canvas){
         background(c,.72f)
@@ -424,7 +371,7 @@ class NightSurface(
         val w=(vw-120)/2;val right=72+w
         val toggles=listOf(Triple("music","Musique d’ambiance",snapshot.optBoolean("music")),Triple("effects","Sons de combat",snapshot.optBoolean("effects")),Triple("haptics","Vibrations",snapshot.optBoolean("haptics")))
         toggles.forEachIndexed{i,t->button(c,t.first,"${t.second}   ${if(t.third)"Activé"else"Désactivé"}",48f,131f+i*71,w,56f){command(t.first)}}
-        button(c,"aim","Attaque automatique   ${if(autoAim)"Activée"else"Désactivée"}",right,131f,w,56f){autoAim=!autoAim;prefs.edit().putBoolean("autoAim",autoAim).apply()}
+        button(c,"aim","Attaque auto · Marches   ${if(autoAim)"Activée"else"Désactivée"}",right,131f,w,56f){autoAim=!autoAim;prefs.edit().putBoolean("autoAim",autoAim).apply()}
         button(c,"contrast","Contraste renforcé   ${if(snapshot.optBoolean("accessible"))"Activé"else"Désactivé"}",right,202f,w,56f){command("contrast")}
         button(c,"motion","Animations d’ambiance   ${if(reduceMotion)"Réduites"else"Complètes"}",right,273f,w,56f){reduceMotion=!reduceMotion;prefs.edit().putBoolean("reduceMotion",reduceMotion).apply()}
         val cw=(vw-132)/3
@@ -719,7 +666,7 @@ class NightSurface(
         }
         text(c,if(snapshot.optBoolean("online"))""else"Fermer l’application conserve l’aventure en cours.",vw/2,438f,13f,muted,sans,Paint.Align.CENTER)
     }
-    private fun result(c:Canvas){background(c,.54f);val b=snapshot.optJSONObject("battle");val run=snapshot.optJSONObject("expedition");val win=if(run!=null)run.optBoolean("victory")else if(b?.optJSONObject("siege")!=null)b.getJSONObject("siege").optBoolean("captured")else snapshot.optBoolean("tutorial")||(b?.optJSONArray("fighters")?.optJSONObject(0)?.optInt("kills")?:0)>0;val x=vw/2;text(c,if(win)"LA NUIT RECULE"else"LA FLAMME DEMEURE",x,122f,13f,gold,bold,Paint.Align.CENTER);text(c,if(win)"Tu as porté la lumière."else"Chaque veille t’apprend.",x,202f,45f,ivory,serif,Paint.Align.CENTER);val kills=b?.optJSONArray("fighters")?.optJSONObject(0)?.optInt("kills")?:0;val seconds=(b?.optInt("tick")?:0)/30;val lit=run?.optJSONArray("charges");val subtitle=if(run!=null)"${(0..2).count{lit?.optInt(it)==90}} balises réveillées  •  Ombres dissipées : $kills"else"Ombres dissipées : $kills  •  ${seconds/60} min ${seconds%60} s";text(c,subtitle,x,261f,19f,muted,sans,Paint.Align.CENTER);if(run!=null)text(c,"Butin : ${run.optInt("loot_count")+(if(win)1 else 0)} objets  •  ${run.optInt("dust")} poussières",x,300f,17f,teal,sans,Paint.Align.CENTER)else ornament(c,x-56,300f);button(c,"again",if(run!=null)"Examiner mon butin  ›"else "Découvrir le refuge  ›",x-180,342f,360f,61f,true){command("finish");if(run!=null){chosenItem=0;inventoryPage=0;command("inventory")}};button(c,"finish","Retrouver le refuge",x-180,423f,360f,51f){command("finish")}}
+    private fun result(c:Canvas){background(c,.54f);val b=snapshot.optJSONObject("battle");val run=snapshot.optJSONObject("expedition");val win=if(run!=null)run.optBoolean("victory")else if(b?.optJSONObject("siege")!=null)b.getJSONObject("siege").optBoolean("captured")else snapshot.optBoolean("tutorial")||(b?.optJSONArray("fighters")?.optJSONObject(0)?.optInt("kills")?:0)>0;val x=vw/2;text(c,if(win)"LA NUIT RECULE"else"LA FLAMME DEMEURE",x,122f,13f,gold,bold,Paint.Align.CENTER);text(c,if(win)"Tu as porté la lumière."else"Chaque veille t’apprend.",x,202f,45f,ivory,serif,Paint.Align.CENTER);val kills=b?.optJSONArray("fighters")?.optJSONObject(0)?.optInt("kills")?:0;val seconds=(b?.optInt("tick")?:0)/30;val lit=run?.optJSONArray("charges");val subtitle=if(run!=null)"${(0..2).count{lit?.optInt(it)==90}} balises réveillées  •  Ombres dissipées : $kills"else"Ombres dissipées : $kills  •  ${seconds/60} min ${seconds%60} s";text(c,subtitle,x,261f,19f,muted,sans,Paint.Align.CENTER);if(run!=null)text(c,"Butin : ${run.optInt("loot_count")+(if(win)1 else 0)} objets  •  ${run.optInt("dust")} poussières",x,300f,17f,teal,sans,Paint.Align.CENTER)else ornament(c,x-56,300f);button(c,"again",if(run!=null)"Examiner mon butin  ›"else "Découvrir le refuge  ›",x-180,342f,360f,61f,true){command("finish");if(run!=null){command("inventory")}};button(c,"finish","Retrouver le refuge",x-180,423f,360f,51f){command("finish")}}
     private fun legacy(c:Canvas){background(c,.79f);val commands=snapshot.optJSONArray("ui")?:JSONArray();val logical=snapshot.optInt("width",logicalWidth);val sc=min(2f,(vw-32)/logical);val left=(vw-logical*sc)/2;val top=30f
         c.save();c.translate(left,top);c.scale(sc,sc)
         for(i in 0 until commands.length()){val d=commands.getJSONObject(i);val x=d.optInt("x").toFloat();val y=d.optInt("y").toFloat();when(d.optString("kind")){
@@ -733,6 +680,7 @@ class NightSurface(
     }
     override fun onTouchEvent(event:MotionEvent):Boolean{
         if(height<=0)return true
+        if(frontierUi.handles(snapshot.optInt("screen"))&&!helpOpen&&!heroChoice&&intro<0&&!(snapshot.optInt("screen")==7&&(legacyHome||worldMap))){val handled=frontierUi.touch(event,viewportLeft,viewportTop,viewportScale);invalidate();return handled}
         val scale=viewportScale;val phase=event.actionMasked
         if(phase==MotionEvent.ACTION_CANCEL){clearInput();return true}
         val battle=snapshot.optInt("screen")==6&&intro<0&&!heroChoice&&!helpOpen
@@ -750,6 +698,10 @@ class NightSurface(
             if(up){if(id==pointerButton){val hit=focused;focused=null;pointerButton=-1;if(hit!=null&&hit.rect.contains(x,y)){performClick();hit.run()}};engine.touch(id,2u,0,0)}
         }
         invalidate();return true
+    }
+    override fun onHoverEvent(event:MotionEvent):Boolean {
+        if(snapshot.optInt("screen")==40){frontierUi.hover((event.x-viewportLeft)/viewportScale,(event.y-viewportTop)/viewportScale,event.actionMasked==MotionEvent.ACTION_HOVER_EXIT);invalidate();return true}
+        return super.onHoverEvent(event)
     }
     override fun performClick():Boolean {super.performClick();return true}
 }

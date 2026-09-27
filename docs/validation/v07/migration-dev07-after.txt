@@ -1,0 +1,6 @@
+
+game.hexkeep.IdentityMigrationTest:.
+
+Time: 1.472
+
+OK (1 test)

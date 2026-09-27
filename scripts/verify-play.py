@@ -41,6 +41,8 @@ def inspect_native(path):
             if name.endswith('/libhk_ffi.so'):
                 assert b'uniffi_hk_ffi_checksum_method_engine_can_save' in data, f'Stale engine: {name}'
                 assert b'uniffi_hk_ffi_checksum_constructor_engine_offline' in data, f'Stale bindings: {name}'
+                assert 'Les Échos des Confins'.encode() in data, f'Missing v0.7 campaign: {name}'
+                assert b'beacons_boss' in data, f'Missing v0.7 mission engine: {name}'
             libraries.append({'path': name, 'bits': 64 if bits == 2 else 32, 'load_alignment': loads})
         engines = {n.split('/')[-2] for n in archive.namelist() if n.endswith('/libhk_ffi.so')}
         assert engines == {'arm64-v8a', 'armeabi-v7a', 'x86_64'}, engines
@@ -57,7 +59,7 @@ def main():
     sdk = Path(os.environ['ANDROID_HOME']) / 'build-tools' / '36.0.0'
     badging = run(sdk/'aapt', 'dump', 'badging', args.apk)
     assert "package: name='game.hexkeep'" in badging
-    assert "versionCode='6'" in badging and "targetSdkVersion:'36'" in badging
+    assert "versionCode='7'" in badging and "targetSdkVersion:'36'" in badging
     permissions = re.findall(r"uses-permission: name='([^']+)'", badging)
     assert permissions == ['android.permission.VIBRATE'], permissions
     run(sdk/'apksigner', 'verify', '--verbose', args.apk)
@@ -74,7 +76,7 @@ def main():
         certificate = run('keytool', '-printcert', '-jarfile', args.aab)
         assert 'Android Debug' not in certificate, 'Debug key is not an upload key'
         assert 'jar verified.' in run('jarsigner', '-verify', args.aab)
-    result = {'application_id': 'game.hexkeep', 'target_sdk': 36, 'version_code': 6,
+    result = {'application_id': 'game.hexkeep', 'target_sdk': 36, 'version_code': 7,
               'permissions': permissions, 'aab_signed': signed, 'play_console_approval': 'not performed',
               'artifacts': {str(p): {'sha256': hashlib.sha256(p.read_bytes()).hexdigest(),
                             'bytes': p.stat().st_size, 'native': inspect_native(p)} for p in [args.apk, args.aab]}}

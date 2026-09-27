@@ -1,0 +1,190 @@
+{
+  "application_id": "game.hexkeep",
+  "target_sdk": 36,
+  "version_code": 7,
+  "permissions": [
+    "android.permission.VIBRATE"
+  ],
+  "aab_signed": false,
+  "play_console_approval": "not performed",
+  "artifacts": {
+    "artifacts/HEXKEEP-v0.7-PLAY-preview.apk": {
+      "sha256": "9c76bd84bfbb601b38c0842974dd5ebb282073ba4e0075c07a5a471b6b90b064",
+      "bytes": 53166722,
+      "native": [
+        {
+          "path": "lib/arm64-v8a/libif_watch-7fdb5681f04f9050.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "lib/arm64-v8a/libjnidispatch.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "lib/armeabi-v7a/libif_watch-7a3abb36b0c0f951.so",
+          "bits": 32,
+          "load_alignment": [
+            4096,
+            4096,
+            4096
+          ]
+        },
+        {
+          "path": "lib/armeabi-v7a/libjnidispatch.so",
+          "bits": 32,
+          "load_alignment": [
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "lib/x86_64/libif_watch-bf3a5eba77815ec5.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "lib/x86_64/libjnidispatch.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "lib/arm64-v8a/libhk_ffi.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "lib/armeabi-v7a/libhk_ffi.so",
+          "bits": 32,
+          "load_alignment": [
+            4096,
+            4096,
+            4096,
+            4096
+          ]
+        },
+        {
+          "path": "lib/x86_64/libhk_ffi.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        }
+      ]
+    },
+    "artifacts/HEXKEEP-v0.7-PLAY.aab": {
+      "sha256": "db901e8b4aabebeed13de12a993e4f35545ef2914f2a77675c2858179f7fd781",
+      "bytes": 46260672,
+      "native": [
+        {
+          "path": "base/lib/arm64-v8a/libhk_ffi.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "base/lib/arm64-v8a/libif_watch-7fdb5681f04f9050.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "base/lib/arm64-v8a/libjnidispatch.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "base/lib/armeabi-v7a/libhk_ffi.so",
+          "bits": 32,
+          "load_alignment": [
+            4096,
+            4096,
+            4096,
+            4096
+          ]
+        },
+        {
+          "path": "base/lib/armeabi-v7a/libif_watch-7a3abb36b0c0f951.so",
+          "bits": 32,
+          "load_alignment": [
+            4096,
+            4096,
+            4096
+          ]
+        },
+        {
+          "path": "base/lib/armeabi-v7a/libjnidispatch.so",
+          "bits": 32,
+          "load_alignment": [
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "base/lib/x86_64/libhk_ffi.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "base/lib/x86_64/libif_watch-bf3a5eba77815ec5.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "path": "base/lib/x86_64/libjnidispatch.so",
+          "bits": 64,
+          "load_alignment": [
+            16384,
+            16384
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -62,7 +62,7 @@ class GameplayTest {
             awaitCooldown("skill_cd")
             capture("prologue-combat");tap(vw-60,40f);capture("pause");if(JSONObject(engine.presentation(584)).getInt("screen")==12)tap(vw/2,446f)else{tap(vw/2,370f);instrumentation.uiAutomation.rootInActiveWindow.findAccessibilityNodeInfosByText("Retourner au refuge").last().performAction(android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK);SystemClock.sleep(350)}
             onActivity{assertEquals(7,JSONObject(it.engine.presentation(584)).getInt("screen"))}
-            capture("refuge");tap(140f,470f);capture("map");tap(vw*.40f+57f,303f);assertFalse(JSONObject(engine.presentation(584)).getBoolean("selected_current"));if(BuildConfig.OFFLINE_EDITION){tap(vw-268,425f);assertTrue(JSONObject(engine.presentation(584)).getBoolean("selected_current"))}else{tap(vw-268,312f);assertTrue(JSONObject(engine.presentation(584)).getString("message").contains("Rejoins"))};tap(vw-110,60f)
+            capture("refuge");tap(vw-182,500f);tap(140f,470f);capture("map");tap(vw*.40f+57f,303f);assertFalse(JSONObject(engine.presentation(584)).getBoolean("selected_current"));if(BuildConfig.OFFLINE_EDITION){tap(vw-268,425f);assertTrue(JSONObject(engine.presentation(584)).getBoolean("selected_current"))}else{tap(vw-268,312f);assertTrue(JSONObject(engine.presentation(584)).getString("message").contains("Rejoins"))};tap(vw-110,60f)
             tap(200f,400f);capture("journal");tap(180f,408f);SystemClock.sleep(900);capture("expedition")
             assertEquals(8,JSONObject(engine.presentation(584)).getInt("battle_mode"))
             // Use Android Home: ActivityScenario waits for UI idleness before changing

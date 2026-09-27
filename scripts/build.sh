@@ -28,8 +28,8 @@ mkdir -p ../artifacts
 cp app/build/outputs/apk/dev/debug/app-dev-debug.apk ../artifacts/
 cp app/build/outputs/apk/prod/release/app-prod-release-unsigned.apk ../artifacts/
 
-cp app/build/outputs/apk/dev/release/app-dev-release.apk ../artifacts/HEXKEEP-v0.6-DEV.apk
+cp app/build/outputs/apk/dev/release/app-dev-release.apk ../artifacts/HEXKEEP-v0.7-DEV.apk
 
-cp app/build/outputs/apk/play/debug/app-play-debug.apk ../artifacts/HEXKEEP-v0.6-PLAY-preview.apk
-cp app/build/outputs/bundle/playRelease/app-play-release.aab ../artifacts/HEXKEEP-v0.6-PLAY.aab
+cp app/build/outputs/apk/play/debug/app-play-debug.apk ../artifacts/HEXKEEP-v0.7-PLAY-preview.apk
+cp app/build/outputs/bundle/playRelease/app-play-release.aab ../artifacts/HEXKEEP-v0.7-PLAY.aab
 cp app/build/outputs/apk/androidTest/play/debug/app-play-debug-androidTest.apk ../artifacts/

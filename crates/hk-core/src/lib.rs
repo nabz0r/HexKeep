@@ -2,6 +2,7 @@
 mod adventure;
 mod discoveries;
 mod expansion;
+mod frontier;
 mod network;
 mod presentation;
 mod release;
@@ -53,6 +54,8 @@ pub struct Save {
     pub journey: adventure::Journey,
     #[serde(default)]
     pub checkpoint: Option<release::Checkpoint>,
+    #[serde(default)]
+    pub frontier: frontier::Campaign,
 }
 fn default_sound() -> bool {
     true
@@ -78,6 +81,7 @@ impl Default for Save {
             sound_effects: true,
             journey: Default::default(),
             checkpoint: None,
+            frontier: Default::default(),
         }
     }
 }
@@ -154,7 +158,13 @@ impl Game {
         let error = parsed.is_err();
         let mut save = parsed.unwrap_or_default();
         save.journey.migrate();
-        let mut tampered = save.version != 1 || save.ledger.events.iter().any(|e| !e.valid("dev"));
+        let frontier_valid = save.frontier.valid();
+        let mut tampered = save.version != 1
+            || !frontier_valid
+            || save.ledger.events.iter().any(|e| !e.valid("dev"));
+        if !frontier_valid {
+            save.frontier = Default::default();
+        }
         let mut authority = expansion::fixture().authority;
         if authority
             .merge(&save.expansion.authority, &save.ledger)
@@ -439,6 +449,7 @@ impl Game {
                 self.event(Kind::Watch, 60);
             }
         }
+        self.frontier_tick();
         if self.screen != 6 {
             // Opening an in-match menu cannot pause the other participants.
             if matches!(self.screen, 14 | 40 | 42) && self.online.is_some() {

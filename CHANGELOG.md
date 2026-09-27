@@ -1,5 +1,21 @@
 # Historique des versions
 
+## 0.7.0 — Les Échos des Confins · 27 septembre 2026
+
+- Campagne originale en trois régions de 48 × 32 cases : forêt inondée, désert cristallin et toundra céleste. Atlas interactif, voyages, progression et déverrouillage des territoires.
+- Douze missions, dont trois principales et neuf secondaires : balises et gardiens, mémoires, voyageurs à secourir, chasses. Acceptation, suivi et récompenses persistantes attribuées une seule fois.
+- Dix cinématiques de campagne : introductions, révélation, arrivées des gardiens et conclusions. Caméras interpolées, texte progressif, pause, passage et reprise après fermeture.
+- Machine à états du combat : déplacement, préparation, frappe, récupération, esquive, impact et mort. Combo trois coups rapides → finissante lourde, brise-garde, fenêtre d’enchaînement, commandes tamponnées pendant le hitstop.
+- Postures Équilibre, Assaut et Rempart : vitesse, puissance, résistance et silhouette. Postures ennemies liées à leur comportement.
+- Cinq archétypes supplémentaires : Ravageur agressif, Aiguilleur à distance, Bastion gardé, Essaim mobile et Archonte à trois phases. Trois gardiens nommés, projectiles radiaux, charges et invocations.
+- Six emplacements : arme, plastron, amulette, casque, gants et bottes. Catalogue de 72 modèles ; migration additive conservant les objets, valeurs et identités historiques.
+- Nouvel inventaire tactile : grille paginée, glisser-déposer vers les emplacements, déplacement des cases, tri, comparaison chiffrée, infobulle au survol, forge et recyclage au refuge.
+- Superposition de six couches procédurales sur le personnage de campagne et son aperçu. Biomes, silhouettes, icônes, effets et atlas dessinés par le code ; aucun nouvel asset externe nécessaire.
+- Accueil, atlas, journal, chroniques et bestiaire cohérents ; transitions, minimap, zones sûres, mode contraste et réduction des secousses.
+- Sauvegarde complète du combat, des phases, de l’exploration, du butin et des cinématiques. Menus et interruptions suspendent la campagne ; reprendre reste une action volontaire.
+- Anciennes aventures et fonctions DEV conservées. Aucun changement des règles du combat réseau ; édition Play toujours solo hors ligne, sans publicité ni achats intégrés.
+- Version Android 7, API cible 36, trois ABI. Tests Rust, parcours tactiles Android et contrôle APK/AAB ; détails et limites de validation dans `docs/delivery-v07.md`.
+
 ## 0.6.0 — Les Lanternes du Refuge · 27 septembre 2026
 
 - Édition Play solo hors ligne jouable, AAB, signature d’envoi configurable et contrôles des artefacts. Le réseau de production reste verrouillé ; la DEV conserve ses fonctions.

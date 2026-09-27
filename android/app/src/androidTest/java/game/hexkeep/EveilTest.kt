@@ -57,7 +57,7 @@ class EveilTest {
  @Test fun animateExploreInspectAndResume(){
   ActivityScenario.launch<MainActivity>(Intent(test.targetContext,MainActivity::class.java)).use{scenario->
    SystemClock.sleep(1500);scenario.onActivity{activity=it;engine=it.engine;val viewport=JSONObject(it.renderMetrics()).getJSONObject("viewport");scale=viewport.getDouble("scale").toFloat();left=viewport.getDouble("left").toFloat();top=viewport.getDouble("top").toFloat();vw=viewport.getDouble("width").toFloat();engine.uiAction("continue");engine.uiAction("home");engine.hero(0u,0u)}
-   SystemClock.sleep(300);tap(200f,398f);tap(160f,407f);assertEquals(6,state().getInt("screen"))
+   SystemClock.sleep(300);tap(160f,476f);tap(160f,407f);assertEquals(6,state().getInt("screen"))
    for((index,direction) in listOf(1f to 0f,0f to -1f,-1f to 0f,0f to 1f).withIndex()){
     beginMove(direction.first,direction.second);SystemClock.sleep(650);shot("walk-$index");stop()
    }

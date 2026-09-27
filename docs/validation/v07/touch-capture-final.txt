@@ -1,0 +1,6 @@
+
+game.hexkeep.FrontierTest:.
+
+Time: 15.323
+
+OK (1 test)

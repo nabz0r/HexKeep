@@ -38,7 +38,7 @@ jobs:
       - name: Inspect the Play package
         run: |
           curl --fail --silent --show-error --location https://github.com/google/bundletool/releases/download/1.18.3/bundletool-all-1.18.3.jar -o "$RUNNER_TEMP/bundletool.jar"
-          python3 scripts/verify-play.py --apk artifacts/HEXKEEP-v0.6-PLAY-preview.apk --aab artifacts/HEXKEEP-v0.6-PLAY.aab --bundletool "$RUNNER_TEMP/bundletool.jar" > artifacts/play-verification.json
+          python3 scripts/verify-play.py --apk artifacts/HEXKEEP-v0.7-PLAY-preview.apk --aab artifacts/HEXKEEP-v0.7-PLAY.aab --bundletool "$RUNNER_TEMP/bundletool.jar" > artifacts/play-verification.json
       - uses: actions/upload-artifact@v4
         with:
           name: hexkeep-apks
@@ -73,7 +73,7 @@ jobs:
           profile: pixel_5
           script: |
             adb shell settings put secure immersive_mode_confirmations confirmed
-            adb install artifacts/artifacts/HEXKEEP-v0.6-PLAY-preview.apk
+            adb install artifacts/artifacts/HEXKEEP-v0.7-PLAY-preview.apk
             adb install artifacts/artifacts/app-play-debug-androidTest.apk
             scripts/test-play-device.sh artifacts
       - uses: actions/upload-artifact@v4

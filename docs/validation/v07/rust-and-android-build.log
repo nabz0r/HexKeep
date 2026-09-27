@@ -1,0 +1,701 @@
+   Compiling hk-core v0.7.0 (/workspace/HexKeep/crates/hk-core)
+   Compiling hk-ffi v0.7.0 (/workspace/HexKeep/crates/hk-ffi)
+   Compiling hexkeep-sim v0.7.0 (/workspace/HexKeep/tools/hexkeep-sim)
+    Finished `release` profile [optimized] target(s) in 1m 00s
+     Running unittests src/main.rs (target/release/deps/crown-6577649d68521927)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/release/deps/hexkeep_relay-7dd7ce3acfa33a5f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/release/deps/hexkeep_sim-d1bf1c8007c956ff)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/release/deps/hk_apu-c1b800834ad3db81)
+
+running 3 tests
+test tests::music_and_effects_are_independent ... ok
+test tests::continuous_blocks ... ok
+test tests::bounded_audio ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running unittests src/main.rs (target/release/deps/hk_bindgen-baa6a0d91cba128f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/release/deps/hk_core-6de17974749c0252)
+
+running 37 tests
+test adventure::tests::inventory_migration_equipment_salvage ... ok
+test adventure::tests::leaving_a_replay_unlocks_the_refuge_without_awarding_its_kills ... ok
+test frontier::tests::authored_world_has_reachable_objectives_and_complete_content ... ok
+test discoveries::tests::full_bag_converts_loot_and_reports_that_conversion ... ok
+test discoveries::tests::found_caches_are_kept_on_retreat_and_not_awarded_twice ... ok
+test adventure::eveil_tests::difficulty_unlocks_and_forging_updates_collection ... ok
+test adventure::tests::pve_loadout_is_not_applied_to_pvp ... ok
+test adventure::eveil_tests::field_equipment_pauses_and_never_grants_free_health ... ok
+test adventure::tests::rewards_are_consumed_once_and_inventory_resumes_combat ... ok
+test frontier::tests::journal_inventory_and_codex_return_to_their_source_without_resuming_combat ... ok
+test discoveries::tests::sites_reward_once_immediately_and_memories_survive_reload ... ok
+test discoveries::tests::marked_ground_can_be_escaped_or_dodged_and_hits_only_once ... ok
+test adventure::eveil_tests::legacy_journey_migration_preserves_values_and_equipment ... ok
+test frontier::tests::missions_acceptance_rewards_and_save_reload_are_idempotent ... ok
+test frontier::tests::inventory_sort_reorder_equipment_and_snapshot_do_not_heal ... ok
+test network::silence_tests::one_silent_participant_is_not_hidden_by_other_traffic ... ok
+test frontier::tests::timeline_resume_pause_and_skip_are_exact_and_do_not_advance_combat ... ok
+test frontier::tests::six_slot_migration_preserves_v06_identity_items_and_loadout ... ok
+test presentation::tests::expedition_stops_after_three_lost_lights ... ok
+test frontier::tests::stance_changes_have_real_tradeoffs_and_guard_break_is_heavy_only ... ok
+test frontier::tests::corrupted_frontier_checkpoints_fail_closed ... ok
+test presentation::tests::guided_start_and_manual_controls_are_safe ... ok
+test presentation::tests::old_save_migrates_without_changing_identity_or_progress ... ok
+test tests::malformed_save_never_overwritten ... ok
+test release::tests::play_is_solo_and_does_not_unlock_the_production_network ... ok
+test tests::onboarding_and_touch ... ok
+test tests::all_screens_render ... ok
+test release::tests::old_saves_migrate_and_invalid_checkpoints_fail_closed ... ok
+test tests::solo_save_roundtrip ... ok
+test tests::tutorial_can_be_won_without_changing_combat_stats ... ok
+test frontier::tests::combo_has_three_quick_strikes_then_a_heavy_and_input_survives_hitstop ... ok
+test release::tests::adventure_checkpoint_preserves_combat_loot_and_pause_without_double_reward ... ok
+test frontier::tests::all_enemy_archetypes_act_and_boss_changes_phase ... ok
+test presentation::tests::all_three_realms_can_complete_expedition_and_claim_once ... ok
+test frontier::tests::checkpoint_replay_produces_the_same_combat_state ... ok
+test frontier::tests::campaign_is_winnable_and_all_twelve_missions_can_be_claimed ... ok
+test frontier::tests::ten_minutes_of_boss_ai_keeps_transient_collections_bounded ... ok
+
+test result: ok. 37 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.61s
+
+     Running tests/milestones.rs (target/release/deps/milestones-ea1f255552eab3fc)
+
+running 8 tests
+test siege_gate_capture_and_contestation ... ok
+test balance_editor_changes_only_after_seal ... ok
+test cosmetic_edicts_wait_for_seal_and_revoke ... ok
+test v01_save_migrates_and_m7_persists ... ok
+test all_expansion_screens_at_every_supported_width ... ok
+test throne_ban_propagation_rollback_and_season ... ok
+test purchased_cosmetics_cannot_change_combat ... ok
+test thirty_minute_partition_reconciles ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+     Running unittests src/lib.rs (target/release/deps/hk_crown-cc6e66a76a5a2cc4)
+
+running 3 tests
+test tests::expiry_and_revoke ... ok
+test tests::partition_merge_and_forgery ... ok
+test tests::ban_only_after_seal_and_rollback ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/release/deps/hk_crypto-d4c2acbb56ae7006)
+
+running 7 tests
+test tests::twenty_four_words ... ok
+test tests::all_three_of_five ... ok
+test identity::tests::beacon_rotates ... ok
+test tests::signatures_are_separated ... ok
+test identity::tests::encrypted_recovery ... ok
+test identity::recovery_tests::five_guardians_three_recovers_owner ... ok
+test identity::tests::hierarchy_expiry_tamper ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/release/deps/hk_ffi-48b7a471deccbab1)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/release/deps/hk_ledger-b415d6cbfbf48c2d)
+
+running 2 tests
+test tests::missing_parent ... ok
+test tests::merge_order_and_tamper ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/release/deps/hk_net-26d5c7818b9a2fea)
+
+running 6 tests
+test tests::conflicting_inputs_abort ... ok
+test tests::reordered_input_cannot_escape_rollback_window ... ok
+test tests::packet_authentication ... ok
+test tests::rollback_matches_ordered ... ok
+test tests::cached_chain_does_not_accept_modified_or_expired_packets ... ok
+test transport_tests::real_noise_tcp_transport ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+     Running unittests src/lib.rs (target/release/deps/hk_ppu-ec966dfdac4c108c)
+
+running 1 test
+test tests::boundaries ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/release/deps/hk_proto-db75e9727b7b6f17)
+
+running 2 tests
+test tests::domains ... ok
+test tests::square_roots ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/release/deps/hk_season-e9d57819052a8038)
+
+running 4 tests
+test tests::memory_drops_and_collective_bonus_only ... ok
+test tests::sybil_three_devices_limit ... ok
+test tests::tiers_and_test_receipts ... ok
+test tests::house_requires_distinct_signed_members ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/release/deps/hk_sim-36f2a5e459d92e4d)
+
+running 10 tests
+test navigation::gameplay_tests::analogue_is_proportional_and_release_brakes ... ok
+test navigation::tests::swept_dash_cannot_tunnel ... ok
+test tests::armor_damage ... ok
+test tests::evolution_bounded ... ok
+test navigation::tests::actor_can_leave_a_wall_margin_and_rounded_corner ... ok
+test navigation::tests::route_goes_around_wall ... ok
+test navigation::gameplay_tests::every_spawn_is_walkable ... ok
+test navigation::gameplay_tests::all_enemy_roles_can_navigate_a_barrier ... ok
+test tests::roles_and_realms ... ok
+test tests::ten_thousand_replays has been running for over 60 seconds
+test tests::ten_thousand_replays ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 136.42s
+
+     Running unittests src/lib.rs (target/release/deps/hk_world-1f27079d17bfe508)
+
+running 5 tests
+test tests::banner_delay ... ok
+test tests::geometry ... ok
+test tests::memory_speed ... ok
+test tests::guard_saturates ... ok
+test tests::darkness_and_watch ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_apu
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_core
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_crown
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_crypto
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_ffi
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_ledger
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_net
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_ppu
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_proto
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_season
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_sim
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hk_world
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Compiling hk-ffi v0.7.0 (/workspace/HexKeep/crates/hk-ffi)
+    Finished `release` profile [optimized] target(s) in 2.09s
+   Compiling hk-bindgen v0.7.0 (/workspace/HexKeep/tools/bindgen)
+    Finished `release` profile [optimized] target(s) in 21.85s
+     Running `target/release/hk-bindgen generate --library target/release/libhk_ffi.dylib --language kotlin --out-dir android/app/src/main/java --config crates/hk-ffi/uniffi.toml`
+Code generation complete, formatting with ktlint (use --no-format to disable)
+Warning: Unable to auto-format hk_ffi.kt using ktlint: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+    Building arm64-v8a (aarch64-linux-android)
+   Compiling hk-core v0.7.0 (/workspace/HexKeep/crates/hk-core)
+   Compiling hk-ffi v0.7.0 (/workspace/HexKeep/crates/hk-ffi)
+    Finished `release` profile [optimized] target(s) in 26.38s
+    Building armeabi-v7a (armv7-linux-androideabi)
+   Compiling hk-proto v0.7.0 (/workspace/HexKeep/crates/hk-proto)
+   Compiling hk-ppu v0.7.0 (/workspace/HexKeep/crates/hk-ppu)
+   Compiling hk-apu v0.7.0 (/workspace/HexKeep/crates/hk-apu)
+   Compiling hk-crypto v0.7.0 (/workspace/HexKeep/crates/hk-crypto)
+   Compiling hk-world v0.7.0 (/workspace/HexKeep/crates/hk-world)
+   Compiling hk-ledger v0.7.0 (/workspace/HexKeep/crates/hk-ledger)
+   Compiling hk-crown v0.7.0 (/workspace/HexKeep/crates/hk-crown)
+   Compiling hk-sim v0.7.0 (/workspace/HexKeep/crates/hk-sim)
+   Compiling hk-season v0.7.0 (/workspace/HexKeep/crates/hk-season)
+   Compiling hk-net v0.7.0 (/workspace/HexKeep/crates/hk-net)
+   Compiling hk-core v0.7.0 (/workspace/HexKeep/crates/hk-core)
+   Compiling hk-ffi v0.7.0 (/workspace/HexKeep/crates/hk-ffi)
+    Finished `release` profile [optimized] target(s) in 41.16s
+    Building x86_64 (x86_64-linux-android)
+   Compiling hk-proto v0.7.0 (/workspace/HexKeep/crates/hk-proto)
+   Compiling hk-ppu v0.7.0 (/workspace/HexKeep/crates/hk-ppu)
+   Compiling hk-apu v0.7.0 (/workspace/HexKeep/crates/hk-apu)
+   Compiling hk-crypto v0.7.0 (/workspace/HexKeep/crates/hk-crypto)
+   Compiling hk-world v0.7.0 (/workspace/HexKeep/crates/hk-world)
+   Compiling hk-ledger v0.7.0 (/workspace/HexKeep/crates/hk-ledger)
+   Compiling hk-crown v0.7.0 (/workspace/HexKeep/crates/hk-crown)
+   Compiling hk-sim v0.7.0 (/workspace/HexKeep/crates/hk-sim)
+   Compiling hk-season v0.7.0 (/workspace/HexKeep/crates/hk-season)
+   Compiling hk-net v0.7.0 (/workspace/HexKeep/crates/hk-net)
+   Compiling hk-core v0.7.0 (/workspace/HexKeep/crates/hk-core)
+   Compiling hk-ffi v0.7.0 (/workspace/HexKeep/crates/hk-ffi)
+    Finished `release` profile [optimized] target(s) in 35.93s
+     Copying libraries to /workspace/HexKeep/artifacts/jni-DRjZpX
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build
+Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+> Task :app:bundleLicenses UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDevDebugBuild UP-TO-DATE
+> Task :app:mergeDevDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:generateDevDebugBuildConfig
+> Task :app:checkDevDebugAarMetadata UP-TO-DATE
+> Task :app:generateDevDebugResValues UP-TO-DATE
+> Task :app:mapDevDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDevDebugResources UP-TO-DATE
+> Task :app:mergeDevDebugResources UP-TO-DATE
+> Task :app:packageDevDebugResources UP-TO-DATE
+> Task :app:parseDevDebugLocalResources UP-TO-DATE
+> Task :app:createDevDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksDevDebug UP-TO-DATE
+
+> Task :app:processDevDebugMainManifest
+/workspace/HexKeep/android/app/src/main/AndroidManifest.xml:22:333-365 Warning:
+	android:extractNativeLibs should not be specified in this source AndroidManifest.xml file. See https://d.android.com/guide/topics/manifest/application-element#extractNativeLibs for more information.
+The AGP Upgrade Assistant can remove the attribute from the AndroidManifest.xml file and update the build file accordingly. See https://d.android.com/studio/build/agp-upgrade-assistant for more information.
+
+> Task :app:processDevDebugManifest
+> Task :app:javaPreCompileDevDebug UP-TO-DATE
+> Task :app:mergeDevDebugShaders UP-TO-DATE
+> Task :app:compileDevDebugShaders NO-SOURCE
+> Task :app:generateDevDebugAssets UP-TO-DATE
+> Task :app:mergeDevDebugAssets
+> Task :app:desugarDevDebugFileDependencies UP-TO-DATE
+> Task :app:checkDevDebugDuplicateClasses
+> Task :app:compressDevDebugAssets
+> Task :app:mergeDevDebugJniLibFolders
+> Task :app:mergeLibDexDevDebug UP-TO-DATE
+> Task :app:validateSigningDevDebug UP-TO-DATE
+> Task :app:writeDevDebugAppMetadata UP-TO-DATE
+> Task :app:writeDevDebugSigningConfigVersions UP-TO-DATE
+> Task :app:preDevReleaseBuild UP-TO-DATE
+> Task :app:mergeDevReleaseJniLibFolders
+> Task :app:processDevDebugManifestForPackage
+> Task :app:mergeDevDebugNativeLibs
+> Task :app:mergeDevReleaseNativeLibs
+> Task :app:mergeDevReleaseArtProfile UP-TO-DATE
+
+> Task :app:stripDevDebugDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libhk_ffi.so. Run with --info option to learn more.
+
+> Task :app:desugarDevReleaseFileDependencies UP-TO-DATE
+> Task :app:buildKotlinToolingMetadata UP-TO-DATE
+> Task :app:generateDevReleaseBuildConfig
+> Task :app:checkDevReleaseAarMetadata UP-TO-DATE
+> Task :app:generateDevReleaseResValues UP-TO-DATE
+
+> Task :app:stripDevReleaseDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libhk_ffi.so. Run with --info option to learn more.
+
+> Task :app:mapDevReleaseSourceSetPaths UP-TO-DATE
+> Task :app:generateDevReleaseResources UP-TO-DATE
+> Task :app:extractDevReleaseNativeSymbolTables
+> Task :app:processDevDebugResources
+> Task :app:mergeDevReleaseResources UP-TO-DATE
+> Task :app:mergeDevReleaseNativeDebugMetadata NO-SOURCE
+> Task :app:packageDevReleaseResources UP-TO-DATE
+> Task :app:parseDevReleaseLocalResources UP-TO-DATE
+> Task :app:createDevReleaseCompatibleScreenManifests
+> Task :app:extractDeepLinksDevRelease UP-TO-DATE
+
+> Task :app:processDevReleaseMainManifest
+/workspace/HexKeep/android/app/src/main/AndroidManifest.xml:22:333-365 Warning:
+	android:extractNativeLibs should not be specified in this source AndroidManifest.xml file. See https://d.android.com/guide/topics/manifest/application-element#extractNativeLibs for more information.
+The AGP Upgrade Assistant can remove the attribute from the AndroidManifest.xml file and update the build file accordingly. See https://d.android.com/studio/build/agp-upgrade-assistant for more information.
+
+> Task :app:processDevReleaseManifest
+> Task :app:javaPreCompileDevRelease UP-TO-DATE
+> Task :app:checkDevReleaseDuplicateClasses UP-TO-DATE
+> Task :app:mergeDevReleaseStartupProfile UP-TO-DATE
+> Task :app:mergeExtDexDevRelease UP-TO-DATE
+> Task :app:mergeDevReleaseShaders UP-TO-DATE
+> Task :app:compileDevReleaseShaders NO-SOURCE
+> Task :app:generateDevReleaseAssets UP-TO-DATE
+> Task :app:mergeDevReleaseAssets UP-TO-DATE
+> Task :app:compressDevReleaseAssets UP-TO-DATE
+> Task :app:extractDevReleaseVersionControlInfo UP-TO-DATE
+> Task :app:extractProguardFiles UP-TO-DATE
+> Task :app:collectDevReleaseDependencies UP-TO-DATE
+> Task :app:sdkDevReleaseDependencyData UP-TO-DATE
+> Task :app:validateSigningDevRelease UP-TO-DATE
+> Task :app:writeDevReleaseAppMetadata UP-TO-DATE
+> Task :app:writeDevReleaseSigningConfigVersions UP-TO-DATE
+> Task :app:preProdReleaseBuild UP-TO-DATE
+> Task :app:mergeProdReleaseJniLibFolders
+> Task :app:checkProdReleaseDuplicateClasses UP-TO-DATE
+> Task :app:generateProdReleaseBuildConfig
+> Task :app:checkProdReleaseAarMetadata UP-TO-DATE
+> Task :app:generateProdReleaseResValues UP-TO-DATE
+> Task :app:mapProdReleaseSourceSetPaths UP-TO-DATE
+> Task :app:generateProdReleaseResources UP-TO-DATE
+> Task :app:mergeProdReleaseResources UP-TO-DATE
+> Task :app:packageProdReleaseResources UP-TO-DATE
+> Task :app:parseProdReleaseLocalResources UP-TO-DATE
+> Task :app:createProdReleaseCompatibleScreenManifests
+> Task :app:extractDeepLinksProdRelease UP-TO-DATE
+> Task :app:mergeProdReleaseNativeLibs
+
+> Task :app:processProdReleaseMainManifest
+/workspace/HexKeep/android/app/src/main/AndroidManifest.xml:22:333-365 Warning:
+	android:extractNativeLibs should not be specified in this source AndroidManifest.xml file. See https://d.android.com/guide/topics/manifest/application-element#extractNativeLibs for more information.
+The AGP Upgrade Assistant can remove the attribute from the AndroidManifest.xml file and update the build file accordingly. See https://d.android.com/studio/build/agp-upgrade-assistant for more information.
+
+> Task :app:processProdReleaseManifest
+> Task :app:javaPreCompileProdRelease UP-TO-DATE
+> Task :app:desugarProdReleaseFileDependencies UP-TO-DATE
+> Task :app:mergeProdReleaseStartupProfile UP-TO-DATE
+> Task :app:mergeExtDexProdRelease UP-TO-DATE
+> Task :app:mergeProdReleaseArtProfile UP-TO-DATE
+> Task :app:mergeProdReleaseShaders UP-TO-DATE
+> Task :app:compileProdReleaseShaders NO-SOURCE
+> Task :app:generateProdReleaseAssets UP-TO-DATE
+
+> Task :app:stripProdReleaseDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libhk_ffi.so. Run with --info option to learn more.
+
+> Task :app:mergeProdReleaseAssets
+> Task :app:extractProdReleaseNativeSymbolTables
+> Task :app:mergeProdReleaseNativeDebugMetadata NO-SOURCE
+> Task :app:extractProdReleaseVersionControlInfo UP-TO-DATE
+> Task :app:collectProdReleaseDependencies UP-TO-DATE
+> Task :app:compressProdReleaseAssets
+> Task :app:sdkProdReleaseDependencyData UP-TO-DATE
+> Task :app:writeProdReleaseAppMetadata UP-TO-DATE
+> Task :app:writeProdReleaseSigningConfigVersions UP-TO-DATE
+> Task :app:prePlayDebugBuild UP-TO-DATE
+> Task :app:mergePlayDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generatePlayDebugBuildConfig UP-TO-DATE
+> Task :app:checkPlayDebugAarMetadata UP-TO-DATE
+> Task :app:generatePlayDebugResValues UP-TO-DATE
+> Task :app:mapPlayDebugSourceSetPaths UP-TO-DATE
+> Task :app:generatePlayDebugResources UP-TO-DATE
+> Task :app:mergePlayDebugResources UP-TO-DATE
+> Task :app:packagePlayDebugResources UP-TO-DATE
+> Task :app:parsePlayDebugLocalResources UP-TO-DATE
+> Task :app:createPlayDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksPlayDebug UP-TO-DATE
+> Task :app:processPlayDebugMainManifest UP-TO-DATE
+> Task :app:processPlayDebugManifest UP-TO-DATE
+> Task :app:processPlayDebugManifestForPackage UP-TO-DATE
+> Task :app:processPlayDebugResources UP-TO-DATE
+> Task :app:javaPreCompilePlayDebug UP-TO-DATE
+> Task :app:mergeExtDexDevDebug
+> Task :app:mergePlayDebugShaders UP-TO-DATE
+> Task :app:compilePlayDebugShaders NO-SOURCE
+> Task :app:generatePlayDebugAssets UP-TO-DATE
+> Task :app:mergePlayDebugAssets UP-TO-DATE
+> Task :app:compressPlayDebugAssets UP-TO-DATE
+> Task :app:checkPlayDebugDuplicateClasses UP-TO-DATE
+> Task :app:desugarPlayDebugFileDependencies UP-TO-DATE
+> Task :app:mergeExtDexPlayDebug UP-TO-DATE
+> Task :app:mergeLibDexPlayDebug UP-TO-DATE
+> Task :app:mergePlayDebugJniLibFolders
+> Task :app:validateSigningPlayDebug UP-TO-DATE
+> Task :app:writePlayDebugAppMetadata UP-TO-DATE
+> Task :app:writePlayDebugSigningConfigVersions UP-TO-DATE
+> Task :app:prePlayDebugAndroidTestBuild SKIPPED
+> Task :app:processPlayDebugAndroidTestManifest UP-TO-DATE
+> Task :app:generatePlayDebugAndroidTestBuildConfig UP-TO-DATE
+> Task :app:checkPlayDebugAndroidTestAarMetadata UP-TO-DATE
+> Task :app:generatePlayDebugAndroidTestResValues UP-TO-DATE
+> Task :app:mergePlayDebugNativeLibs
+> Task :app:mapPlayDebugAndroidTestSourceSetPaths UP-TO-DATE
+> Task :app:generatePlayDebugAndroidTestResources UP-TO-DATE
+> Task :app:mergePlayDebugAndroidTestResources UP-TO-DATE
+> Task :app:processPlayDebugAndroidTestResources UP-TO-DATE
+> Task :app:javaPreCompilePlayDebugAndroidTest UP-TO-DATE
+> Task :app:mergePlayDebugAndroidTestShaders UP-TO-DATE
+> Task :app:compilePlayDebugAndroidTestShaders NO-SOURCE
+> Task :app:generatePlayDebugAndroidTestAssets UP-TO-DATE
+> Task :app:mergePlayDebugAndroidTestAssets UP-TO-DATE
+> Task :app:compressPlayDebugAndroidTestAssets UP-TO-DATE
+
+> Task :app:stripPlayDebugDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libhk_ffi.so. Run with --info option to learn more.
+
+> Task :app:checkPlayDebugAndroidTestDuplicateClasses UP-TO-DATE
+> Task :app:desugarPlayDebugAndroidTestFileDependencies UP-TO-DATE
+> Task :app:mergeExtDexPlayDebugAndroidTest UP-TO-DATE
+> Task :app:mergeLibDexPlayDebugAndroidTest UP-TO-DATE
+> Task :app:mergePlayDebugAndroidTestJniLibFolders UP-TO-DATE
+> Task :app:mergePlayDebugAndroidTestNativeLibs NO-SOURCE
+> Task :app:stripPlayDebugAndroidTestDebugSymbols NO-SOURCE
+> Task :app:validateSigningPlayDebugAndroidTest UP-TO-DATE
+> Task :app:writePlayDebugAndroidTestSigningConfigVersions UP-TO-DATE
+> Task :app:prePlayReleaseBuild UP-TO-DATE
+> Task :app:generatePlayReleaseResValues UP-TO-DATE
+> Task :app:mapPlayReleaseSourceSetPaths UP-TO-DATE
+> Task :app:generatePlayReleaseResources UP-TO-DATE
+> Task :app:mergePlayReleaseResources UP-TO-DATE
+> Task :app:createPlayReleaseCompatibleScreenManifests
+> Task :app:extractDeepLinksPlayRelease UP-TO-DATE
+
+> Task :app:processPlayReleaseMainManifest
+/workspace/HexKeep/android/app/src/main/AndroidManifest.xml:22:333-365 Warning:
+	android:extractNativeLibs should not be specified in this source AndroidManifest.xml file. See https://d.android.com/guide/topics/manifest/application-element#extractNativeLibs for more information.
+The AGP Upgrade Assistant can remove the attribute from the AndroidManifest.xml file and update the build file accordingly. See https://d.android.com/studio/build/agp-upgrade-assistant for more information.
+
+> Task :app:processPlayReleaseManifest
+> Task :app:processApplicationManifestPlayReleaseForBundle
+> Task :app:checkPlayReleaseAarMetadata UP-TO-DATE
+> Task :app:packagePlayReleaseResources UP-TO-DATE
+> Task :app:parsePlayReleaseLocalResources UP-TO-DATE
+> Task :app:extractPlayReleaseVersionControlInfo UP-TO-DATE
+> Task :app:checkPlayReleaseDuplicateClasses UP-TO-DATE
+> Task :app:generatePlayReleaseBuildConfig
+> Task :app:javaPreCompilePlayRelease UP-TO-DATE
+> Task :app:desugarPlayReleaseFileDependencies UP-TO-DATE
+> Task :app:mergePlayReleaseStartupProfile UP-TO-DATE
+> Task :app:mergeExtDexPlayRelease UP-TO-DATE
+> Task :app:mergePlayReleaseShaders UP-TO-DATE
+> Task :app:compilePlayReleaseShaders NO-SOURCE
+> Task :app:generatePlayReleaseAssets UP-TO-DATE
+> Task :app:mergePlayReleaseAssets UP-TO-DATE
+> Task :app:mergePlayReleaseJniLibFolders
+> Task :app:writePlayReleaseAppMetadata UP-TO-DATE
+> Task :app:mergePlayReleaseArtProfile UP-TO-DATE
+> Task :app:collectPlayReleaseDependencies UP-TO-DATE
+> Task :app:configurePlayReleaseDependencies UP-TO-DATE
+> Task :app:parsePlayReleaseIntegrityConfig UP-TO-DATE
+> Task :app:prePlayReleaseUnitTestBuild UP-TO-DATE
+> Task :app:processProdReleaseManifestForPackage
+> Task :app:processPlayReleaseManifestForPackage
+> Task :app:processDevReleaseManifestForPackage
+> Task :app:mergePlayReleaseNativeLibs
+> Task :app:processProdReleaseResources
+> Task :app:processPlayReleaseResources
+
+> Task :app:stripPlayReleaseDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libhk_ffi.so. Run with --info option to learn more.
+
+> Task :app:processDevReleaseResources
+> Task :app:bundlePlayReleaseResources
+> Task :app:extractPlayReleaseNativeSymbolTables
+> Task :app:optimizeProdReleaseResources
+> Task :app:optimizeDevReleaseResources
+
+> Task :app:compilePlayDebugKotlin
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/NightSurface.kt:149:38 'val systemWindowInsetLeft: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/NightSurface.kt:149:67 'val systemWindowInsetTop: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/NightSurface.kt:149:95 'val systemWindowInsetRight: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/NightSurface.kt:149:125 'val systemWindowInsetBottom: Int' is deprecated. Deprecated in Java.
+
+> Task :app:compilePlayReleaseKotlin
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:46:37 'fun setUserAuthenticationValidityDurationSeconds(p0: Int): KeyGenParameterSpec.Builder' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:97:26 'var systemUiVisibility: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:119:45 'fun createConfirmDeviceCredentialIntent(p0: CharSequence!, p1: CharSequence!): Intent!' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:192:149 'val isFromMockProvider: Boolean' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:211:104 'var systemUiVisibility: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:215:104 'fun onBackPressed(): Unit' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/NightSurface.kt:149:38 'val systemWindowInsetLeft: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/NightSurface.kt:149:67 'val systemWindowInsetTop: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/NightSurface.kt:149:95 'val systemWindowInsetRight: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/NightSurface.kt:149:125 'val systemWindowInsetBottom: Int' is deprecated. Deprecated in Java.
+
+> Task :app:compilePlayDebugJavaWithJavac UP-TO-DATE
+
+> Task :app:compileDevDebugKotlin
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:46:37 'fun setUserAuthenticationValidityDurationSeconds(p0: Int): KeyGenParameterSpec.Builder' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:97:26 'var systemUiVisibility: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:119:45 'fun createConfirmDeviceCredentialIntent(p0: CharSequence!, p1: CharSequence!): Intent!' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:192:149 'val isFromMockProvider: Boolean' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:211:104 'var systemUiVisibility: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:215:104 'fun onBackPressed(): Unit' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/NightSurface.kt:149:38 'val systemWindowInsetLeft: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/NightSurface.kt:149:67 'val systemWindowInsetTop: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/NightSurface.kt:149:95 'val systemWindowInsetRight: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/NightSurface.kt:149:125 'val systemWindowInsetBottom: Int' is deprecated. Deprecated in Java.
+
+> Task :app:compileProdReleaseKotlin
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:46:37 'fun setUserAuthenticationValidityDurationSeconds(p0: Int): KeyGenParameterSpec.Builder' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:97:26 'var systemUiVisibility: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:119:45 'fun createConfirmDeviceCredentialIntent(p0: CharSequence!, p1: CharSequence!): Intent!' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:192:149 'val isFromMockProvider: Boolean' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:211:104 'var systemUiVisibility: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:215:104 'fun onBackPressed(): Unit' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/NightSurface.kt:149:38 'val systemWindowInsetLeft: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/NightSurface.kt:149:67 'val systemWindowInsetTop: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/NightSurface.kt:149:95 'val systemWindowInsetRight: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/NightSurface.kt:149:125 'val systemWindowInsetBottom: Int' is deprecated. Deprecated in Java.
+
+> Task :app:compileDevReleaseKotlin
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:46:37 'fun setUserAuthenticationValidityDurationSeconds(p0: Int): KeyGenParameterSpec.Builder' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:97:26 'var systemUiVisibility: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:119:45 'fun createConfirmDeviceCredentialIntent(p0: CharSequence!, p1: CharSequence!): Intent!' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:192:149 'val isFromMockProvider: Boolean' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:211:104 'var systemUiVisibility: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/MainActivity.kt:215:104 'fun onBackPressed(): Unit' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/NightSurface.kt:149:38 'val systemWindowInsetLeft: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/NightSurface.kt:149:67 'val systemWindowInsetTop: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/NightSurface.kt:149:95 'val systemWindowInsetRight: Int' is deprecated. Deprecated in Java.
+w: file:///workspace/HexKeep/android/app/src/main/java/game/hexkeep/NightSurface.kt:149:125 'val systemWindowInsetBottom: Int' is deprecated. Deprecated in Java.
+
+> Task :app:dexBuilderPlayDebug
+> Task :app:compileDevDebugJavaWithJavac
+> Task :app:dexBuilderDevDebug
+> Task :app:mergeDevDebugGlobalSynthetics UP-TO-DATE
+> Task :app:processDevDebugJavaRes
+> Task :app:mergeProjectDexDevDebug
+> Task :app:compileDevReleaseJavaWithJavac
+> Task :app:mergeDevDebugJavaResource
+> Task :app:dexBuilderDevRelease
+> Task :app:mergeDevReleaseGlobalSynthetics UP-TO-DATE
+> Task :app:generateDevReleaseLintVitalReportModel
+> Task :app:processDevReleaseJavaRes
+> Task :app:mergeDevReleaseJavaResource
+> Task :app:compileProdReleaseJavaWithJavac
+> Task :app:mergeDexDevRelease
+> Task :app:dexBuilderProdRelease
+> Task :app:compileDevReleaseArtProfile
+> Task :app:mergeProdReleaseGlobalSynthetics UP-TO-DATE
+> Task :app:generateProdReleaseLintVitalReportModel
+> Task :app:processProdReleaseJavaRes
+> Task :app:mergePlayDebugGlobalSynthetics UP-TO-DATE
+> Task :app:processPlayDebugJavaRes UP-TO-DATE
+> Task :app:mergePlayDebugJavaResource UP-TO-DATE
+> Task :app:bundlePlayDebugClassesToCompileJar
+> Task :app:mergeProdReleaseJavaResource
+> Task :app:mergeProjectDexPlayDebug
+> Task :app:compilePlayReleaseJavaWithJavac
+> Task :app:mergeDexProdRelease
+> Task :app:dexBuilderPlayRelease
+> Task :app:compileProdReleaseArtProfile
+> Task :app:mergePlayReleaseGlobalSynthetics UP-TO-DATE
+> Task :app:processPlayReleaseJavaRes
+> Task :app:mergePlayReleaseJavaResource
+> Task :app:generatePlayReleaseLintVitalReportModel
+> Task :app:generatePlayReleaseLintReportModel
+> Task :app:bundlePlayReleaseClassesToCompileJar
+> Task :app:packageDevDebug
+> Task :app:createDevDebugApkListingFileRedirect
+> Task :app:assembleDevDebug
+> Task :app:generatePlayReleaseUnitTestLintModel
+> Task :app:mergeDexPlayRelease
+> Task :app:packagePlayDebug
+> Task :app:createPlayDebugApkListingFileRedirect UP-TO-DATE
+> Task :app:assemblePlayDebug
+> Task :app:buildPlayReleasePreBundle
+> Task :app:compilePlayReleaseArtProfile
+> Task :app:compilePlayDebugAndroidTestKotlin
+> Task :app:compilePlayDebugAndroidTestJavaWithJavac UP-TO-DATE
+> Task :app:dexBuilderPlayDebugAndroidTest
+> Task :app:mergePlayDebugAndroidTestGlobalSynthetics UP-TO-DATE
+> Task :app:processPlayDebugAndroidTestJavaRes UP-TO-DATE
+> Task :app:mergePlayDebugAndroidTestJavaResource UP-TO-DATE
+> Task :app:mergeProjectDexPlayDebugAndroidTest
+> Task :app:packagePlayDebugAndroidTest
+> Task :app:createPlayDebugAndroidTestApkListingFileRedirect UP-TO-DATE
+> Task :app:assemblePlayDebugAndroidTest
+> Task :app:lintAnalyzePlayReleaseUnitTest
+> Task :app:lintVitalAnalyzeProdRelease
+> Task :app:lintVitalAnalyzeDevRelease
+> Task :app:lintVitalAnalyzePlayRelease
+> Task :app:lintVitalReportPlayRelease SKIPPED
+> Task :app:lintVitalPlayRelease SKIPPED
+> Task :app:lintVitalReportProdRelease
+> Task :app:lintVitalReportDevRelease
+> Task :app:lintVitalDevRelease
+> Task :app:lintVitalProdRelease
+> Task :app:packageProdRelease
+> Task :app:createProdReleaseApkListingFileRedirect
+> Task :app:assembleProdRelease
+> Task :app:packagePlayReleaseBundle
+> Task :app:packageDevRelease
+> Task :app:createDevReleaseApkListingFileRedirect
+> Task :app:assembleDevRelease
+> Task :app:signPlayReleaseBundle
+> Task :app:producePlayReleaseBundleIdeListingFile
+> Task :app:createPlayReleaseBundleListingFileRedirect UP-TO-DATE
+> Task :app:bundlePlayRelease
+> Task :app:lintAnalyzePlayRelease
+
+> Task :app:lintReportPlayRelease
+Wrote HTML report to file:///workspace/HexKeep/android/app/build/reports/lint-results-playRelease.html
+
+> Task :app:lintPlayRelease
+
+[Incubating] Problems report is available at: file:///workspace/HexKeep/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 44s
+256 actionable tasks: 115 executed, 141 up-to-date

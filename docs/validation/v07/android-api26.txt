@@ -1,0 +1,38 @@
+
+game.hexkeep.PlayReleaseTest:...
+
+Time: 19.041
+
+OK (3 tests)
+
+
+
+game.hexkeep.AdventureTest:.
+
+Time: 31.351
+
+OK (1 test)
+
+
+
+game.hexkeep.EveilTest:.
+
+Time: 37.896
+
+OK (1 test)
+
+
+
+game.hexkeep.FrontierTest:...
+
+Time: 48.737
+
+OK (3 tests)
+
+
+
+game.hexkeep.GameplayTest:.
+
+Time: 36.623
+
+OK (1 test)

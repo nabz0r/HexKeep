@@ -99,7 +99,7 @@ impl Engine {
                 6
             } else if g.battle.as_ref().is_some_and(|b| b.siege.is_some()) {
                 5
-            } else if g.screen == 6 {
+            } else if matches!(g.screen, 6 | 52) {
                 4
             } else {
                 g.save.realm.index() as u8 + 1
