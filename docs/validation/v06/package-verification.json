@@ -9,7 +9,7 @@
   "play_console_approval": "not performed",
   "artifacts": {
     "downloads/HEXKEEP-v0.6-PLAY-preview.apk": {
-      "sha256": "81b77536a37fbc3ba5a814263fa1c82ed5f3d2788063d5a464898f9be2a51cd5",
+      "sha256": "a54e0da7efd5753a3e4807a5a387739966a9cb43fb89deb0a4845bf9aa055c3b",
       "bytes": 53191269,
       "native": [
         {
@@ -98,8 +98,8 @@
       ]
     },
     "artifacts/HEXKEEP-v0.6-PLAY-unsigned.aab": {
-      "sha256": "c93d7f6384649faaf68b1176dcfb7c2b1456c91b80f0e70fb44f1f416315c8a6",
-      "bytes": 45902545,
+      "sha256": "8cffd7ec6797ea5b3edd781bb9607ec756b0110986bdaf2ecc02b3d8a9324ad0",
+      "bytes": 45902493,
       "native": [
         {
           "path": "base/lib/arm64-v8a/libhk_ffi.so",

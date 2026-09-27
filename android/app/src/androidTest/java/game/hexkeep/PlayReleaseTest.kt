@@ -100,10 +100,20 @@ class PlayReleaseTest {
         val file=File(test.targetContext.filesDir,"state.hk")
         val original=if(file.exists())file.readBytes()else null
         val invalid="unreadable-test-ciphertext".toByteArray()
+        val backup=File(file.path+".bak")
         try {
+            // Android 8 can leave only the committed backup after an interrupted
+            // atomic write. It must be restored before deciding this is a new player.
+            val vault=Vault(test.targetContext)
+            vault.write("committed-test-state")
+            val committed=file.readBytes()
+            assertTrue(file.renameTo(backup))
+            assertEquals("committed-test-state",vault.read())
+            assertArrayEquals(committed,file.readBytes())
+            assertFalse(backup.exists())
             file.writeBytes(invalid)
             launch().use { scenario -> assertFalse(engine.canSave()); test.runOnMainSync{activity.persist()} }
             assertArrayEquals(invalid,file.readBytes())
-        } finally { if(original==null)file.delete()else file.writeBytes(original) }
+        } finally { backup.delete(); if(original==null)file.delete()else file.writeBytes(original) }
     }
 }

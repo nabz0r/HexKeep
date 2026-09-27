@@ -48,7 +48,9 @@ class Vault(private val activity: Context) {
         }.generateKey()
     }
     fun read():String { synchronized(diskLock) {
-        if(!file.baseFile.exists()) return ""
+        // Older AtomicFile implementations may leave only the committed backup
+        // after a crash. Let readFully restore it before treating this as a new save.
+        if(!file.baseFile.exists() && !File(file.baseFile.path+".bak").exists()) return ""
         val bytes=file.readFully()
         require(bytes.size>29 && bytes[0]==1.toByte()) { "Format de sauvegarde incorrect" }
         val cipher=Cipher.getInstance("AES/GCM/NoPadding")
